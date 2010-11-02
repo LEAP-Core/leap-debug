@@ -9,3 +9,278 @@ Directory admin/packages
  leap-examples             Locally Removed             2 
 
 Fix misnamed administrative file.
+
+----------
+jsemer      Date: Tue Nov  2 15:19:32 EDT 2010  CSN: CSN-leap-debug-4
+                  Tue Nov  2 19:19:32 UTC 2010
+
+
+Directory config/pm/leap
+ tests/                    Locally Added               0 
+
+Directory config/pm/leap/tests
+ alu_test/                 Locally Added               0 
+
+Directory config/pm/leap/tests/alu_test
+ alu_test_hybrid_htg.apm   Locally Added               0 
+ alu_test_hybrid_exe.apm   Locally Added               0 
+
+Directory config/pm/leap/tests
+ bram_test/                Locally Added               0 
+
+Directory config/pm/leap/tests/bram_test
+ bram_test_hybrid_htg.apm  Locally Added               0 
+ bram_test_hybrid_exe.apm  Locally Added               0 
+
+Directory config/pm/leap/tests
+ context_test/             Locally Added               0 
+
+Directory config/pm/leap/tests/context_test
+ traffic_light_synth_exe.apm Locally Added               0 
+
+Directory config/pm/leap/tests
+ pipeline_test/            Locally Added               0 
+
+Directory config/pm/leap/tests/pipeline_test
+ pipeline_test_shared_rule_htg.apm Locally Added               0 
+ pipeline_test_shared_rule_routed_exe.apm Locally Added               0 
+ pipeline_test_shared_rule_routed_htg.apm Locally Added               0 
+ pipeline_test_private_rule_exe.apm Locally Added               0 
+ pipeline_test_private_rule_htg.apm Locally Added               0 
+ pipeline_test_duplicate_modules_exe.apm Locally Added               0 
+ pipeline_test_duplicate_modules_htg.apm Locally Added               0 
+ pipeline_test_stage_ctrl_unguarded_exe.apm Locally Added               0 
+ pipeline_test_stage_ctrl_unguarded_htg.apm Locally Added               0 
+ pipeline_test_stage_ctrl_exe.apm Locally Added               0 
+ pipeline_test_stage_ctrl_htg.apm Locally Added               0 
+ pipeline_test_shared_rule_exe.apm Locally Added               0 
+
+Directory config/pm/leap/tests
+ fp_test/                  Locally Added               0 
+
+Directory config/pm/leap/tests/fp_test
+ fp_test_cvt_i_to_s.apm    Locally Added               0 
+
+Directory config/pm/leap/tests
+ chantest/                 Locally Added               0 
+
+Directory config/pm/leap/tests/chantest
+ chantest08_hybrid_exe.apm Locally Added               0 
+ chantest16_hybrid_acp_nallatech.apm Locally Added               0 
+ chantest08_hybrid_acp_nallatech.apm Locally Added               0 
+ chantest16_hybrid_exe.apm Locally Added               0 
+
+Directory config/pm/leap/tests
+ interconnect_test/        Locally Added               0 
+
+Directory config/pm/leap/tests/interconnect_test
+ interconnect_test_hybrid_exe.apm Locally Added               0 
+
+Directory config/pm/leap/tests
+ clock_test/               Locally Added               0 
+
+Directory config/pm/leap/tests/clock_test
+ clock_test_mem_exe.apm    Locally Added               0 
+ clock_test_exe.apm        Locally Added               0 
+ clock_test_mem_acp.apm    Locally Added               0 
+ clock_test_acp.apm        Locally Added               0 
+ clock_test_mem_synth_exe.apm Locally Added               0 
+ clock_test_mem_synth_acp.apm Locally Added               0 
+ clock_test_synth_exe.apm  Locally Added               0 
+ clock_test_synth_acp.apm  Locally Added               0 
+
+Directory config/pm/leap/tests
+ mem_test/                 Locally Added               0 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_nopvt_exe.apm Locally Added               0 
+ mem_test_hybrid_nopvt_htg.apm Locally Added               0 
+ mem_test_hybrid_nopvt_acp.apm Locally Added               0 
+ mem_test_hybrid_exe.apm   Locally Added               0 
+ mem_test_hybrid_htg.apm   Locally Added               0 
+ mem_test_hybrid_acp.apm   Locally Added               0 
+
+Directory config/pm/leap
+ debuggers/                Locally Added               0 
+
+Directory config/pm/leap/debuggers
+ sram/                     Locally Added               0 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Added               0 
+ nallatech_fake_sram_debugger.apm Locally Added               0 
+ sram_debugger_htg.apm     Locally Added               0 
+
+Directory config/pm/leap/debuggers
+ jtag/                     Locally Added               0 
+
+Directory config/pm/leap/debuggers/jtag
+ jtag_htg_debugger.apm     Locally Added               0 
+
+Directory modules
+ apps/                     Locally Added               0 
+
+Directory modules/apps
+ tests/                    Locally Added               0 
+
+Directory modules/apps/tests
+ alu_test/                 Locally Added               0 
+
+Directory modules/apps/tests/alu_test
+ alu-test-streamid.dic     Locally Added               0 
+ alu-test.awb              Locally Added               0 
+ alu-test.bsv              Locally Added               0 
+ alu-test-streams.dic      Locally Added               0 
+
+Directory modules/apps/tests
+ bram_test/                Locally Added               0 
+
+Directory modules/apps/tests/bram_test
+ bram-test.awb             Locally Added               0 
+ bram-test.bsv             Locally Added               0 
+ bram-test.dic             Locally Added               0 
+
+Directory modules/apps/tests
+ channel-integrity-test/   Locally Added               0 
+
+Directory modules/apps/tests/channel-integrity-test
+ chan-test.bsv             Locally Added               0 
+ chan-test-server.h        Locally Added               0 
+ chan-test-16.awb          Locally Added               0 
+ chan-test.rrr             Locally Added               0 
+ chan-test-16.cpp          Locally Added               0 
+ chan-test.awb             Locally Added               0 
+ chan-test-server-16.cpp   Locally Added               0 
+ chan-test-16.h            Locally Added               0 
+ chan-test-16.bsv          Locally Added               0 
+ chan-test-server-16.h     Locally Added               0 
+ chan-test.txt             Locally Added               0 
+ chan-test.cpp             Locally Added               0 
+ chan-test-server.cpp      Locally Added               0 
+ chan-test.h               Locally Added               0 
+ chan-test-16.rrr          Locally Added               0 
+
+Directory modules/apps/tests
+ fp_test/                  Locally Added               0 
+
+Directory modules/apps/tests/fp_test
+ fp-test-streamid.dic      Locally Added               0 
+ fp-test.awb               Locally Added               0 
+ fp-test.bsv               Locally Added               0 
+ fp-test-streams.dic       Locally Added               0 
+
+Directory modules/apps/tests
+ shared_pipeline_test/     Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ private-rule/             Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/private-rule
+ pipeline-private-rule.awb Locally Added               0 
+ pipeline-private-rule.bsv Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.bsv  Locally Added               0 
+ duplicate-modules/        Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/duplicate-modules
+ pipeline-duplicate-modules.awb Locally Added               0 
+ pipeline-duplicate-modules.bsv Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-tree/              Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/shared-tree
+ pipeline-shared-tree.bsv  Locally Added               0 
+ pipeline-shared-tree.awb  Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.dic  Locally Added               0 
+ stage-ctrl/               Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/stage-ctrl
+ pipeline-stage-ctrl.awb   Locally Added               0 
+ pipeline-stage-ctrl.bsv   Locally Added               0 
+ stage-controller.bsv      Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ common/                   Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/common
+ pipetest-common.awb       Locally Added               0 
+ pipetest-common.bsv       Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-rule/              Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test/shared-rule
+ pipeline-shared-rule.awb  Locally Added               0 
+ pipeline-shared-rule.bsv  Locally Added               0 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.awb  Locally Added               0 
+
+Directory modules/apps/tests
+ interconnect_test/        Locally Added               0 
+
+Directory modules/apps/tests/interconnect_test
+ interconnect-test.awb     Locally Added               0 
+ interconnect-test.bsv     Locally Added               0 
+ interconnect-test-streams.dic Locally Added               0 
+ interconnect-test-streamid.dic Locally Added               0 
+
+Directory modules/apps/tests
+ clock_test/               Locally Added               0 
+
+Directory modules/apps/tests/clock_test
+ clock.rrr                 Locally Added               0 
+ clock_test.h              Locally Added               0 
+ clock_function_pipeline/  Locally Added               0 
+
+Directory modules/apps/tests/clock_test/clock_function_pipeline
+ PipelineMem.dic           Locally Added               0 
+ synth_pipeline/           Locally Added               0 
+
+Directory modules/apps/tests/clock_test/clock_function_pipeline/synth_pipeline
+ PipelineMem.dic           Locally Added               0 
+ stage1_mem.awb            Locally Added               0 
+ stage1_mem.bsv            Locally Added               0 
+ stage1.awb                Locally Added               0 
+ pipeline.awb              Locally Added               0 
+ stage2.awb                Locally Added               0 
+ stage1.bsv                Locally Added               0 
+ pipeline.bsv              Locally Added               0 
+ stage2.bsv                Locally Added               0 
+
+Directory modules/apps/tests/clock_test/clock_function_pipeline
+ pipeline_mem.awb          Locally Added               0 
+ pipeline_mem.bsv          Locally Added               0 
+ pipeline.awb              Locally Added               0 
+ pipeline.bsv              Locally Added               0 
+
+Directory modules/apps/tests/clock_test
+ clock_test_system.awb     Locally Added               0 
+ clock_test.cpp            Locally Added               0 
+ System.bsv                Locally Added               0 
+
+Directory modules/apps/tests
+ mem_test/                 Locally Added               0 
+
+Directory modules/apps/tests/mem_test
+ mem-test.awb              Locally Added               0 
+ mem-test.bsv              Locally Added               0 
+ mem-test.dic              Locally Added               0 
+
+Directory modules/apps
+ debuggers/                Locally Added               0 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Added               0 
+ platform-debugger.dic     Locally Added               0 
+ platform-debugger.txt     Locally Added               0 
+ platform-debugger.cpp     Locally Added               0 
+ platform-debugger.rrr     Locally Added               0 
+ platform-debugger.h       Locally Added               0 
+ platform-debugger.awb     Locally Added               0 
+
+Moved a number of tests/debuggers from leap to here.
