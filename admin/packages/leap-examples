@@ -1,0 +1,9 @@
+
+[Global]
+Buildorder=1000
+Version=1
+Lock=asim-leap-debug
+Description=Description of leap-debug
+Name=leap-debug
+Tag=HEAD
+CSN=CSN-leap-debug-0
