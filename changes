@@ -284,3 +284,68 @@ Directory modules/apps/debuggers
  platform-debugger.awb     Locally Added               0 
 
 Moved a number of tests/debuggers from leap to here.
+
+----------
+jsemer      Date: Tue Nov  9 17:10:39 EST 2010  CSN: CSN-leap-debug-5
+                  Tue Nov  9 22:10:39 UTC 2010
+
+
+Directory config/pm/leap/tests/alu_test
+ alu_test_hybrid_htg.apm   Locally Modified            4 
+ alu_test_hybrid_exe.apm   Locally Modified            4 
+
+Directory config/pm/leap/tests/bram_test
+ bram_test_hybrid_htg.apm  Locally Modified            4 
+ bram_test_hybrid_exe.apm  Locally Modified            4 
+
+Directory config/pm/leap/tests/context_test
+ traffic_light_synth_exe.apm Locally Modified            4 
+
+Directory config/pm/leap/tests/pipeline_test
+ pipeline_test_shared_rule_htg.apm Locally Modified            4 
+ pipeline_test_shared_rule_routed_exe.apm Locally Modified            4 
+ pipeline_test_shared_rule_routed_htg.apm Locally Modified            4 
+ pipeline_test_private_rule_exe.apm Locally Modified            4 
+ pipeline_test_duplicate_modules_exe.apm Locally Modified            4 
+ pipeline_test_private_rule_htg.apm Locally Modified            4 
+ pipeline_test_duplicate_modules_htg.apm Locally Modified            4 
+ pipeline_test_stage_ctrl_unguarded_exe.apm Locally Modified            4 
+ pipeline_test_stage_ctrl_unguarded_htg.apm Locally Modified            4 
+ pipeline_test_stage_ctrl_exe.apm Locally Modified            4 
+ pipeline_test_stage_ctrl_htg.apm Locally Modified            4 
+ pipeline_test_shared_rule_exe.apm Locally Modified            4 
+
+Directory config/pm/leap/tests/chantest
+ chantest08_hybrid_exe.apm Locally Modified            4 
+ chantest16_hybrid_acp_nallatech.apm Locally Modified            4 
+ chantest08_hybrid_acp_nallatech.apm Locally Modified            4 
+ chantest16_hybrid_exe.apm Locally Modified            4 
+
+Directory config/pm/leap/tests/clock_test
+ clock_test_mem_exe.apm    Locally Modified            4 
+ clock_test_exe.apm        Locally Modified            4 
+ clock_test_mem_acp.apm    Locally Modified            4 
+ clock_test_acp.apm        Locally Modified            4 
+ clock_test_mem_synth_exe.apm Locally Modified            4 
+ clock_test_mem_synth_acp.apm Locally Modified            4 
+ clock_test_synth_exe.apm  Locally Modified            4 
+ clock_test_synth_acp.apm  Locally Modified            4 
+
+Directory config/pm/leap/tests/interconnect_test
+ interconnect_test_hybrid_exe.apm Locally Modified            4 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_nopvt_exe.apm Locally Modified            4 
+ mem_test_hybrid_nopvt_htg.apm Locally Modified            4 
+ mem_test_hybrid_exe.apm   Locally Modified            4 
+ mem_test_hybrid_htg.apm   Locally Modified            4 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified            4 
+ nallatech_fake_sram_debugger.apm Locally Modified            4 
+ sram_debugger_htg.apm     Locally Modified            4 
+
+Directory config/pm/leap/debuggers/jtag
+ jtag_htg_debugger.apm     Locally Modified            4 
+
+Changed path to default benchmark.
