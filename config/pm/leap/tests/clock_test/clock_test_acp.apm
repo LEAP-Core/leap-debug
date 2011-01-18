@@ -3,12 +3,14 @@
 SaveParameters=0
 Description=Traffic Light from Bluespec Tutorial for ACP w. synthesis boundary
 File=clock_test_acp
-Version=2.1
+Version=2.2
 Name=Traffic Light Model - ACP with synthesis boundary
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
 
 [Model]
 DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project
@@ -16,15 +18,15 @@ model=HW/SW Hybrid Pipeline Build
 
 [FPGA Environment]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech-no-cache.apm
-Packagehint=platform-acp
+Packagehint=platforms-acp
 
 [Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm
-Packagehint=hasim
+Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build]
-File=modules/project/project-pipeline.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Hybrid Project Common Utilities
@@ -32,8 +34,8 @@ fpgaenv=FPGA Environment
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment]
-File=modules/application-env/hybrid/soft-services/application-env-hybrid-soft-service.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
 
 [Soft Services Hybrid Application Environment/Requires]
 platform_services=NULL Platform Services
@@ -42,18 +44,18 @@ connected_application=Clock Domains Test System with Soft Connections
 
 [Soft Services]
 File=config/pm/hasim/submodels/common/soft-services.apm
-Packagehint=hasim
+Packagehint=leap
 
 [FPGA Environment/Params]
 MODEL_CLOCK_DIVIDER=8
 
 [clock test pipeline]
 File=modules/apps/tests/clock_test/clock_function_pipeline/pipeline.awb
-Packagehint=hasim
+Packagehint=leap-debug
 
 [Clock Domains Test System with Soft Connections]
 File=modules/apps/tests/clock_test/clock_test_system.awb
-Packagehint=hasim
+Packagehint=leap-debug
 
 [Clock Domains Test System with Soft Connections/Requires]
 clock_test=clock test pipeline
@@ -65,9 +67,9 @@ WAIT_FOR_HARDWARE=0
 starter_service=Starter Service
 
 [NULL Platform Services]
-File=modules/hasim/util/platform-services/platform-services-null.awb
-Packagehint=hasim
+File=modules/leap/virtual-platform/virtual-devices/backwards-compat/platform-services/platform-services-null.awb
+Packagehint=leap
 
 [Starter Service]
-File=modules/hasim/util/platform-services/starter-service/starter-service.awb
-Packagehint=hasim
+File=modules/leap/virtual-platform/virtual-devices/backwards-compat/platform-services/starter-service/starter-service.awb
+Packagehint=leap

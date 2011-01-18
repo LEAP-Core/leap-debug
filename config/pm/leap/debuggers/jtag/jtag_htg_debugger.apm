@@ -3,12 +3,14 @@
 SaveParameters=0
 Description=RRR Test and Benchmarking Program for HTG v5 PCIe
 File=jtag_htg_debugger
-Version=2.1
+Version=2.2
 Name=RRR Test and Benchmarking Program for HTG v5 PCIe
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
+RootName=HW/SW Hybrid Project Foundation
+RootProvides=model
 
 [Model]
 DefaultAttributes=rrrtest unconnected hybrid project htg
@@ -16,15 +18,15 @@ model=HW/SW Hybrid Project Foundation
 
 [FPGA Environment]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
-Packagehint=platforms
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation]
-File=modules/project/project-hybrid.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/project-hybrid.awb
+Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/application-env/hybrid/base/application-env-hybrid-base.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Requires]
 fpgaenv=FPGA Environment
@@ -46,8 +48,9 @@ File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/jtag/xil
 Packagehint=platforms
 
 [JTAG Debug Application/Requires]
-jtag_device=JTAG Physical Device (physical)
+jtag_device=Xilinx JTAG Physical Device
 
-[JTAG Physical Device (physical)]
+
+[Xilinx JTAG Physical Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/jtag/xilinx/jtag-device-physical.awb
 Packagehint=platforms

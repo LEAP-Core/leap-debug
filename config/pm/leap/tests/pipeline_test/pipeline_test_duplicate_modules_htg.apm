@@ -3,12 +3,14 @@
 SaveParameters=0
 Description=Experiment with resource consumtion of varying Bluespec pipeline coding methods
 File=pipeline_test_duplicate_modules_htg
-Version=2.1
+Version=2.2
 Name=Duplicate Modules Pipeline Resource Tests
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
+RootName=HW/SW Hybrid Project Foundation
+RootProvides=model
 
 [Model]
 DefaultAttributes=hybrid htg pipetest
@@ -16,7 +18,7 @@ model=HW/SW Hybrid Project Foundation
 
 [FPGA Environment]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
-Packagehint=platforms
+Packagehint=leap
 
 [Soft Connections Hybrid Application Environment/Requires]
 platform_services=Platform Services
@@ -32,23 +34,20 @@ File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
 Packagehint=leap
 
 [Default Software Connected Application]
-File=modules/application-env/hybrid/soft-connections/default-sw/connected-application-default-sw.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/soft-connections/default-sw/connected-application-default-sw.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation]
-File=modules/project/project-hybrid.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/project-hybrid.awb
+Packagehint=leap
 
 [Default Software Connected Application/Requires]
 hardware_system=Shared Pipeline Resource Utlization Tests
 
 
-[HW/SW Hybrid Project Foundation/Params]
-MAKE_ALL_TARGET=bit
-
 [Soft Connections Hybrid Application Environment]
-File=modules/application-env/hybrid/soft-connections/application-env-hybrid-soft-conn.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/soft-connections/application-env-hybrid-soft-conn.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Requires]
 fpgaenv=FPGA Environment
@@ -57,7 +56,7 @@ project_common=Hybrid Project Common Utilities
 
 [Base Pipetest Common]
 File=modules/apps/tests/shared_pipeline_test/common/pipetest-common.awb
-Packagehint=leap
+Packagehint=leap-debug
 
 [Shared Pipeline Resource Utlization Tests/Requires]
 pipeline_test=Duplicate Modules Pipeline Test
@@ -65,11 +64,11 @@ pipetest_common=Base Pipetest Common
 
 [Duplicate Modules Pipeline Test]
 File=modules/apps/tests/shared_pipeline_test/duplicate-modules/pipeline-duplicate-modules.awb
-Packagehint=leap
+Packagehint=leap-debug
 
 [Shared Pipeline Resource Utlization Tests]
 File=modules/apps/tests/shared_pipeline_test/shared-pipeline-test.awb
-Packagehint=leap
+Packagehint=leap-debug
 
 [Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm

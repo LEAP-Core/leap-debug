@@ -3,12 +3,14 @@
 SaveParameters=0
 Description=Channel Integrity Test and Benchmarking Program for ACP (Nallatech)
 File=chantest08_hybrid_acp_nallatech
-Version=2.1
+Version=2.2
 Name=Channel Integrity Test and Benchmarking Program for ACP (Nallatech)
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
+RootName=HW/SW Hybrid Project Foundation
+RootProvides=model
 
 [Model]
 DefaultAttributes=hybrid acp bluespec
@@ -16,15 +18,15 @@ model=HW/SW Hybrid Project Foundation
 
 [FPGA Environment]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
-Packagehint=platform-acp
+Packagehint=platforms-acp
 
 [HW/SW Hybrid Project Foundation]
-File=modules/project/project-hybrid.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/project-hybrid.awb
+Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/application-env/hybrid/base/application-env-hybrid-base.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Requires]
 fpgaenv=FPGA Environment
@@ -43,5 +45,5 @@ WAIT_FOR_HARDWARE=0
 
 [Bluespec Channel Integrity Test (8-wide)]
 File=modules/apps/tests/channel-integrity-test/chan-test.awb
-Packagehint=leap
+Packagehint=leap-debug
 

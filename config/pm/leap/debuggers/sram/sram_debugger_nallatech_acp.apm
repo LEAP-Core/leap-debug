@@ -3,28 +3,30 @@
 SaveParameters=0
 Description=ACP Nallatech SRAM Debugger
 File=sram_debugger_nallatech_acp
-Version=2.1
+Version=2.2
 Name=ACP Nallatech SRAM Debugger
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
+RootName=HW/SW Hybrid Project Foundation
+RootProvides=model
 
 [Model]
 DefaultAttributes=hybrid acp bluespec
 model=HW/SW Hybrid Project Foundation
 
 [FPGA Environment]
-File=modules/bluespec/common/fpgaenv/fpga-environment.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/fpga-environment.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation]
-File=modules/project/project-hybrid.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/project-hybrid.awb
+Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/application-env/hybrid/base/application-env-hybrid-base.awb
-Packagehint=platforms
+File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Params]
 WAIT_FOR_HARDWARE=0
@@ -46,12 +48,12 @@ File=modules/bluespec/common/fpgaenv/fpga-components/hardware-fpga-components-vi
 Packagehint=platforms
 
 [Low Level Platform Interface Hybrid]
-File=modules/bluespec/common/fpgaenv/low-level-platform-interface/hybrid-llpi.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/low-level-platform-interface/hybrid-llpi.awb
+Packagehint=leap
 
 [RL Bluespec Library]
 File=config/pm/hasim/submodels/fpgaenv/librl-bsv.apm
-Packagehint=platforms
+Packagehint=leap
 
 [Low Level Platform Interface Hybrid/Requires]
 physical_platform=ACP M2 Compute Module With SRAM (Nallatech)
@@ -63,15 +65,15 @@ local_mem=NULL Local Memory Interface
 
 [ACP DDR2 SRAM Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/ddr-sram/ddr-sram-device.awb
-Packagehint=platform-acp
+Packagehint=platforms-acp
 
 [Null Clocks Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/null/null-clocks-device.awb
 Packagehint=platforms
 
 [RRR Clients and Servers]
-File=modules/bluespec/common/fpgaenv/virtual-platform/rrr/basic/basic-rrr.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/rrr/basic/basic-rrr.awb
+Packagehint=leap
 
 [Null Physical Platform Debugger]
 File=modules/bluespec/common/fpgaenv/physical-platform/debuggers/null/null-debugger.awb
@@ -91,31 +93,31 @@ led_device=General LED Device
 
 [Nallatech Edge Physical Channel]
 File=modules/bluespec/common/fpgaenv/virtual-platform/channelio/physical-channel/nallatech-edge/nallatech-edge-channel.awb
-Packagehint=platform-acp
+Packagehint=platforms-acp
 
 [ACP M2 Compute Module With SRAM (Nallatech)]
 File=modules/bluespec/common/fpgaenv/physical-platform/acp-m2c-with-sram/acp-m2c.awb
-Packagehint=platform-acp
+Packagehint=platforms-acp
 
 [Basic Virtual Channel Multiplexer]
-File=modules/bluespec/common/fpgaenv/virtual-platform/channelio/basic/basic-channelio.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/channelio/basic/basic-channelio.awb
+Packagehint=leap
 
 [Standard Virtual Platform]
-File=modules/bluespec/common/fpgaenv/virtual-platform/std-virtual-platform.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/std-virtual-platform.awb
+Packagehint=leap
 
 [Common Physical Platform Utilities]
 File=modules/bluespec/common/fpgaenv/physical-platform/utils/utils.awb
 Packagehint=platforms
 
 [NULL Virtual Devices]
-File=modules/bluespec/common/fpgaenv/virtual-platform/virtual-devices/null-virtual-devices.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/virtual-devices/virtual-device-sets/null/null-virtual-devices.awb
+Packagehint=leap
 
 [Null Remote Memory]
-File=modules/bluespec/common/fpgaenv/low-level-platform-interface/remote-memory/null/null-remote-memory.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/low-level-platform-interface/remote-memory/null/null-remote-memory.awb
+Packagehint=leap
 
 [NULL Virtual Devices/Requires]
 starter_device=Null Starter Virtual Device
@@ -128,8 +130,8 @@ File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-litt
 Packagehint=platforms
 
 [Null Starter Virtual Device]
-File=modules/bluespec/common/fpgaenv/virtual-platform/virtual-devices/null-starter/null-starter-device.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/virtual-devices/devices/starter/null/null-starter-device.awb
+Packagehint=leap
 
 [FPGA Environment/Requires]
 virtual_platform=Standard Virtual Platform
@@ -145,36 +147,26 @@ SRAM_DEBUG=1
 SRAM_MAX_OUTSTANDING_READS=32
 
 [RRR Common Module]
-File=modules/bluespec/common/fpgaenv/virtual-platform/rrr/rrr_common/rrr_common.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/rrr/rrr-common/rrr-common.awb
+Packagehint=leap
 
 [RRR Clients and Servers/Requires]
 rrr_common=RRR Common Module
 
 [SRAM Debugger Application]
 File=modules/apps/debuggers/platform-debugger.awb
-Packagehint=leap
+Packagehint=leap-debug
 
 [FPGA Build Pipeline]
 File=config/pm/hasim/submodels/pipelines/build-pipeline-xilinx.apm
-Packagehint=platforms
-
-
-
-
-
-
-
-
-
+Packagehint=leap
 
 [NULL Local Memory Interface]
-File=modules/bluespec/common/fpgaenv/low-level-platform-interface/local-mem/local-mem-null.awb
-Packagehint=platforms
+File=modules/leap/virtual-platform/low-level-platform-interface/local-mem/local-mem-null.awb
+Packagehint=leap
 
 [SRAM Debugger Application/Params]
 MEM_CHECK_LATENCY=1
-
 
 [Null Clocks Device/Params]
 CRYSTAL_CLOCK_FREQ=200
@@ -186,4 +178,4 @@ Packagehint=platforms
 
 [Nallatech Edge Physical Device v2]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/nallatech-edge/nallatech-edge-device.awb
-Packagehint=platform-acp
+Packagehint=platforms-acp
