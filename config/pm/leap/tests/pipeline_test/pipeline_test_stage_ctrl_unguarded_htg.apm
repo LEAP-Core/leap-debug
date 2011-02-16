@@ -16,22 +16,13 @@ RootProvides=model
 DefaultAttributes=hybrid htg pipetest
 model=HW/SW Hybrid Project Foundation
 
-[FPGA Environment]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
-Packagehint=leap
 
 [Soft Connections Hybrid Application Environment/Requires]
-platform_services=Platform Services
-soft_connections_lib=Soft Connections Library
+platform_services=Standard Platform Services
+soft_connections_lib=Standard Soft Connections Lib
 connected_application=Default Software Connected Application
 
-[Soft Connections Library]
-File=config/pm/hasim/submodels/common/soft-connections-lib.apm
-Packagehint=leap
 
-[Platform Services]
-File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
-Packagehint=leap
 
 [Default Software Connected Application]
 File=modules/leap/build-support/project/application-env/hybrid/soft-connections/default-sw/connected-application-default-sw.awb
@@ -44,15 +35,14 @@ Packagehint=leap
 [Default Software Connected Application/Requires]
 hardware_system=Shared Pipeline Resource Utlization Tests
 
-
 [Soft Connections Hybrid Application Environment]
 File=modules/leap/build-support/project/application-env/hybrid/soft-connections/application-env-hybrid-soft-conn.awb
 Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Requires]
-fpgaenv=FPGA Environment
+fpgaenv=Hybrid HTG-v5-PCIe FPGA Environment
 application_env=Soft Connections Hybrid Application Environment
-project_common=Hybrid Project Common Utilities
+project_common=Default Hybrid Project Common Utilities
 
 [Base Pipetest Common]
 File=modules/apps/tests/shared_pipeline_test/common/pipetest-common.awb
@@ -73,6 +63,19 @@ PIPE_TEST_GUARDED_FIFOS=0
 File=modules/apps/tests/shared_pipeline_test/shared-pipeline-test.awb
 Packagehint=leap-debug
 
-[Hybrid Project Common Utilities]
+
+[Standard Platform Services]
+File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
+Packagehint=leap
+
+[Standard Soft Connections Lib]
+File=config/pm/hasim/submodels/common/soft-connections-lib.apm
+Packagehint=leap
+
+[Default Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Hybrid HTG-v5-PCIe FPGA Environment]
+File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
 Packagehint=leap

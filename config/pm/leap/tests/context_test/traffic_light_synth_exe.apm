@@ -16,14 +16,11 @@ RootProvides=model
 DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project exe
 model=HW/SW Hybrid Project Foundation
 
-[FPGA Environment]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
-Packagehint=leap
 
 [Soft Connections Hybrid Application Environment/Requires]
 connected_application=Default Software Connected Application
-platform_services=Platform Services
-soft_connections_lib=Soft Connections Library
+platform_services=Standard Platform Services
+soft_connections_lib=ModuleContext Soft Connections Lib
 
 [HW/SW Hybrid Project Foundation]
 File=modules/leap/build-support/project/project-hybrid.awb
@@ -34,9 +31,9 @@ File=modules/leap/build-support/project/application-env/hybrid/soft-connections/
 Packagehint=leap
 
 [HW/SW Hybrid Project Foundation/Requires]
-fpgaenv=FPGA Environment
+fpgaenv=Hybrid Simulation FPGA Environment
 application_env=Soft Connections Hybrid Application Environment
-project_common=Hybrid Project Common Utilities
+project_common=Default Hybrid Project Common Utilities
 
 [Traffic Light System with Soft Connections]
 File=modules/leap/examples/traffic-light/traffic-light-system.awb
@@ -57,14 +54,20 @@ File=modules/leap/examples/traffic-light/traffic-light-function/traffic-light-fu
 Packagehint=leap
 
 
-[Platform Services]
+
+
+[Standard Platform Services]
 File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
 Packagehint=leap
 
-[Soft Connections Library]
+[ModuleContext Soft Connections Lib]
 File=config/pm/hasim/submodels/common/soft-connections-lib-context.apm
 Packagehint=leap
 
-[Hybrid Project Common Utilities]
+[Hybrid Simulation FPGA Environment]
+File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+Packagehint=leap
+
+[Default Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm
 Packagehint=leap
