@@ -9,33 +9,22 @@ DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
 Type=Leap
 Class=Asim::Model
 DefaultRunOpts=
-RootName=HW/SW Hybrid Project Foundation
+RootName=HW/SW Hybrid Pipeline Build
 RootProvides=model
 
 [Model]
 DefaultAttributes=rrrtest unconnected hybrid project exe
-model=HW/SW Hybrid Project Foundation
+model=HW/SW Hybrid Pipeline Build
 
-
-[HW/SW Hybrid Project Foundation]
-File=modules/leap/build-support/project/project-hybrid.awb
-Packagehint=leap
 
 [Base Hybrid Application Environment]
 File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
 Packagehint=leap
 
-[HW/SW Hybrid Project Foundation/Requires]
-fpgaenv=Hybrid Simulation FPGA Environment
-application_env=Base Hybrid Application Environment
-project_common=Default Hybrid Project Common Utilities
 
 [Base Hybrid Application Environment/Requires]
 hybrid_application=Bluespec Channel Integrity Test (8-wide)
 
-
-[HW/SW Hybrid Project Foundation/Params]
-WAIT_FOR_HARDWARE=0
 
 [Bluespec Channel Integrity Test (8-wide)]
 File=modules/apps/tests/channel-integrity-test/chan-test.awb
@@ -47,4 +36,16 @@ Packagehint=leap
 
 [Hybrid Simulation FPGA Environment]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Params]
+WAIT_FOR_HARDWARE=0
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid Simulation FPGA Environment
+application_env=Base Hybrid Application Environment
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap

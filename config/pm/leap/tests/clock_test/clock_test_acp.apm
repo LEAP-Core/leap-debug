@@ -16,8 +16,6 @@ RootProvides=model
 DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project
 model=HW/SW Hybrid Pipeline Build
 
-
-
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
@@ -33,12 +31,8 @@ Packagehint=leap
 
 [Soft Services Hybrid Application Environment/Requires]
 platform_services=NULL Platform Services
-soft_services=Soft Services
+soft_services=Soft Services Submodel
 connected_application=Clock Domains Test System with Soft Connections
-
-[Soft Services]
-File=config/pm/hasim/submodels/common/soft-services.apm
-Packagehint=leap
 
 
 [clock test pipeline]
@@ -76,3 +70,7 @@ Packagehint=leap
 [Hybrid ACP M2 Compute Environment - No Central Cache (Nallatech)]
 File=config/pm/hasim/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech-no-cache.apm
 Packagehint=platforms-acp
+
+[Soft Services Submodel]
+File=config/pm/hasim/submodels/common/soft-services.apm
+Packagehint=leap

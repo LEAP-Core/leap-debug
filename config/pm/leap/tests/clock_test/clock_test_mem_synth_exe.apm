@@ -16,8 +16,6 @@ RootProvides=model
 DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project
 model=HW/SW Hybrid Pipeline Build
 
-
-
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
@@ -33,12 +31,8 @@ Packagehint=leap
 
 [Soft Services Hybrid Application Environment/Requires]
 platform_services=Standard Platform Services
-soft_services=Soft Services
+soft_services=Soft Services Submodel
 connected_application=Clock Domains Test System with Soft Connections
-
-[Soft Services]
-File=config/pm/hasim/submodels/common/soft-services.apm
-Packagehint=leap
 
 [Clock Domains Test System with Soft Connections]
 File=modules/apps/tests/clock_test/clock_test_system.awb
@@ -49,7 +43,6 @@ clock_test=clock test pipeline with synthesis boundaries
 
 [HW/SW Hybrid Pipeline Build/Params]
 WAIT_FOR_HARDWARE=0
-
 
 [clock test pipeline with synthesis boundaries/Requires]
 clock_test_stage_1=clock test stage 1 with memory
@@ -77,4 +70,8 @@ Packagehint=leap
 
 [Default Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Soft Services Submodel]
+File=config/pm/hasim/submodels/common/soft-services.apm
 Packagehint=leap

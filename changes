@@ -490,3 +490,76 @@ Directory config/pm/leap/debuggers/jtag
  jtag_htg_debugger.apm     Locally Modified            6 
 
 Updated stale models.
+
+----------
+mpellaue    Date: Tue Apr  5 15:48:04 EDT 2011  CSN: CSN-leap-debug-8
+                  Tue Apr  5 19:48:04 UTC 2011
+
+
+Directory config/pm/leap/tests/alu_test
+ alu_test_hybrid_htg.apm   Locally Modified            7 
+ alu_test_hybrid_exe.apm   Locally Modified            7 
+
+Directory config/pm/leap/tests/bram_test
+ bram_test_hybrid_htg.apm  Locally Modified            7 
+ bram_test_hybrid_exe.apm  Locally Modified            7 
+
+Directory config/pm/leap/tests/context_test
+ traffic_light_synth_exe.apm Locally Modified            7 
+
+Directory config/pm/leap/tests/fp_test
+ fp_test_cvt_i_to_s.apm    Locally Modified            7 
+
+Directory config/pm/leap/tests/pipeline_test
+ pipeline_test_shared_rule_htg.apm Locally Modified            7 
+ pipeline_test_shared_rule_routed_exe.apm Locally Modified            7 
+ pipeline_test_shared_rule_routed_htg.apm Locally Modified            7 
+ pipeline_test_private_rule_exe.apm Locally Modified            7 
+ pipeline_test_duplicate_modules_exe.apm Locally Modified            7 
+ pipeline_test_private_rule_htg.apm Locally Modified            7 
+ pipeline_test_duplicate_modules_htg.apm Locally Modified            7 
+ pipeline_test_stage_ctrl_unguarded_exe.apm Locally Modified            7 
+ pipeline_test_stage_ctrl_unguarded_htg.apm Locally Modified            7 
+ pipeline_test_stage_ctrl_exe.apm Locally Modified            7 
+ pipeline_test_stage_ctrl_htg.apm Locally Modified            7 
+ pipeline_test_shared_rule_exe.apm Locally Modified            7 
+
+Directory config/pm/leap/tests/chantest
+ chantest08_hybrid_exe.apm Locally Modified            7 
+ chantest16_hybrid_acp_nallatech.apm Locally Modified            7 
+ chantest08_hybrid_acp_nallatech.apm Locally Modified            7 
+ chantest16_hybrid_exe.apm Locally Modified            7 
+
+Directory config/pm/leap/tests/clock_test
+ clock_test_mem_exe.apm    Locally Modified            7 
+ clock_test_exe.apm        Locally Modified            7 
+ clock_test_mem_acp.apm    Locally Modified            7 
+ clock_test_acp.apm        Locally Modified            7 
+ clock_test_mem_synth_exe.apm Locally Modified            7 
+ clock_test_mem_synth_acp.apm Locally Modified            7 
+ clock_test_synth_exe.apm  Locally Modified            7 
+ clock_test_synth_acp.apm  Locally Modified            7 
+
+Directory config/pm/leap/tests/interconnect_test
+ interconnect_test_hybrid_exe.apm Locally Modified            7 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_nopvt_exe.apm Locally Modified            7 
+ mem_test_hybrid_nopvt_htg.apm Locally Modified            7 
+ mem_test_hybrid_nopvt_acp.apm Locally Modified            7 
+ mem_test_hybrid_exe.apm   Locally Modified            7 
+ mem_test_hybrid_htg.apm   Locally Modified            7 
+ mem_test_hybrid_acp.apm   Locally Modified            7 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified            7 
+ nallatech_fake_sram_debugger.apm Locally Modified            7 
+ sram_debugger_htg.apm     Locally Modified            7 
+
+Directory config/pm/leap/debuggers/jtag
+ jtag_htg_debugger.apm     Locally Modified            7 
+
+
+* Change all models to use the Build Pipeline (if not already doing so).
+* Change all models to get full Soft Services, not just Soft Connections.
+
