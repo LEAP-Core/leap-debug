@@ -48,7 +48,7 @@ module [CONNECTED_MODULE] mkSystem ();
     Reg#(STATE) state <- mkReg(STATE_init);
 
     // Streams (output)
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_PIPETEST);
 
     // Instantiate the test pipelines
     PIPELINE_TEST#(`PIPE_TEST_STAGES, `PIPE_TEST_NUM_PIPES) pipes <- mkPipeTest();
@@ -143,18 +143,12 @@ module [CONNECTED_MODULE] mkSystem ();
         Bit#(64) d = zeroExtend(outData);
 
         // Write the data so it can't be optimized away
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_PIPETEST,
-                                            stringID: `STREAMS_PIPETEST_DONE,
-                                            payload0: d[63:32],
-                                            payload1: d[31:0] });
+        link_streams.send(`STREAMS_PIPETEST_DONE, d[63:32], d[31:0]);
         state <= STATE_exit;
     endrule
 
     rule finished (state == STATE_exit);
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_NULL,
-                                            stringID: `STREAMS_MESSAGE_EXIT,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
     endrule
 
 endmodule

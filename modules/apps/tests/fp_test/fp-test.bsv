@@ -43,7 +43,7 @@ import Vector::*;
 module [CONNECTED_MODULE] mkSystem ();
 
     // Link to streams
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_FPTEST);
 
     // Dynamic parameters to feed to datapath.
     PARAMETER_NODE paramNode <- mkDynamicParameterNode();
@@ -80,10 +80,7 @@ module [CONNECTED_MODULE] mkSystem ();
         let outp <- dp.getRsp();
         Bit#(64) res2 = (rounding) ? toDouble(roundToSingle(outp.result)) : outp.result;
 
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_FPTEST,
-                                            stringID: `STREAMS_FPTEST_RESULT,
-                                            payload0: res2[63:32],
-                                            payload1: res2[31:0]});
+        link_streams.send(`STREAMS_FPTEST_RESULT, res2[63:32], res2[31:0]);
     endrule
 
 endmodule

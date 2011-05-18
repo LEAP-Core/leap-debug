@@ -508,7 +508,7 @@ endmodule
 
 module [CONNECTED_MODULE] mkSystem ();
 
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_BRAMTEST);
 
     FIFO#(STREAMS_REQUEST) streamsQ <- mkSizedFIFO(128);
 
@@ -585,7 +585,7 @@ module [CONNECTED_MODULE] mkSystem ();
         let msg = streamsQ.first();
         streamsQ.deq();
         
-        link_streams.send(msg);
+        link_streams.sendAs(msg.streamID, msg.stringID, msg.payload0, msg.payload1);
     endrule
 
 endmodule

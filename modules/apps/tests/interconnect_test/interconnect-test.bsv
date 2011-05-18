@@ -86,7 +86,7 @@ typedef enum
 
 module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_INFO));
 
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_ICTEST);
     
     Reg#(CONTROLLER_STATE) state <- mkReg(CTRL_ready);
     
@@ -230,10 +230,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
             CTRL_seq_multi_traffic_test:  `STREAMS_ICTEST_SEQ_MULTI_TRAFFIC_BEGIN;
         endcase;
         
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: str_id,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.send(str_id, 0, 0);
         state <= newstate;
         testFreq.setC(127);
         curFreq.setC(0);
@@ -245,20 +242,14 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != seqQ.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_SEQ_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_SEQ_FAILED, 0, 0);
         end
         else
         begin
             if (n == 1)
             begin
             
-                link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                    stringID: `STREAMS_ICTEST_SEQ_PASSED,
-                                                    payload0: 0,
-                                                    payload1: 0 });
+                link_streams.send(`STREAMS_ICTEST_SEQ_PASSED, 0, 0);
                 seqDone <= True;
             end
         end
@@ -270,10 +261,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
     
     rule finishSeq2 (linkFrom2.receive() matches tagged TEST_seq .n);
     
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: `STREAMS_ICTEST_SEQ_FAILED,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_ICTEST_SEQ_FAILED, 0, 0);
         
         linkFrom2.deq();
 
@@ -281,10 +269,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
 
     rule finishSeq3 (linkFrom3.receive() matches tagged TEST_seq .n);
     
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: `STREAMS_ICTEST_SEQ_FAILED,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_ICTEST_SEQ_FAILED, 0, 0);
 
         linkFrom3.deq();
 
@@ -296,10 +281,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != multi1Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_MULTI_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_MULTI_FAILED, 0, 0);
         end
         else
         begin
@@ -307,10 +289,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
             begin
                 if (multi2Passed && multi3Passed)
                 begin
-                    link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                        stringID: `STREAMS_ICTEST_MULTI_PASSED,
-                                                        payload0: 0,
-                                                        payload1: 0 });
+                    link_streams.send(`STREAMS_ICTEST_MULTI_PASSED, 0, 0);
                     multiDone <= True;
                 end
                 else
@@ -331,10 +310,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != multi2Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_MULTI_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_MULTI_FAILED, 0, 0);
         end
         else
         begin
@@ -342,10 +318,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
             begin
                 if (multi1Passed && multi3Passed)
                 begin
-                    link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                        stringID: `STREAMS_ICTEST_MULTI_PASSED,
-                                                        payload0: 0,
-                                                        payload1: 0 });
+                    link_streams.send(`STREAMS_ICTEST_MULTI_PASSED, 0, 0);
                     multiDone <= True;
                 end
                 else
@@ -366,10 +339,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != multi3Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_MULTI_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_MULTI_FAILED, 0, 0);
         end
         else
         begin
@@ -377,10 +347,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
             begin
                 if (multi1Passed && multi2Passed)
                 begin
-                    link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                        stringID: `STREAMS_ICTEST_MULTI_PASSED,
-                                                        payload0: 0,
-                                                        payload1: 0 });
+                    link_streams.send(`STREAMS_ICTEST_MULTI_PASSED, 0, 0);
                     multiDone <= True;
                 end
                 else
@@ -400,20 +367,14 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != traffic1Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_TRAFFIC_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_TRAFFIC_FAILED, 0, 0);
 
         end
         else
         begin
             if (n == 1)
             begin
-                link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                    stringID: `STREAMS_ICTEST_TRAFFIC_PASSED,
-                                                    payload0: 0,
-                                                    payload1: 0 });
+                link_streams.send(`STREAMS_ICTEST_TRAFFIC_PASSED, 0, 0);
                 trafficDone <= True;
             end
         end
@@ -431,10 +392,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != traffic2Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_TRAFFIC_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_TRAFFIC_FAILED, 0, 0);
 
         end
         
@@ -452,10 +410,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
         if (n != traffic3Q.first())
         begin
         
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                                stringID: `STREAMS_ICTEST_TRAFFIC_FAILED,
-                                                payload0: 0,
-                                                payload1: 0 });
+            link_streams.send(`STREAMS_ICTEST_TRAFFIC_FAILED, 0, 0);
 
         end
         
@@ -466,10 +421,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
 
     rule error1 (linkFrom1.receive() matches tagged TEST_error .cd);
     
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: `STREAMS_ICTEST_ERROR1,
-                                            payload0: zeroExtend(cd),
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_ICTEST_ERROR1, zeroExtend(cd), 0);
  
         linkFrom1.deq();
     
@@ -478,10 +430,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
 
     rule error2 (linkFrom2.receive() matches tagged TEST_error .cd);
     
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: `STREAMS_ICTEST_ERROR2,
-                                            payload0: zeroExtend(cd),
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_ICTEST_ERROR2, zeroExtend(cd), 0);
  
         linkFrom2.deq();
     
@@ -490,10 +439,7 @@ module [CONNECTED_MODULE] mkICTestController (Tuple2#(PHYSICAL_STATION, STATION_
    (* descending_urgency="error3, error2, error1, finishTest, initiate, finishSeq3, finishSeq2, finishSeq1, finishMulti1, finishMulti2, finishMulti3, finishTraffic3, finishTraffic2, finishTraffic1" *)
    rule error3 (linkFrom3.receive() matches tagged TEST_error .cd);
     
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ICTEST,
-                                            stringID: `STREAMS_ICTEST_ERROR3,
-                                            payload0: zeroExtend(cd),
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_ICTEST_ERROR3, zeroExtend(cd), 0);
  
         linkFrom3.deq();
     

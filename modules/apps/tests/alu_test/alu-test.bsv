@@ -59,7 +59,7 @@ module [CONNECTED_MODULE] mkSystem ();
 
     Connection_Client#(SCRATCHPAD_MEM_REQUEST, SCRATCHPAD_MEM_VALUE) link_memory <- mkConnection_Client("vdev_memory");
     Connection_Receive#(SCRATCHPAD_MEM_ADDRESS) link_memory_inval <- mkConnection_Receive("vdev_memory_invalidate");
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_ALUTEST);
 
     Reg#(Bit#(32)) cooldown <- mkReg(1000);
     Reg#(SCRATCHPAD_MEM_ADDRESS) addr <- mkReg('h1000);
@@ -93,10 +93,7 @@ module [CONNECTED_MODULE] mkSystem ();
         
         let c <- uMul.resp();
 
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ALUTEST,
-                                            stringID: `STREAMS_ALUTEST_NUM64_SP,
-                                            payload0: c[127:96],
-                                            payload1: c[95:64] });
+        link_streams.send(`STREAMS_ALUTEST_NUM64_SP, c[127:96], c[95:64]);
 
         result_l <= c[63:0];
         state <= STATE_calc_end1;
@@ -105,10 +102,7 @@ module [CONNECTED_MODULE] mkSystem ();
 
     rule calc_end1(state == STATE_calc_end1);
         
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ALUTEST,
-                                            stringID: `STREAMS_ALUTEST_NUM64_CR,
-                                            payload0: result_l[63:32],
-                                            payload1: result_l[31:0] });
+        link_streams.send(`STREAMS_ALUTEST_NUM64_CR, result_l[63:32], result_l[31:0]);
 
         state <= STATE_ready;
 
@@ -148,10 +142,7 @@ module [CONNECTED_MODULE] mkSystem ();
             1:
             begin
                 arg0[63:32] <= v;
-                link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ALUTEST,
-                                                    stringID: `STREAMS_ALUTEST_NUM64_SP,
-                                                    payload0: v,
-                                                    payload1: arg0[31:0] });
+                link_streams.send(`STREAMS_ALUTEST_NUM64_SP, v, arg0[31:0]);
             end
             
             2:
@@ -162,10 +153,7 @@ module [CONNECTED_MODULE] mkSystem ();
             3:
             begin
                 arg1[63:32] <= v;
-                link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_ALUTEST,
-                                                    stringID: `STREAMS_ALUTEST_NUM64_SP,
-                                                    payload0: v,
-                                                    payload1: arg1[31:0] });
+                link_streams.send(`STREAMS_ALUTEST_NUM64_SP, v, arg1[31:0]);
             end
         endcase
 
@@ -187,10 +175,7 @@ module [CONNECTED_MODULE] mkSystem ();
 
     rule finishup (state == STATE_finished && cooldown != 0);
 
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_NULL,
-                                            stringID: `STREAMS_MESSAGE_EXIT,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
         cooldown <= cooldown - 1;
 
     endrule

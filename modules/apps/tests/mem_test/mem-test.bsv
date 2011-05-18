@@ -131,7 +131,7 @@ module [CONNECTED_MODULE] mkSystem ()
     let enableHeap = heapTestMode == 1;
 
     // Streams (output)
-    Connection_Send#(STREAMS_REQUEST) link_streams <- mkConnection_Send("vdev_streams");
+    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_MEMTEST);
 
     Reg#(CYCLE_COUNTER) cycle <- mkReg(0);
     Reg#(STATE) state <- mkReg(STATE_init);
@@ -334,10 +334,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
         if (verbose || error)
         begin
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                                stringID: msg_id,
-                                                payload0: zeroExtend(r_addr),
-                                               payload1: truncate(pack(v)) });
+            link_streams.send(msg_id, zeroExtend(r_addr), truncate(pack(v)));
         end
         
         if (done)
@@ -377,10 +374,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
         if (verbose || error)
         begin
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                                stringID: msg_id,
-                                                payload0: zeroExtend(r_addr),
-                                                payload1: resize(pack(v)) });
+            link_streams.send(msg_id, zeroExtend(r_addr), resize(pack(v)));
         end
         
         if (done)
@@ -416,10 +410,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
         if (verbose || error)
         begin
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                                stringID: msg_id,
-                                                payload0: zeroExtend(r_addr),
-                                                payload1: zeroExtend(pack(v)) });
+            link_streams.send(msg_id, zeroExtend(r_addr), zeroExtend(pack(v)));
         end
         
         if (done)
@@ -465,10 +456,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
         if (verbose || error)
         begin
-            link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                                stringID: msg_id,
-                                                payload0: zeroExtend(r_addr),
-                                                payload1: zeroExtend(pack(v)) });
+            link_streams.send(msg_id, zeroExtend(r_addr), zeroExtend(pack(v)));
         end
         
         if (done)
@@ -532,20 +520,14 @@ module [CONNECTED_MODULE] mkSystem ()
     
     rule readTimeEmit0 (state == STATE_read_timing_emit0);
         Bit#(128) latency = pack(readCycles);
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                            stringID: `STREAMS_MEMTEST_LATENCY,
-                                            payload0: latency[63:32],
-                                            payload1: latency[31:0] });
+        link_streams.send(`STREAMS_MEMTEST_LATENCY, latency[63:32], latency[31:0]);
 
         state <= STATE_read_timing_emit1;
     endrule
 
     rule readTimeEmit1 (state == STATE_read_timing_emit1);
         Bit#(128) latency = pack(readCycles);
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                            stringID: `STREAMS_MEMTEST_LATENCY,
-                                            payload0: latency[127:96],
-                                            payload1: latency[95:64] });
+        link_streams.send(`STREAMS_MEMTEST_LATENCY, latency[127:96], latency[95:64]);
 
         if (timingPass == 2)
         begin
@@ -571,18 +553,12 @@ module [CONNECTED_MODULE] mkSystem ()
     // ====================================================================
 
     rule sendDone (state == STATE_finished);
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_MEMTEST,
-                                            stringID: `STREAMS_MEMTEST_DONE,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.send(`STREAMS_MEMTEST_DONE, 0, 0);
         state <= STATE_exit;
     endrule
 
     rule finished (state == STATE_exit);
-        link_streams.send(STREAMS_REQUEST { streamID: `STREAMID_NULL,
-                                            stringID: `STREAMS_MESSAGE_EXIT,
-                                            payload0: 0,
-                                            payload1: 0 });
+        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
     endrule
 
 endmodule

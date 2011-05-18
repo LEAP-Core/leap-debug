@@ -563,3 +563,31 @@ Directory config/pm/leap/debuggers/jtag
 * Change all models to use the Build Pipeline (if not already doing so).
 * Change all models to get full Soft Services, not just Soft Connections.
 
+
+----------
+mcadler     Date: Wed May 18 17:36:32 EDT 2011  CSN: CSN-leap-debug-9
+                  Wed May 18 21:36:32 UTC 2011
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified            8 
+
+Directory modules/apps/tests/alu_test
+ alu-test.bsv              Locally Modified            8 
+
+Directory modules/apps/tests/bram_test
+ bram-test.bsv             Locally Modified            8 
+
+Directory modules/apps/tests/fp_test
+ fp-test.bsv               Locally Modified            8 
+
+Directory modules/apps/tests/interconnect_test
+ interconnect-test.bsv     Locally Modified            8 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.bsv  Locally Modified            8 
+
+Directory modules/apps/tests/mem_test
+ mem-test.bsv              Locally Modified            8 
+
+Update to new streams ring interface.
