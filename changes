@@ -591,3 +591,13 @@ Directory modules/apps/tests/mem_test
  mem-test.bsv              Locally Modified            8 
 
 Update to new streams ring interface.
+
+----------
+mcadler     Date: Wed May 25 22:12:22 EDT 2011  CSN: CSN-leap-debug-10
+                  Thu May 26 02:12:22 UTC 2011
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_htg.apm     Locally Modified            9 
+
+Update package dependence.

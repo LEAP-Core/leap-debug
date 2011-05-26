@@ -20,19 +20,16 @@ model=HW/SW Hybrid Pipeline Build
 File=modules/leap/virtual-platform/fpga-environment.awb
 Packagehint=leap
 
-
 [Base Hybrid Application Environment]
 File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
 Packagehint=leap
-
-
 
 [Base Hybrid Application Environment/Requires]
 hybrid_application=SRAM Debugger Application
 
 [Hardware FPGA Components for Virtex 5]
 File=modules/bluespec/common/fpgaenv/fpga-components/hardware-fpga-components-virtex5.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Low Level Platform Interface Hybrid]
 File=modules/leap/virtual-platform/low-level-platform-interface/hybrid-llpi.awb
@@ -52,7 +49,7 @@ Packagehint=leap
 
 [Null Physical Platform Debugger]
 File=modules/bluespec/common/fpgaenv/physical-platform/debuggers/null/null-debugger.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Standard Virtual Platform/Requires]
 umf=Little-Endian Unified Message Format
@@ -69,7 +66,7 @@ Packagehint=leap
 
 [Common Physical Platform Utilities]
 File=modules/bluespec/common/fpgaenv/physical-platform/utils/utils.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [NULL Virtual Devices]
 File=modules/leap/virtual-platform/virtual-devices/virtual-device-sets/null/null-virtual-devices.awb
@@ -87,7 +84,7 @@ physical_channel=PCI-Express CSR-based Physical Channel
 
 [Little-Endian Unified Message Format]
 File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-little-endian.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Null Starter Virtual Device]
 File=modules/leap/virtual-platform/virtual-devices/devices/starter/null/null-starter-device.awb
@@ -116,7 +113,7 @@ Packagehint=leap
 
 [HTG Virtex 5 PCIE Enabled]
 File=modules/bluespec/common/fpgaenv/physical-platform/htg_virtex5/pcie-enabled/htg-v5-pcie-enabled.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [PCI-Express CSR-based Physical Channel]
 File=modules/leap/virtual-platform/channelio/physical-channel/pcie-csr/pcie-physical-channel.awb
@@ -124,11 +121,11 @@ Packagehint=leap
 
 [General LED Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/general-led-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Driver Header for PCIe Kernel Module]
-File=drivers/linux/hasim/kernel/pchnl_if.awb
-Packagehint=platforms
+File=drivers/linux/hasim/kernel-pcie-virtex5/pchnl_if.awb
+Packagehint=leap-platforms
 
 [HTG Virtex 5 PCIE Enabled/Requires]
 pci_express_device=PCI Express Physical Device (mmap-based)
@@ -143,19 +140,19 @@ pci_express_driver_header=Driver Header for PCIe Kernel Module
 
 [General Switch Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/switches/general-switch-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [DDR2 SDRAM Physical Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/ddr2-sdram/ddr2-sdram-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [PCI Express Physical Device (mmap-based)]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-new/pci-express-device-mmap.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Single-Ended Crystal Clocks Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/single-ended/single-ended-clocks-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [DDR2 SDRAM Physical Device/Params]
 DRAM_DEBUG=1
@@ -179,8 +176,6 @@ Packagehint=leap
 File=config/pm/hasim/submodels/common/project-common-default.apm
 Packagehint=leap
 
-[HW/SW Hybrid Pipeline Build/Params]
-WAIT_FOR_HARDWARE=0
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
