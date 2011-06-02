@@ -160,9 +160,6 @@ DRAM_DEBUG=1
 [SRAM Debugger Application/Params]
 MEM_BURST_COUNT=2
 
-[Single-Ended Crystal Clocks Device/Params]
-MODEL_CLOCK_DIVIDER=1
-MODEL_CLOCK_MULTIPLIER=1
 
 [FPGA Build Pipeline Xilinx]
 File=config/pm/hasim/submodels/pipelines/build-pipeline-xilinx.apm
@@ -175,7 +172,6 @@ Packagehint=leap
 [Default Hybrid Project Common Utilities]
 File=config/pm/hasim/submodels/common/project-common-default.apm
 Packagehint=leap
-
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb

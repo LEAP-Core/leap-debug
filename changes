@@ -601,3 +601,13 @@ Directory config/pm/leap/debuggers/sram
  sram_debugger_htg.apm     Locally Modified            9 
 
 Update package dependence.
+
+----------
+mcadler     Date: Thu Jun  2 15:31:40 EDT 2011  CSN: CSN-leap-debug-11
+                  Thu Jun  2 19:31:40 UTC 2011
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_htg.apm     Locally Modified           10 
+
+Update clock PLL parameters.
