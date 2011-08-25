@@ -21,7 +21,7 @@ File=modules/leap/virtual-platform/fpga-environment.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment/Requires]
@@ -157,17 +157,16 @@ File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/nallatec
 Packagehint=leap-platforms-acp
 
 [FPGA Build Pipeline Xilinx]
-File=config/pm/hasim/submodels/pipelines/build-pipeline-xilinx.apm
+File=config/pm/leap/submodels/pipelines/build-pipeline-xilinx.apm
 Packagehint=leap
 
 [RL Bluespec Library Submodel]
-File=config/pm/hasim/submodels/fpgaenv/librl-bsv.apm
+File=config/pm/leap/submodels/common/librl-bsv.apm
 Packagehint=leap
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
-
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb

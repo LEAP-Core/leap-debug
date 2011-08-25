@@ -21,7 +21,7 @@ File=modules/leap/virtual-platform/fpga-environment.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment/Requires]
@@ -116,7 +116,7 @@ File=modules/bluespec/common/fpgaenv/physical-platform/htg_virtex5/pcie-enabled/
 Packagehint=leap-platforms
 
 [PCI-Express CSR-based Physical Channel]
-File=modules/leap/virtual-platform/channelio/physical-channel/pcie-csr/pcie-physical-channel.awb
+File=modules/leap/virtual-platform/physical-channel/pcie/csr/pcie-physical-channel.awb
 Packagehint=leap
 
 [General LED Device]
@@ -160,17 +160,16 @@ DRAM_DEBUG=1
 [SRAM Debugger Application/Params]
 MEM_BURST_COUNT=2
 
-
 [FPGA Build Pipeline Xilinx]
-File=config/pm/hasim/submodels/pipelines/build-pipeline-xilinx.apm
+File=config/pm/leap/submodels/pipelines/build-pipeline-xilinx.apm
 Packagehint=leap
 
 [RL Bluespec Library Submodel]
-File=config/pm/hasim/submodels/fpgaenv/librl-bsv.apm
+File=config/pm/leap/submodels/common/librl-bsv.apm
 Packagehint=leap
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build]

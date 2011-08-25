@@ -21,7 +21,7 @@ File=modules/leap/virtual-platform/fpga-environment.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
 
 [Base Hybrid Application Environment/Requires]
@@ -29,7 +29,7 @@ hybrid_application=SRAM Debugger Application
 
 [Hardware FPGA Components for Virtex 5]
 File=modules/bluespec/common/fpgaenv/fpga-components/hardware-fpga-components-virtex5.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Low Level Platform Interface Hybrid]
 File=modules/leap/virtual-platform/low-level-platform-interface/hybrid-llpi.awb
@@ -45,7 +45,7 @@ local_mem=NULL Local Memory Interface
 
 [Null Clocks Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/null/null-clocks-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [RRR Clients and Servers]
 File=modules/leap/virtual-platform/rrr/basic/basic-rrr.awb
@@ -53,7 +53,7 @@ Packagehint=leap
 
 [Null Physical Platform Debugger]
 File=modules/bluespec/common/fpgaenv/physical-platform/debuggers/null/null-debugger.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Standard Virtual Platform/Requires]
 umf=Little-Endian Unified Message Format
@@ -69,11 +69,11 @@ led_device=General LED Device
 
 [Nallatech Edge Physical Channel]
 File=modules/bluespec/common/fpgaenv/virtual-platform/channelio/physical-channel/nallatech-edge/nallatech-edge-channel.awb
-Packagehint=platforms-acp
+Packagehint=leap-platforms-acp
 
 [ACP M2 Compute Module With SRAM (Nallatech)]
 File=modules/bluespec/common/fpgaenv/physical-platform/acp-m2c-with-sram/acp-m2c.awb
-Packagehint=platforms-acp
+Packagehint=leap-platforms-acp
 
 [Basic Virtual Channel Multiplexer]
 File=modules/leap/virtual-platform/channelio/basic/basic-channelio.awb
@@ -85,7 +85,7 @@ Packagehint=leap
 
 [Common Physical Platform Utilities]
 File=modules/bluespec/common/fpgaenv/physical-platform/utils/utils.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [NULL Virtual Devices]
 File=modules/leap/virtual-platform/virtual-devices/virtual-device-sets/null/null-virtual-devices.awb
@@ -103,7 +103,7 @@ physical_channel=Nallatech Edge Physical Channel
 
 [Little-Endian Unified Message Format]
 File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-little-endian.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Null Starter Virtual Device]
 File=modules/leap/virtual-platform/virtual-devices/devices/starter/null/null-starter-device.awb
@@ -124,7 +124,7 @@ UMF_CHUNK_BYTES=8
 
 [ACP Fake DDR2 SRAM Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/ddr-sram/ddr-sram-device-fake.awb
-Packagehint=platforms-acp
+Packagehint=leap-platforms-acp
 
 [RRR Common Module]
 File=modules/leap/virtual-platform/rrr/rrr-common/rrr-common.awb
@@ -139,26 +139,24 @@ Packagehint=leap-debug
 
 [General LED Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/general-led-device.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Nallatech Edge Physical Device v2]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/nallatech-edge/nallatech-edge-device.awb
-Packagehint=platforms-acp
+Packagehint=leap-platforms-acp
 
 [FPGA Build Pipeline Xilinx]
-File=config/pm/hasim/submodels/pipelines/build-pipeline-xilinx.apm
+File=config/pm/leap/submodels/pipelines/build-pipeline-xilinx.apm
 Packagehint=leap
 
 [RL Bluespec Library Submodel]
-File=config/pm/hasim/submodels/fpgaenv/librl-bsv.apm
+File=config/pm/leap/submodels/common/librl-bsv.apm
 Packagehint=leap
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
-[HW/SW Hybrid Pipeline Build/Params]
-WAIT_FOR_HARDWARE=0
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb

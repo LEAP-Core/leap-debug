@@ -16,30 +16,25 @@ RootProvides=model
 DefaultAttributes=hybrid acp bluespec
 model=HW/SW Hybrid Pipeline Build
 
-
 [Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
-
 
 [Base Hybrid Application Environment/Requires]
 hybrid_application=Bluespec Channel Integrity Test (8-wide)
-
 
 [Bluespec Channel Integrity Test (8-wide)]
 File=modules/apps/tests/channel-integrity-test/chan-test.awb
 Packagehint=leap-debug
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [Hybrid ACP M2 Compute Environment (Nallatech)]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
-Packagehint=platforms-acp
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
+Packagehint=leap-platforms-acp
 
-[HW/SW Hybrid Pipeline Build/Params]
-WAIT_FOR_HARDWARE=0
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
@@ -49,3 +44,6 @@ application_env=Base Hybrid Application Environment
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
+
+[Hybrid ACP M2 Compute Environment (Nallatech)/Params]
+XST_INSERT_IOBUF=0

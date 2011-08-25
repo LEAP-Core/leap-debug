@@ -26,14 +26,13 @@ fpgaenv=Hybrid Simulation FPGA Environment
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/soft-services/application-env-hybrid-soft-service.awb
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
 Packagehint=leap
 
 [Soft Services Hybrid Application Environment/Requires]
 platform_services=Standard Platform Services
 soft_services=Soft Services Submodel
 connected_application=Clock Domains Test System with Soft Connections
-
 
 [Clock Domains Test System with Soft Connections]
 File=modules/apps/tests/clock_test/clock_test_system.awb
@@ -42,8 +41,6 @@ Packagehint=leap-debug
 [Clock Domains Test System with Soft Connections/Requires]
 clock_test=clock test pipeline with synthesis boundaries
 
-[HW/SW Hybrid Pipeline Build/Params]
-WAIT_FOR_HARDWARE=0
 
 [clock test pipeline with synthesis boundaries/Requires]
 clock_test_stage_1=clock test stage 1
@@ -62,17 +59,17 @@ File=modules/apps/tests/clock_test/clock_function_pipeline/synth_pipeline/pipeli
 Packagehint=leap-debug
 
 [Standard Platform Services]
-File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
+File=config/pm/leap/submodels/platform-services/standard-platform-services.apm
 Packagehint=leap
 
 [Hybrid Simulation FPGA Environment]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
 Packagehint=leap
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [Soft Services Submodel]
-File=config/pm/hasim/submodels/common/soft-services.apm
+File=config/pm/leap/submodels/common/soft-services.apm
 Packagehint=leap

@@ -20,16 +20,12 @@ model=HW/SW Hybrid Pipeline Build
 File=modules/leap/libraries/soft-services/services/soft-connections/physical-interconnects/shared-tree/shared-tree.awb
 Packagehint=leap
 
-
 [Default Software Connected Application]
-File=modules/leap/build-support/project/application-env/hybrid/soft-connections/default-sw/connected-application-default-sw.awb
+File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
 Packagehint=leap
-
 
 [Default Software Connected Application/Requires]
 hardware_system=Interconnect Test System
-
-
 
 [Interconnect Test System/Requires]
 physical_interconnect=Shared Tree Physical Interconnect
@@ -39,24 +35,23 @@ File=modules/apps/tests/interconnect_test/interconnect-test.awb
 Packagehint=leap-debug
 
 [Standard Platform Services]
-File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
+File=config/pm/leap/submodels/platform-services/standard-platform-services.apm
 Packagehint=leap
 
 [Hybrid Simulation FPGA Environment]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
 Packagehint=leap
 
-
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [Soft Services Submodel]
-File=config/pm/hasim/submodels/common/soft-services.apm
+File=config/pm/leap/submodels/common/soft-services.apm
 Packagehint=leap
 
 [Soft Services Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/soft-services/application-env-hybrid-soft-service.awb
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
 Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]

@@ -16,37 +16,32 @@ RootProvides=model
 DefaultAttributes=rrrtest unconnected hybrid project htg
 model=HW/SW Hybrid Pipeline Build
 
-
 [Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/base/application-env-hybrid-base.awb
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
-
 
 [Base Hybrid Application Environment/Requires]
 hybrid_application=JTAG Debug Application
 
-
 [JTAG Debug Application]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/jtag/xilinx/debug/jtag-debug.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [JTAG Debug Application/Requires]
 jtag_device=Xilinx JTAG Physical Device
 
 [Xilinx JTAG Physical Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/jtag/xilinx/jtag-device-physical.awb
-Packagehint=platforms
+Packagehint=leap-platforms
 
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [Hybrid HTG-v5-PCIe FPGA Environment]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-htg-v5-pcie.apm
 Packagehint=leap
 
-[HW/SW Hybrid Pipeline Build/Params]
-WAIT_FOR_HARDWARE=0
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities

@@ -16,11 +16,9 @@ DefaultRunOpts=
 DefaultAttributes=bram-test hasim hybrid
 model=HW/SW Hybrid Pipeline Build
 
-
 [Default Software Connected Application]
-File=modules/leap/build-support/project/application-env/hybrid/soft-connections/default-sw/connected-application-default-sw.awb
+File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
 Packagehint=leap
-
 
 [Default Software Connected Application/Requires]
 hardware_system=Scratchpad Memory Test System
@@ -29,26 +27,23 @@ hardware_system=Scratchpad Memory Test System
 File=modules/apps/tests/mem_test/mem-test.awb
 Packagehint=leap-debug
 
-
-
 [Scratchpad Memory Test System/Params]
 MEM_TEST_PRIVATE_CACHES=0
 
 [Standard Platform Services]
-File=config/pm/hasim/submodels/platform-services/standard-platform-services.apm
+File=config/pm/leap/submodels/platform-services/standard-platform-services.apm
 Packagehint=leap
 
-
 [Default Hybrid Project Common Utilities]
-File=config/pm/hasim/submodels/common/project-common-default.apm
+File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
 [Hybrid ACP M2 Compute Environment (Nallatech)]
-File=config/pm/hasim/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
-Packagehint=platforms-acp
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
+Packagehint=leap-platforms-acp
 
 [Soft Services Submodel]
-File=config/pm/hasim/submodels/common/soft-services.apm
+File=config/pm/leap/submodels/common/soft-services.apm
 Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build]
@@ -61,10 +56,13 @@ fpgaenv=Hybrid ACP M2 Compute Environment (Nallatech)
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/hybrid/soft-services/application-env-hybrid-soft-service.awb
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
 Packagehint=leap
 
 [Soft Services Hybrid Application Environment/Requires]
 platform_services=Standard Platform Services
 soft_services=Soft Services Submodel
 connected_application=Default Software Connected Application
+
+[Hybrid ACP M2 Compute Environment (Nallatech)/Params]
+XST_INSERT_IOBUF=0
