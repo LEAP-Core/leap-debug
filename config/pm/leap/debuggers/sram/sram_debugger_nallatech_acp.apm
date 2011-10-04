@@ -146,7 +146,6 @@ MEM_CHECK_LATENCY=1
 
 [Null Clocks Device/Params]
 CRYSTAL_CLOCK_FREQ=200
-MODEL_CLOCK_FREQ=100
 
 [General LED Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/general-led-device.awb
@@ -176,3 +175,4 @@ Packagehint=leap
 project_common=Default Hybrid Project Common Utilities
 fpgaenv=FPGA Environment
 application_env=Base Hybrid Application Environment
+

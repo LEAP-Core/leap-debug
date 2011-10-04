@@ -20,6 +20,7 @@
 //
 
 import FIFO::*;
+import FIFOF::*;
 import Vector::*;
 
 `include "asim/provides/virtual_platform.bsh"
@@ -27,6 +28,8 @@ import Vector::*;
 `include "asim/provides/physical_platform.bsh"
 `include "asim/provides/ddr2_device.bsh"
 `include "asim/provides/low_level_platform_interface.bsh"
+
+`include "asim/provides/hybrid_application.bsh"
 
 `include "asim/rrr/server_stub_PLATFORM_DEBUGGER.bsh"
 
@@ -36,6 +39,7 @@ typedef enum
 {
     STATE_idle,
     STATE_running,
+    STATE_doReads,
     STATE_calibrating
 }
 STATE
@@ -74,57 +78,80 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     //
     // Platform-specific debug code goes here.
     //
-    rule accept_load_req0 (state == STATE_running);
-        
-        let addr <- serverStub.acceptRequest_ReadReq0();        
-        serverStub.sendResponse_ReadReq0(0);
 
-        sram[0].readReq(truncate(addr));
+    //
+    // Up to 32 read requests are buffered until a DoReads() request arrives.
+    // This enables testing of DDR read calibration to ensure that pipelined
+    // read requests work.
+    //
+    FIFOF#(Tuple2#(Bit#(TLog#(FPGA_DDR_BANKS)), Bit#(32))) readReqQ <- mkSizedFIFOF(valueOf(FPGA_DDR_BANKS) * 32);
+    Vector#(FPGA_DDR_BANKS, FIFO#(Bit#(64))) readRspQ <- replicateM(mkSizedFIFO(`MEM_BURST_COUNT * 32));
 
-    endrule
-    
-    rule accept_load_rsp0 (state == STATE_running);
-        
-        let dummy <- serverStub.acceptRequest_ReadRsp0();
-        let data  <- sram[0].readRsp();
-        serverStub.sendResponse_ReadRsp0(truncate(data));
-        
-    endrule
-    
-    rule accept_load_req1 (state == STATE_running);
-        
-        let addr <- serverStub.acceptRequest_ReadReq1();        
-        serverStub.sendResponse_ReadReq1(0);
+    rule accept_load_req (state == STATE_running);
 
-        sram[valueOf(TSub#(FPGA_DDR_BANKS, 1))].readReq(truncate(addr));
+        let req <- serverStub.acceptRequest_ReadReq();
+        serverStub.sendResponse_ReadReq(0);
+
+        readReqQ.enq(tuple2(truncate(req.bank), req.addr));
 
     endrule
-    
-    rule accept_load_rsp1 (state == STATE_running);
-        
-        let dummy <- serverStub.acceptRequest_ReadRsp1();
-        let data  <- sram[valueOf(TSub#(FPGA_DDR_BANKS, 1))].readRsp();
-        serverStub.sendResponse_ReadRsp1(truncate(data));
-        
+
+    rule accept_load_doReads (state == STATE_running);
+
+        let dummy <- serverStub.acceptRequest_DoReads();
+        serverStub.sendResponse_DoReads(0);
+
+        state <= STATE_doReads;
+
     endrule
+
+    rule doReads (state == STATE_doReads);
+
+        if (readReqQ.notEmpty())
+        begin
+            match {.bank, .addr} = readReqQ.first();
+            sram[bank].readReq(truncate(addr));
+            readReqQ.deq();
+        end
+        else
+        begin
+            state <= STATE_running;
+        end
+
+    endrule
+
+    for (Integer bank = 0; bank < valueOf(FPGA_DDR_BANKS); bank = bank + 1)
+    begin
+        rule bufReads ((state == STATE_running) || (state == STATE_doReads));
+
+            let data <- sram[bank].readRsp();
+            readRspQ[bank].enq(truncate(data));
+
+        endrule
+    end
     
+    rule accept_load_rsp (state == STATE_running);
+
+        let bank <- serverStub.acceptRequest_ReadRsp();
+        serverStub.sendResponse_ReadRsp(readRspQ[bank].first());
+        readRspQ[bank].deq();
+
+    endrule
+
+
     rule accept_write_req (state == STATE_running);
         
-        let addr <- serverStub.acceptRequest_WriteReq();        
+        let req <- serverStub.acceptRequest_WriteReq();        
         serverStub.sendResponse_WriteReq(0);
 
-        sram[0].writeReq(truncate(addr));
-        if (valueOf(FPGA_DDR_BANKS) > 1)
-            sram[1].writeReq(truncate(addr));
+        sram[req.bank].writeReq(truncate(req.addr));
         
     endrule
     
     rule accept_write_data (state == STATE_running);
         
-        let resp <- serverStub.acceptRequest_WriteData();
-        sram[0].writeData(zeroExtend(resp.data), truncate(resp.mask));
-        if (valueOf(FPGA_DDR_BANKS) > 1)
-            sram[1].writeData(~zeroExtend(resp.data), truncate(resp.mask));
+        let req <- serverStub.acceptRequest_WriteData();
+        sram[req.bank].writeData(zeroExtend(req.data), truncate(req.mask));
 
         serverStub.sendResponse_WriteData(0);
         

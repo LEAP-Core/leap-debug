@@ -46,8 +46,6 @@ getIdxName(const int idx)
         case 5:  return "mergeReqQ.ports[1].notFull()";
         case 6:  return "syncReadDataQ.notEmpty()";
         case 7:  return "syncReadDataQ.notFull()";
-        case 8:  return "syncResetQ.notEmpty()";
-        case 9:  return "syncResetQ.notFull()";
         case 10: return "syncRequestQ.notEmpty()";
         case 11: return "syncRequestQ.notFull()";
         case 12: return "syncWriteDataQ.notEmpty()";
@@ -137,17 +135,24 @@ HYBRID_APPLICATION_CLASS::Main()
     sts = clientStub->StartDebug(0);
     cout << "debugging started, sts = " << sts << endl << flush;
 
-    // Write a pattern to memory.  On the Bluespec side, data is written to bank 0
-    // and the inverse of data is written to bank 1.
-    for (int i = 0; i <= 1000; i += 1)
+    // Write a pattern to memory.
+    for (int i = 0; i <= 10000; i += 3)
     {
         int addr = i;
-        data = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
-        sts = clientStub->WriteReq(addr * 4);
-        for (int b = 0; b < MEM_BURST_COUNT; b++)
+        for (int bank = 0; bank < MEM_BANKS; bank++)
         {
-            sts = clientStub->WriteData(data, 0);
-            data = ~data;
+            data = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
+            if (bank != 0)
+            {
+                data <<= bank;
+            }
+
+            sts = clientStub->WriteReq(bank, addr);
+            for (int burst = 0; burst < MEM_BURST_COUNT; burst++)
+            {
+                sts = clientStub->WriteData(bank, data, 0);
+                data = ~data;
+            }
         }
     }
 
@@ -155,25 +160,48 @@ HYBRID_APPLICATION_CLASS::Main()
 
     // Read the pattern back.  Alternate banks on each request.
     int errors = 0;
-    int incr = (MEM_BANKS > 1) ? 1 : 2;
-    for (int i = 0; i <= 1000; i += incr)
+    for (int j = 0; j <= 10000 - (33 * 3); j += 3)
     {
-        int addr = i;
-        sts = (addr & 1) ? clientStub->ReadReq1(addr * 4) : clientStub->ReadReq0(addr * 4);
-    
-        UINT64 expect = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
-        if (addr & 1) expect = ~expect;
-
-        for (int b = 0; b < MEM_BURST_COUNT; b++)
+        // Generate a burst of 32 read requests.  The actual reads won't be
+        // triggered unto the DoReads() below so that the RAM read bus
+        // is stressed.
+        for (int i = j; i < j + 32 * 3; i += 3)
         {
-            data = (addr & 1) ? clientStub->ReadRsp1(0) : clientStub->ReadRsp0(0);
-            if (data != expect)
+            int addr = i;
+    
+            for (int bank = 0; bank < MEM_BANKS; bank++)
             {
-                cout << hex << "error read data 0x" << addr << " = 0x" << data << " expect 0x" << expect << dec << endl;
-                errors += 1;
+                clientStub->ReadReq(bank, addr);
             }
+        }
 
-            expect = ~expect;
+        // Tell the hardware to do the reads
+        clientStub->DoReads(0);
+
+        for (int i = j; i < j + 32 * 3; i += 3)
+        {
+            int addr = i;
+    
+            for (int bank = 0; bank < MEM_BANKS; bank++)
+            {
+                UINT64 expect = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
+                if (bank != 0)
+                {
+                    expect <<= bank;
+                }
+
+                for (int burst = 0; burst < MEM_BURST_COUNT; burst++)
+                {
+                    data = clientStub->ReadRsp(bank);
+                    if (data != expect)
+                    {
+                        cout << hex << "error read data 0x" << addr << " = 0x" << data << " expect 0x" << expect << dec << endl;
+                        errors += 1;
+                    }
+
+                    expect = ~expect;
+                }
+            }
         }
     }
 
@@ -205,22 +233,23 @@ HYBRID_APPLICATION_CLASS::Main()
     errors = 0;
     for (int m = 0; m < 8; m++)
     {
-        clientStub->WriteReq(0);
+        clientStub->WriteReq(0, 0);
         for (int b = 0; b < MEM_BURST_COUNT; b++)
         {
-            clientStub->WriteData(0xffffffffffffffff, 0);
+            clientStub->WriteData(0, 0xffffffffffffffff, 0);
         }
 
-        clientStub->WriteReq(0);
+        clientStub->WriteReq(0, 0);
         for (int b = 0; b < MEM_BURST_COUNT; b++)
         {
-            clientStub->WriteData(0, 1 << m);
+            clientStub->WriteData(0, 0, 1 << m);
         }
 
-        clientStub->ReadReq0(0);
+        clientStub->ReadReq(0, 0);
+        clientStub->DoReads(0);
         for (int b = 0; b < MEM_BURST_COUNT; b++)
         {
-            UINT64 data = clientStub->ReadRsp0(0);
+            UINT64 data = clientStub->ReadRsp(0);
             UINT64 expect = 0xffL << (m * 8);
 
             if (data != expect)

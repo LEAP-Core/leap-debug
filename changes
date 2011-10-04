@@ -682,3 +682,23 @@ Directory config/pm/leap/debuggers/jtag
 
 
 Update stale .apm files.
+
+----------
+mcadler     Date: Tue Oct  4 15:03:50 EDT 2011  CSN: CSN-leap-debug-13
+                  Tue Oct  4 19:03:50 UTC 2011
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           12 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           12 
+ platform-debugger.cpp     Locally Modified           12 
+ platform-debugger.rrr     Locally Modified           12 
+
+Updates to SRAM debugger:
+
+- Generalize banks specification in RRR interface.
+
+- Add the ability to trigger pipelined read requests in order to test for
+  read errors and read-clock calibration problems.

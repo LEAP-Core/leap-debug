@@ -4,12 +4,11 @@ service PLATFORM_DEBUGGER
     {
         method StartDebug(in UINT8[8] input, out UINT8[8] status);
         method StatusCheck(in UINT8[8] bank, out UINT64[64] status);
-        method ReadReq0  (in UINT32[32] addr, out UINT8[8] status);
-        method ReadRsp0  (in UINT8[8] dummy, out UINT64[64] data);
-        method ReadReq1  (in UINT32[32] addr, out UINT8[8] status);
-        method ReadRsp1  (in UINT8[8] dummy, out UINT64[64] data);
-        method WriteReq  (in UINT32[32] addr, out UINT8[8] status);
-        method WriteData (in UINT64[64] data, in UINT32[32] mask, out UINT8[8] status);
+        method ReadReq   (in UINT8[8] bank, in UINT32[32] addr, out UINT8[8] status);
+        method DoReads   (in UINT8[8] dummy, out UINT8[8] status);
+        method ReadRsp   (in UINT8[8] bank, out UINT64[64] data);
+        method WriteReq  (in UINT8[8] bank, in UINT32[32] addr, out UINT8[8] status);
+        method WriteData (in UINT8[8] bank, in UINT64[64] data, in UINT32[32] mask, out UINT8[8] status);
 
         // Calibrate max outstanding reads
         method ReadLatency(in UINT16[16] nReads, in UINT16[16] maxOutstanding,
