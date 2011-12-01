@@ -702,3 +702,16 @@ Updates to SRAM debugger:
 
 - Add the ability to trigger pipelined read requests in order to test for
   read errors and read-clock calibration problems.
+
+----------
+mcadler     Date: Thu Dec  1 14:35:26 EST 2011  CSN: CSN-leap-debug-14
+                  Thu Dec  1 19:35:26 UTC 2011
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           13 
+ nallatech_fake_sram_debugger.apm Locally Modified           13 
+ sram_debugger_htg.apm     Locally Modified           13 
+
+Update platforms for LEAP changes:  moved platform and soft services to FPGA
+environment.

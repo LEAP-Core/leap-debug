@@ -55,6 +55,7 @@ Packagehint=leap-platforms
 umf=Little-Endian Unified Message Format
 low_level_platform_interface=Low Level Platform Interface Hybrid
 virtual_devices=NULL Virtual Devices
+platform_services=NULL Platform Services
 
 [Basic Virtual Channel Multiplexer]
 File=modules/leap/virtual-platform/channelio/basic/basic-channelio.awb
@@ -95,6 +96,7 @@ virtual_platform=Standard Virtual Platform
 fpga_components=Hardware FPGA Components for Virtex 5
 librl_bsv=RL Bluespec Library Submodel
 build_pipeline=FPGA Build Pipeline Xilinx
+soft_services=Soft Services Submodel
 
 [RRR Common Module]
 File=modules/leap/virtual-platform/rrr/rrr-common/rrr-common.awb
@@ -124,7 +126,7 @@ File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/gen
 Packagehint=leap-platforms
 
 [Driver Header for PCIe Kernel Module]
-File=drivers/linux/hasim/kernel-pcie-virtex5/pchnl_if.awb
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-driver-header/pchnl_if.awb
 Packagehint=leap-platforms
 
 [HTG Virtex 5 PCIE Enabled/Requires]
@@ -180,3 +182,18 @@ Packagehint=leap
 project_common=Default Hybrid Project Common Utilities
 fpgaenv=FPGA Environment
 application_env=Base Hybrid Application Environment
+
+[Soft Services Submodel]
+File=config/pm/leap/submodels/common/soft-services.apm
+Packagehint=leap
+
+[NULL Platform Services]
+File=modules/leap/libraries/platform-services/platform-services-null.awb
+Packagehint=leap
+
+[NULL Platform Services/Requires]
+starter_service=Starter Service
+
+[Starter Service]
+File=modules/leap/libraries/platform-services/starter-service/starter-service.awb
+Packagehint=leap

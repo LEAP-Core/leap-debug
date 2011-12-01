@@ -63,6 +63,7 @@ Packagehint=leap-platforms
 umf=Little-Endian Unified Message Format
 low_level_platform_interface=Low Level Platform Interface Hybrid
 virtual_devices=NULL Virtual Devices
+platform_services=NULL Platform Services
 
 [ACP M2 Compute Module With SRAM (Nallatech)/Requires]
 clocks_device=Null Clocks Device
@@ -118,6 +119,7 @@ virtual_platform=Standard Virtual Platform
 fpga_components=Hardware FPGA Components for Virtex 5
 librl_bsv=RL Bluespec Library Submodel
 build_pipeline=FPGA Build Pipeline Xilinx
+soft_services=Soft Services Submodel
 
 [Little-Endian Unified Message Format/Params]
 UMF_CHUNK_BYTES=8
@@ -176,3 +178,17 @@ project_common=Default Hybrid Project Common Utilities
 fpgaenv=FPGA Environment
 application_env=Base Hybrid Application Environment
 
+[Soft Services Submodel]
+File=config/pm/leap/submodels/common/soft-services.apm
+Packagehint=leap
+
+[NULL Platform Services]
+File=modules/leap/libraries/platform-services/platform-services-null.awb
+Packagehint=leap
+
+[NULL Platform Services/Requires]
+starter_service=Starter Service
+
+[Starter Service]
+File=modules/leap/libraries/platform-services/starter-service/starter-service.awb
+Packagehint=leap
