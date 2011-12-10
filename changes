@@ -715,3 +715,13 @@ Directory config/pm/leap/debuggers/sram
 
 Update platforms for LEAP changes:  moved platform and soft services to FPGA
 environment.
+
+----------
+mcadler     Date: Sat Dec 10 16:49:40 EST 2011  CSN: CSN-leap-debug-15
+                  Sat Dec 10 21:49:40 UTC 2011
+
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_exe.apm   Locally Modified           14 
+
+Update model configuration.
