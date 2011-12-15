@@ -725,3 +725,16 @@ Directory config/pm/leap/tests/mem_test
  mem_test_hybrid_exe.apm   Locally Modified           14 
 
 Update model configuration.
+
+----------
+mcadler     Date: Wed Dec 14 23:32:22 EST 2011  CSN: CSN-leap-debug-16
+                  Thu Dec 15 04:32:22 UTC 2011
+
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_nopvt_exe.apm Locally Modified           15 
+ mem_test_hybrid_nopvt_acp.apm Locally Modified           15 
+ mem_test_hybrid_htg.apm   Locally Modified           15 
+ mem_test_hybrid_acp.apm   Locally Modified           15 
+
+Clean up.
