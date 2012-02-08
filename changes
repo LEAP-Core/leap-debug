@@ -738,3 +738,25 @@ Directory config/pm/leap/tests/mem_test
  mem_test_hybrid_acp.apm   Locally Modified           15 
 
 Clean up.
+
+----------
+mcadler     Date: Wed Feb  8 18:05:54 EST 2012  CSN: CSN-leap-debug-17
+                  Wed Feb  8 23:05:54 UTC 2012
+
+
+Directory config/pm/leap/tests
+ stdio_test/               Locally Added               0 
+
+Directory config/pm/leap/tests/stdio_test
+ stdio_test_hybrid_exe.apm Locally Added               0 
+ stdio_test_hybrid_acp.apm Locally Added               0 
+
+Directory modules/apps/tests
+ stdio_test/               Locally Added               0 
+
+Directory modules/apps/tests/stdio_test
+ stdio-test.awb            Locally Added               0 
+ stdio-test.bsv            Locally Added               0 
+ README                    Locally Added               0 
+
+Add a test harness for the standard I/O service.

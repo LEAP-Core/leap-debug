@@ -1,0 +1,10 @@
+%name StdIO Test
+%desc StdIO Test
+
+%attributes hybrid
+
+%provides hardware_system
+
+%notes README 
+
+%public stdio-test.bsv
