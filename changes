@@ -760,3 +760,13 @@ Directory modules/apps/tests/stdio_test
  README                    Locally Added               0 
 
 Add a test harness for the standard I/O service.
+
+----------
+jsemer      Date: Fri Feb 10 15:29:28 EST 2012  CSN: CSN-leap-debug-18
+                  Fri Feb 10 20:29:28 UTC 2012
+
+
+Directory config/pm/leap/tests/stdio_test
+ stdio_test_hybrid_xupv5.apm Locally Added               0 
+
+Added an xupv5 version of the stdio test.
