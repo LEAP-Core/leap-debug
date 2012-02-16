@@ -782,3 +782,17 @@ Directory modules/apps/tests/stdio_test
 Add tests for new features, including a large test of fread because the
 marshalling code on the software side and the buffering code in the hardware
 is somewhat complicated in order to avoid deadlocks.
+
+----------
+mcadler     Date: Thu Feb 16 17:02:20 EST 2012  CSN: CSN-leap-debug-20
+                  Thu Feb 16 22:02:20 UTC 2012
+
+
+Directory config/pm/leap/tests/stdio_test
+ stdio_test_hybrid_exe.apm Locally Modified           19 
+
+Directory modules/apps/tests/stdio_test
+ stdio-test.bsv            Locally Modified           19 
+
+- Use the no-memory software platform for StdIO test.
+- Tweak file sizes to reduce run time.

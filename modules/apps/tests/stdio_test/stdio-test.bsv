@@ -236,7 +236,7 @@ module [CONNECTED_MODULE] mkSystem ();
     //
 
     // Base length of files.  True length is frw_fileLen + frw_pass.
-    let frw_fileLen = 10000;
+    let frw_fileLen = 2500;
     Vector#(4, Reg#(Bit#(4))) frw_pass <- replicateM(mkReg(1));
     Vector#(4, Reg#(Bit#(16))) frw_writeCnt <- replicateM(mkReg(frw_fileLen + 1));
     Vector#(4, Reg#(Bit#(16))) frw_readCnt <- replicateM(mkReg(0));
@@ -250,7 +250,7 @@ module [CONNECTED_MODULE] mkSystem ();
     let doneLen <- getGlobalStringUID("Finished fread%02d pass %d INCORRECT FILE LENGTH ERROR\n");
 
     // Random number generators for read request sizes
-    Vector#(4, LFSR#(Bit#(6))) readRandomSize <- replicateM(mkLFSR());
+    Vector#(4, LFSR#(Bit#(5))) readRandomSize <- replicateM(mkLFSR());
 
 
     //
