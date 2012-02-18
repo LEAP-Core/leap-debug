@@ -36,10 +36,6 @@ import Vector::*;
 `include "asim/provides/scratchpad_memory_service.bsh"
 `include "asim/provides/scratchpad_memory.bsh"
 
-`include "asim/dict/STREAMID.bsh"
-`include "asim/dict/STREAMS_ALUTEST.bsh"
-`include "asim/dict/STREAMS_MESSAGE.bsh"
-
 `define LAST_ADDR 'h2000
 
 typedef enum
@@ -59,7 +55,6 @@ module [CONNECTED_MODULE] mkSystem ();
 
     Connection_Client#(SCRATCHPAD_MEM_REQUEST, SCRATCHPAD_MEM_VALUE) link_memory <- mkConnection_Client("vdev_memory");
     Connection_Receive#(SCRATCHPAD_MEM_ADDRESS) link_memory_inval <- mkConnection_Receive("vdev_memory_invalidate");
-    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_ALUTEST);
 
     Reg#(Bit#(32)) cooldown <- mkReg(1000);
     Reg#(SCRATCHPAD_MEM_ADDRESS) addr <- mkReg('h1000);
@@ -68,6 +63,11 @@ module [CONNECTED_MODULE] mkSystem ();
 
     Reg#(Bit#(64)) arg0 <- mkReg(0);
     Reg#(Bit#(64)) arg1 <- mkReg(0);
+
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
+    let strNum64 <- getGlobalStringUID("0x%08x ");
+    let strResult128 <- getGlobalStringUID("0x%016x 0x%016x\n");
+    let strDone <- getGlobalStringUID("alu-test: done\n");
 
 
     // ====================================================================
@@ -87,23 +87,11 @@ module [CONNECTED_MODULE] mkSystem ();
 
     endrule
 
-    Reg#(Bit#(64)) result_l <- mkRegU();
-
     rule calc_end(state == STATE_calc_end);
         
         let c <- uMul.resp();
 
-        link_streams.send(`STREAMS_ALUTEST_NUM64_SP, c[127:96], c[95:64]);
-
-        result_l <= c[63:0];
-        state <= STATE_calc_end1;
-
-    endrule
-
-    rule calc_end1(state == STATE_calc_end1);
-        
-        link_streams.send(`STREAMS_ALUTEST_NUM64_CR, result_l[63:32], result_l[31:0]);
-
+        stdio.printf(strNum128, list2(c[127:64], c[63:0]));
         state <= STATE_ready;
 
     endrule
@@ -142,7 +130,7 @@ module [CONNECTED_MODULE] mkSystem ();
             1:
             begin
                 arg0[63:32] <= v;
-                link_streams.send(`STREAMS_ALUTEST_NUM64_SP, v, arg0[31:0]);
+                stdio.printf(strNum64, list1({v, arg0[31:0]}));
             end
             
             2:
@@ -153,7 +141,7 @@ module [CONNECTED_MODULE] mkSystem ();
             3:
             begin
                 arg1[63:32] <= v;
-                link_streams.send(`STREAMS_ALUTEST_NUM64_SP, v, arg1[31:0]);
+                stdio.printf(strNum64, list1({v, arg1[31:0]}));
             end
         endcase
 
@@ -175,7 +163,7 @@ module [CONNECTED_MODULE] mkSystem ();
 
     rule finishup (state == STATE_finished && cooldown != 0);
 
-        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
+        stdio.printf(strDone, List::nil);
         cooldown <= cooldown - 1;
 
     endrule

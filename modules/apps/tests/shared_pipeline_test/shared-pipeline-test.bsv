@@ -21,15 +21,18 @@ import FIFOF::*;
 import GetPut::*;
 import LFSR::*;
 
-`include "asim/provides/soft_connections.bsh"
-`include "asim/provides/common_services.bsh"
+`include "awb/provides/virtual_platform.bsh"
+`include "awb/provides/virtual_devices.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/librl_bsv.bsh"
+
+`include "awb/provides/soft_connections.bsh"
+`include "awb/provides/soft_services.bsh"
+`include "awb/provides/soft_services_lib.bsh"
+`include "awb/provides/soft_services_deps.bsh"
 
 `include "asim/provides/pipetest_common.bsh"
 `include "asim/provides/pipeline_test.bsh"
-
-`include "asim/dict/STREAMID.bsh"
-`include "asim/dict/STREAMS_PIPETEST.bsh"
-`include "asim/dict/STREAMS_MESSAGE.bsh"
 
 typedef enum
 {
@@ -37,7 +40,8 @@ typedef enum
     STATE_enq,
     STATE_deq,
     STATE_finished,
-    STATE_exit
+    STATE_sync,
+    STATE_done
 }
 STATE
     deriving (Bits, Eq);
@@ -45,10 +49,14 @@ STATE
 
 module [CONNECTED_MODULE] mkSystem ();
 
+    Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
+    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
+
     Reg#(STATE) state <- mkReg(STATE_init);
 
-    // Streams (output)
-    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_PIPETEST);
+    // Output
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
+    let msgDone <- getGlobalStringUID("pipetest: done (0x%016llx)\n");
 
     // Instantiate the test pipelines
     PIPELINE_TEST#(`PIPE_TEST_STAGES, `PIPE_TEST_NUM_PIPES) pipes <- mkPipeTest();
@@ -58,6 +66,7 @@ module [CONNECTED_MODULE] mkSystem ();
     LFSR#(Bit#(32)) lfsr_1 <- mkLFSR_32();
 
     rule doInit (state == STATE_init);
+        linkStarterStartRun.deq();
         lfsr_0.seed(1);
         lfsr_1.seed(2);
         state <= STATE_enq;
@@ -143,12 +152,18 @@ module [CONNECTED_MODULE] mkSystem ();
         Bit#(64) d = zeroExtend(outData);
 
         // Write the data so it can't be optimized away
-        link_streams.send(`STREAMS_PIPETEST_DONE, d[63:32], d[31:0]);
-        state <= STATE_exit;
+        stdio.printf(msgDone, list1(d));
+        state <= STATE_sync;
     endrule
 
-    rule finished (state == STATE_exit);
-        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
+    rule sync (state == STATE_sync);
+        stdio.sync_req();
+        state <= STATE_done;
+    endrule
+
+    rule done (state == STATE_done);
+        let r <- stdio.sync_rsp();
+        linkStarterFinishRun.send(0);
     endrule
 
 endmodule

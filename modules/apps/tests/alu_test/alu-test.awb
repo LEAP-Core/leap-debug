@@ -6,5 +6,3 @@
 %provides hardware_system
 
 %sources -t BSV  -v PUBLIC alu-test.bsv
-%sources -t DICT -v PUBLIC alu-test-streams.dic
-%sources -t DICT -v PUBLIC alu-test-streamid.dic

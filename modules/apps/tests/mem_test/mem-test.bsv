@@ -22,19 +22,17 @@ import Vector::*;
 import GetPut::*;
 import LFSR::*;
 
-`include "asim/provides/librl_bsv_base.bsh"
-`include "asim/provides/librl_bsv_storage.bsh"
+`include "asim/provides/librl_bsv.bsh"
 
 `include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_services.bsh"
+`include "awb/provides/soft_services_lib.bsh"
+`include "awb/provides/soft_services_deps.bsh"
 
 `include "asim/provides/mem_services.bsh"
 `include "asim/provides/common_services.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/STREAMID.bsh"
-`include "asim/dict/STREAMS_MEMTEST.bsh"
-`include "asim/dict/STREAMS_MESSAGE.bsh"
-
 `include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
@@ -54,9 +52,9 @@ typedef enum
     STATE_read_random,
     STATE_read_sequential,
     STATE_read_timing,
-    STATE_read_timing_emit0,
-    STATE_read_timing_emit1,
+    STATE_read_timing_emit,
     STATE_finished,
+    STATE_sync,
     STATE_exit
 }
 STATE
@@ -86,6 +84,9 @@ module [CONNECTED_MODULE] mkSystem ()
 
               // Small data (multiple data per container)
               Alias#(MEM_DATA_SM, t_MEM_DATA_SM));
+
+    Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
+    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
     //
     // Allocate scratchpads
@@ -130,8 +131,8 @@ module [CONNECTED_MODULE] mkSystem ()
     Param#(1) heapTestMode <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_MEM_TEST_HEAP, paramNode);
     let enableHeap = heapTestMode == 1;
 
-    // Streams (output)
-    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_MEMTEST);
+    // Output
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
 
     Reg#(CYCLE_COUNTER) cycle <- mkReg(0);
     Reg#(STATE) state <- mkReg(STATE_init);
@@ -146,6 +147,16 @@ module [CONNECTED_MODULE] mkSystem ()
     // If not doing heap tests then mark heap test done already
     function Bit#(2) completeReadsInitVal() = enableHeap ? 0 : 1;
 
+    // Messages
+    let msgData <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x\n");
+    let msgDataErr <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x  ERROR\n");
+    let msgLG <- getGlobalStringUID("LG");
+    let msgMD <- getGlobalStringUID("MD");
+    let msgSM <- getGlobalStringUID("SM");
+    let msgH  <- getGlobalStringUID("H ");
+    let msgLatency <- getGlobalStringUID("latency (4 loads, 2 bytes per load) = 0x%016llx\n                                      0x%016llx\n");
+    let msgDone <- getGlobalStringUID("memtest: done\n");
+
     
     (* fire_when_enabled *)
     rule cycleCount (True);
@@ -153,6 +164,8 @@ module [CONNECTED_MODULE] mkSystem ()
     endrule
 
     rule doInit (state == STATE_init);
+        linkStarterStartRun.deq();
+
         nCompleteReads <= completeReadsInitVal();
 
         lfsr.seed(1);
@@ -322,19 +335,18 @@ module [CONNECTED_MODULE] mkSystem ()
         // Convert value so it equals r_addr
         if (memInitMode == 0)
             v = -(v + 2);
-        
+
         Bool error = False;
-        STREAMS_DICT_TYPE msg_id = `STREAMS_MEMTEST_DATA_LG;
         if (((memInitMode != 1) && (v != unpack(zeroExtend(pack(r_addr))))) ||
             ((memInitMode == 1) && (v != unpack(0))))
         begin
-            msg_id = `STREAMS_MEMTEST_DATA_LG_ERR;
             error = True;
         end
 
         if (verbose || error)
         begin
-            link_streams.send(msg_id, zeroExtend(r_addr), truncate(pack(v)));
+            let msg = (! error ? msgData : msgDataErr);
+            stdio.printf(msg, list3(zeroExtend(msgLG), zeroExtend(r_addr), resize(pack(v))));
         end
         
         if (done)
@@ -364,17 +376,16 @@ module [CONNECTED_MODULE] mkSystem ()
             v = v - 1;
 
         Bool error = False;
-        STREAMS_DICT_TYPE msg_id = `STREAMS_MEMTEST_DATA_MD;
         if (((memInitMode != 1) && (v != unpack(zeroExtend(pack(r_addr))))) ||
             ((memInitMode == 1) && (v != unpack(0))))
         begin
-            msg_id = `STREAMS_MEMTEST_DATA_MD_ERR;
             error = True;
         end
 
         if (verbose || error)
         begin
-            link_streams.send(msg_id, zeroExtend(r_addr), resize(pack(v)));
+            let msg = (! error ? msgData : msgDataErr);
+            stdio.printf(msg, list3(zeroExtend(msgMD), zeroExtend(r_addr), resize(pack(v))));
         end
         
         if (done)
@@ -400,17 +411,16 @@ module [CONNECTED_MODULE] mkSystem ()
         debugLog.record($format("readSM: addr 0x%x, data 0x%x", r_addr, v));
 
         Bool error = False;
-        STREAMS_DICT_TYPE msg_id = `STREAMS_MEMTEST_DATA_SM;
         if (((memInitMode != 1) && (v != unpack(truncate(pack(r_addr))))) ||
             ((memInitMode == 1) && (v != unpack(0))))
         begin
-            msg_id = `STREAMS_MEMTEST_DATA_SM_ERR;
             error = True;
         end
 
         if (verbose || error)
         begin
-            link_streams.send(msg_id, zeroExtend(r_addr), zeroExtend(pack(v)));
+            let msg = (! error ? msgData : msgDataErr);
+            stdio.printf(msg, list3(zeroExtend(msgSM), zeroExtend(r_addr), resize(pack(v))));
         end
         
         if (done)
@@ -446,17 +456,16 @@ module [CONNECTED_MODULE] mkSystem ()
             v = unpack(~pack(v));
 
         Bool error = False;
-        STREAMS_DICT_TYPE msg_id = `STREAMS_MEMTEST_DATA_H;
         if (((memInitMode != 1) && (v != unpack(truncate(pack(r_addr))))) ||
             ((memInitMode == 1) && (v != unpack(0))))
         begin
-            msg_id = `STREAMS_MEMTEST_DATA_H_ERR;
             error = True;
         end
 
         if (verbose || error)
         begin
-            link_streams.send(msg_id, zeroExtend(r_addr), zeroExtend(pack(v)));
+            let msg = (! error ? msgData : msgDataErr);
+            stdio.printf(msg, list3(zeroExtend(msgH), zeroExtend(r_addr), resize(pack(v))));
         end
         
         if (done)
@@ -514,20 +523,13 @@ module [CONNECTED_MODULE] mkSystem ()
 
         if (readCycleRespIdx == 7)
         begin
-            state <= STATE_read_timing_emit0;
+            state <= STATE_read_timing_emit;
         end
     endrule
     
-    rule readTimeEmit0 (state == STATE_read_timing_emit0);
+    rule readTimeEmit1 (state == STATE_read_timing_emit);
         Bit#(128) latency = pack(readCycles);
-        link_streams.send(`STREAMS_MEMTEST_LATENCY, latency[63:32], latency[31:0]);
-
-        state <= STATE_read_timing_emit1;
-    endrule
-
-    rule readTimeEmit1 (state == STATE_read_timing_emit1);
-        Bit#(128) latency = pack(readCycles);
-        link_streams.send(`STREAMS_MEMTEST_LATENCY, latency[127:96], latency[95:64]);
+        stdio.printf(msgLatency, list2(latency[63:0], latency[127:64]));
 
         if (timingPass == 2)
         begin
@@ -553,12 +555,18 @@ module [CONNECTED_MODULE] mkSystem ()
     // ====================================================================
 
     rule sendDone (state == STATE_finished);
-        link_streams.send(`STREAMS_MEMTEST_DONE, 0, 0);
+        stdio.printf(msgDone, List::nil);
+        state <= STATE_sync;
+    endrule
+
+    rule sync (state == STATE_sync);
+        stdio.sync_req();
         state <= STATE_exit;
     endrule
 
     rule finished (state == STATE_exit);
-        link_streams.sendAs(`STREAMID_NULL, `STREAMS_MESSAGE_EXIT, 0, 0);
+        let r <- stdio.sync_rsp();
+        linkStarterFinishRun.send(0);
     endrule
 
 endmodule

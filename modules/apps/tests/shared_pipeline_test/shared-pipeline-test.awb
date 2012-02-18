@@ -7,4 +7,3 @@
 %attributes hybrid pipetest
 
 %public shared-pipeline-test.bsv
-%public shared-pipeline-test.dic

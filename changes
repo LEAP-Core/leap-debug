@@ -796,3 +796,26 @@ Directory modules/apps/tests/stdio_test
 
 - Use the no-memory software platform for StdIO test.
 - Tweak file sizes to reduce run time.
+
+----------
+mcadler     Date: Fri Feb 17 19:32:02 EST 2012  CSN: CSN-leap-debug-21
+                  Sat Feb 18 00:32:02 UTC 2012
+
+
+Directory modules/apps/tests/alu_test
+ alu-test-streamid.dic     Locally Removed            20 
+ alu-test.awb              Locally Modified           20 
+ alu-test.bsv              Locally Modified           20 
+ alu-test-streams.dic      Locally Removed            20 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.bsv  Locally Modified           20 
+ shared-pipeline-test.dic  Locally Removed            20 
+ shared-pipeline-test.awb  Locally Modified           20 
+
+Directory modules/apps/tests/mem_test
+ mem-test.bsv              Locally Modified           20 
+ mem-test.dic              Locally Modified           20 
+
+Use STDIO instead of STREAMS.  There are a few more programs to go that I'll
+fix later.
