@@ -819,3 +819,28 @@ Directory modules/apps/tests/mem_test
 
 Use STDIO instead of STREAMS.  There are a few more programs to go that I'll
 fix later.
+
+----------
+kfleming    Date: Tue Apr 10 12:18:52 EDT 2012  CSN: CSN-leap-debug-22
+                  Tue Apr 10 16:18:52 UTC 2012
+
+
+Directory config/pm/leap/tests
+ mem_perf/                 Locally Added               0 
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_no_pvt_acp.apm Locally Added               0 
+ mem_perf_hybrid_exe.apm   Locally Added               0 
+ mem_perf_hybrid_acp.apm   Locally Added               0 
+
+Directory modules/apps/tests
+ mem_perf/                 Locally Added               0 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.awb              Locally Added               0 
+ mem-perf.bsv              Locally Added               0 
+ mem-perf.dic              Locally Added               0 
+
+
+Added a new test that measures the performance of scratchpads across
+several stride patterns and working set sizes.
