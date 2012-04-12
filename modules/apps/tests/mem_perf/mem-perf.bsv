@@ -84,6 +84,7 @@ module [CONNECTED_MODULE] mkSystem ()
     // Statistics Collection State
     Reg#(CYCLE_COUNTER)  cycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
+    Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
     Reg#(Bit#(64))       totalLatency <- mkReg(0);
     FIFO#(CYCLE_COUNTER) operationStartCycle <- mkSizedBRAMFIFO(128);
     FIFO#(Bool)          operationIsLast     <- mkSizedBRAMFIFO(128);
@@ -124,34 +125,35 @@ module [CONNECTED_MODULE] mkSystem ()
         count <= count + 1;
         if(count + 1 == 0)
         begin
-	    state <= STATE_write_reset;
+            state <= STATE_write_reset;
+            endCycle <= cycle;
         end
     endrule
 
     rule doWriteReset(state == STATE_write_reset);
         addr <= 0;
         startCycle <= cycle;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(cycle - startCycle)));
+        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle)));
         if(bound << 1 == boundMax)
         begin
-	    bound <= boundMin;
+            bound <= boundMin;
             strideIdx <= 0;
             boundMask <= boundMaskBase;
             state <= STATE_reading;
         end
         else
-	begin
-	    state <= STATE_writing;
+        begin
+            state <= STATE_writing;
             if(strideIdx == strideMax)
             begin
- 	        strideIdx <= 0;	        
-		bound <= bound << 1;
+                strideIdx <= 0;         
+                bound <= bound << 1;
                 boundMask <= truncate({boundMask,1'b1});
             end
-	    else
-	    begin
-	        strideIdx <= strideIdx + 1;
-	    end
+            else
+            begin
+                strideIdx <= strideIdx + 1;
+            end
         end
     endrule
 
@@ -177,7 +179,8 @@ module [CONNECTED_MODULE] mkSystem ()
         totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycle.first);
         if(operationIsLast.first)
         begin
-	   state <= STATE_read_reset;
+            state <= STATE_read_reset;
+            endCycle <= cycle;
         end
     endrule
 
@@ -186,26 +189,26 @@ module [CONNECTED_MODULE] mkSystem ()
         reqsDone <= False;
         startCycle <= cycle;
         totalLatency <= 0;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(cycle - startCycle)));
+        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle)));
         if(bound << 1 == boundMax)
         begin
-	    bound <= 1;
+            bound <= 1;
             strideIdx <= 0;
             state <= STATE_finished;
         end
         else
-	begin
-	    state <= STATE_reading;
+        begin
+            state <= STATE_reading;
             if(strideIdx == strideMax)
             begin
- 	        strideIdx <= 0;	        
-		bound <= bound << 1;
+                strideIdx <= 0;         
+                bound <= bound << 1;
                 boundMask <= truncate({boundMask,1'b1});
             end
-	    else
-	    begin
-	        strideIdx <= strideIdx + 1;
-	    end
+            else
+            begin
+                strideIdx <= strideIdx + 1;
+            end
         end
     endrule
 

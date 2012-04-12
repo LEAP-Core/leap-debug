@@ -844,3 +844,14 @@ Directory modules/apps/tests/mem_perf
 
 Added a new test that measures the performance of scratchpads across
 several stride patterns and working set sizes.
+
+----------
+mcadler     Date: Thu Apr 12 17:07:56 EDT 2012  CSN: CSN-leap-debug-23
+                  Thu Apr 12 21:07:56 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           22 
+
+Eliminate STDIO timing from results.  Not likely a big factor given the low
+I/O rate, but may as well do the right thing.
