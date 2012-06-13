@@ -855,3 +855,15 @@ Directory modules/apps/tests/mem_perf
 
 Eliminate STDIO timing from results.  Not likely a big factor given the low
 I/O rate, but may as well do the right thing.
+
+----------
+kfleming    Date: Tue Jun 12 22:24:10 EDT 2012  CSN: CSN-leap-debug-24
+                  Wed Jun 13 02:24:10 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           23 
+
+
+Changed the stride pattern for the memory mountain to better expose
+the L2 cache.

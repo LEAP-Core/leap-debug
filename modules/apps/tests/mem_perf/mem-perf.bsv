@@ -52,10 +52,10 @@ STATE
 
 typedef Bit#(32) CYCLE_COUNTER;
 
-typedef Bit#(32) MEM_ADDRESS;
+typedef Bit#(26) MEM_ADDRESS;
 typedef 26 MAX_WORKING_SET;
 typedef 9 MIN_WORKING_SET;
-typedef 12 STRIDE_INDEXES;
+typedef 14 STRIDE_INDEXES;
 
 MEM_ADDRESS boundMaskBase = (1 << fromInteger(valueof(MIN_WORKING_SET))) - 1;
 MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
@@ -76,7 +76,7 @@ module [CONNECTED_MODULE] mkSystem ()
                                                           SCRATCHPAD_NO_PVT_CACHE);
 
     // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, MEM_ADDRESS) memory <- mkScratchpad(`VDEV_SCRATCH_MEMTEST, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, Bit#(64)) memory <- mkScratchpad(`VDEV_SCRATCH_MEMTEST, private_caches);
 
     // Output
     STDIO#(Bit#(64))     stdio <- mkStdIO();
@@ -92,7 +92,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
-    MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,2,3,4,5,6,7,8,16,32,64,128};
+    MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,1,2,3,4,5,6,7,8,16,32,64,128,128};
     Reg#(Bit#(18))    count <- mkReg(0);  
     Reg#(MEM_ADDRESS) strideIdx <- mkReg(1);
     Reg#(MEM_ADDRESS) bound  <- mkReg(boundMin);
@@ -120,8 +120,9 @@ module [CONNECTED_MODULE] mkSystem ()
 
 
     rule doWrite(state == STATE_writing);
-        memory.write(addr,addr);
-        addr <= (addr + stride[strideIdx]) & boundMask;
+        memory.write((zeroExtend(count) & boundMask) * stride[strideIdx],  
+                     zeroExtend((zeroExtend(count) & boundMask) * stride[strideIdx]));
+
         count <= count + 1;
         if(count + 1 == 0)
         begin
@@ -160,7 +161,7 @@ module [CONNECTED_MODULE] mkSystem ()
     Reg#(Bool) reqsDone <- mkReg(False);
 
     rule readReq (state == STATE_reading && !reqsDone);
-        memory.readReq(addr);
+        memory.readReq((zeroExtend(count) & boundMask) * stride[strideIdx]);
         addr <= (addr + stride[strideIdx]) & boundMask;
         operationStartCycle.enq(cycle);
         count <= count + 1;
