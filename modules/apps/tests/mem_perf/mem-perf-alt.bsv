@@ -62,21 +62,20 @@ MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
 MEM_ADDRESS boundMax      =  1 << fromInteger(valueof(MAX_WORKING_SET));
 MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 
-module [CONNECTED_MODULE] mkMemTester ()
+module [CONNECTED_MODULE] mkMemTesterAlt ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
-    Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
-    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
+
 
     //
     // Allocate scratchpads
     //
 
-    let private_caches = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
+    let private_caches = (`MEM_TEST_PRIVATE_CACHES_ALT != 0 ? SCRATCHPAD_CACHED :
                                                           SCRATCHPAD_NO_PVT_CACHE);
 
     // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, MEM_ADDRESS) memory <- mkScratchpad(`VDEV_SCRATCH_MEMTEST, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, MEM_ADDRESS) memory <- mkScratchpad(`VDEV_SCRATCH_MEMTESTALT, private_caches);
 
     // Output
     STDIO#(Bit#(64))     stdio <- mkStdIO();
@@ -107,8 +106,8 @@ module [CONNECTED_MODULE] mkMemTester ()
         cycle <= cycle + 1;
     endrule
 
-    rule doInit (state == STATE_init);
-        linkStarterStartRun.deq();
+    rule doInit (False);
+        
         state <= STATE_writing;
         startCycle <= cycle;
         totalLatency <= 0;
@@ -121,7 +120,7 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule doWrite(state == STATE_writing);
         memory.write(addr,addr);
-        addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        addr <= (addr + stride[strideIdx]) & boundMask;
         count <= count + 1;
         if(count + 1 == 0)
         begin
@@ -161,7 +160,7 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
-        addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        addr <= (addr + stride[strideIdx]) & boundMask;
         operationStartCycle.enq(cycle);
         count <= count + 1;
         if(count + 1 == 0)
@@ -228,7 +227,6 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule finished (state == STATE_exit);
         let r <- stdio.sync_rsp();
-        linkStarterFinishRun.send(0);
     endrule
 
 endmodule

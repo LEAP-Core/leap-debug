@@ -1,0 +1,13 @@
+%name Scratchpad Memory Performance Test System (MultiFPGA)
+%desc Scratchpad Memory Performance Test System (MultiFPGA)
+
+%attributes scratchpad_test test
+
+%provides hardware_system
+%requires mem_perf_tester
+%requires mem_perf_tester_alt
+
+%public mem-perf-wrapper-multi.bsv
+
+%param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
+

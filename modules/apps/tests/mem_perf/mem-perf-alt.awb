@@ -1,0 +1,14 @@
+%name Scratchpad Memory Performance Test System (FPGA1)
+%desc Scratchpad Memory Performance Test System (FPGA1)
+
+%attributes scratchpad_test test
+
+%provides mem_perf_tester_alt
+
+%public mem-perf-alt.bsv
+%public mem-perf-alt.dic
+
+%param MEM_TEST_PRIVATE_CACHES_ALT 1  "Enable (1) / disable (0) private scratchpad caches"
+
+%param SYNTH_BOUNDARY mkMemTesterAlt "name of synthesis boundary"
+

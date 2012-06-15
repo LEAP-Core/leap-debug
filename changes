@@ -867,3 +867,25 @@ Directory modules/apps/tests/mem_perf
 
 Changed the stride pattern for the memory mountain to better expose
 the L2 cache.
+
+----------
+keflemin    Date: Fri Jun 15 17:05:36 EDT 2012  CSN: CSN-leap-debug-25
+                  Fri Jun 15 21:05:36 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_acp.apm   Locally Modified           24 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Added               0 
+ mem-perf-wrapper.bsv      Locally Added               0 
+ mem-perf.awb              Locally Modified           24 
+ mem-perf.bsv              Locally Modified           24 
+ mem-perf-alt.dic          Locally Added               0 
+ mem-perf-wrapper-multi.awb Locally Added               0 
+ mem-perf-wrapper-multi.bsv Locally Added               0 
+ mem-perf-wrapper.awb      Locally Added               0 
+ mem-perf-alt.awb          Locally Added               0 
+
+
+Added modules for multiple fpga memory performance tests. 

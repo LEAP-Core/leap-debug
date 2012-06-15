@@ -1,0 +1,12 @@
+%name Scratchpad Memory Performance Test System Wrapper
+%desc Scratchpad Memory Performance Test System Wrapper
+
+%attributes scratchpad_test test
+
+%provides hardware_system
+%requires mem_perf_tester
+
+%public mem-perf-wrapper.bsv
+
+%param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
+
