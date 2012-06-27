@@ -21,7 +21,7 @@ File=modules/leap/build-support/project/application-env/soft-services/default-sw
 Packagehint=leap
 
 [Default Software Connected Application/Requires]
-hardware_system=Scratchpad Memory Performance Test System
+hardware_system=Scratchpad Memory Performance Test System Wrapper
 
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
@@ -49,4 +49,11 @@ Packagehint=leap
 
 [Scratchpad Memory Performance Test System]
 File=modules/apps/tests/mem_perf/mem-perf.awb
+Packagehint=leap-debug
+
+[Scratchpad Memory Performance Test System Wrapper/Requires]
+mem_perf_tester=Scratchpad Memory Performance Test System
+
+[Scratchpad Memory Performance Test System Wrapper]
+File=modules/apps/tests/mem_perf/mem-perf-wrapper.awb
 Packagehint=leap-debug

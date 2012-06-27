@@ -889,3 +889,18 @@ Directory modules/apps/tests/mem_perf
 
 
 Added modules for multiple fpga memory performance tests. 
+
+----------
+kfleming    Date: Wed Jun 27 09:51:47 EDT 2012  CSN: CSN-leap-debug-26
+                  Wed Jun 27 13:51:47 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_exe.apm   Locally Modified           25 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           25 
+
+
+
+Added a correctness check to mem-perf test

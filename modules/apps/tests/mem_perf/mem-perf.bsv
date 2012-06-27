@@ -89,18 +89,19 @@ module [CONNECTED_MODULE] mkMemTester ()
     FIFO#(CYCLE_COUNTER) operationStartCycle <- mkSizedBRAMFIFO(128);
     FIFO#(Bool)          operationIsLast     <- mkSizedBRAMFIFO(128);
     Reg#(STATE)          state <- mkReg(STATE_init);
-
+    Reg#(Bool)           correct <- mkReg(True);
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
     MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,2,3,4,5,6,7,8,16,32,64,128};
     Reg#(Bit#(18))    count <- mkReg(0);  
+    FIFO#(MEM_ADDRESS) expected <- mkSizedBRAMFIFO(128);
     Reg#(MEM_ADDRESS) strideIdx <- mkReg(1);
     Reg#(MEM_ADDRESS) bound  <- mkReg(boundMin);
     Reg#(MEM_ADDRESS) boundMask  <- mkReg(boundMaskBase);
 
 
     // Messages
-    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu\n");
+    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu:correct:%llu\n");
     
     (* fire_when_enabled *)
     rule cycleCount (True);
@@ -133,7 +134,8 @@ module [CONNECTED_MODULE] mkMemTester ()
     rule doWriteReset(state == STATE_write_reset);
         addr <= 0;
         startCycle <= cycle;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle)));
+        correct <= True;
+        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
         if(bound << 1 == boundMax)
         begin
             bound <= boundMin;
@@ -168,12 +170,14 @@ module [CONNECTED_MODULE] mkMemTester ()
         begin
             reqsDone <= True;
         end 
-
+        expected.enq(addr);
         operationIsLast.enq(count + 1 == 0);
     endrule
 
     rule readResp;
         let resp <- memory.readRsp();
+        correct <= correct && (resp == expected.first);
+        expected.deq();
         operationIsLast.deq;
         operationStartCycle.deq;
         totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycle.first);
@@ -189,7 +193,8 @@ module [CONNECTED_MODULE] mkMemTester ()
         reqsDone <= False;
         startCycle <= cycle;
         totalLatency <= 0;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle)));
+        correct <= True;
+        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
         if(bound << 1 == boundMax)
         begin
             bound <= 1;
