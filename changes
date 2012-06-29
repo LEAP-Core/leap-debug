@@ -904,3 +904,16 @@ Directory modules/apps/tests/mem_perf
 
 
 Added a correctness check to mem-perf test
+
+----------
+kfleming    Date: Thu Jun 28 21:19:57 EDT 2012  CSN: CSN-leap-debug-27
+                  Fri Jun 29 01:19:57 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           26 
+ mem-perf-wrapper-multi.bsv Locally Modified           26 
+
+
+Fixed perf bug in the memory performance test.
+

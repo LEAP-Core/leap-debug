@@ -65,6 +65,8 @@ MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 module [CONNECTED_MODULE] mkMemTester ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
+    messageM("Compiling mkMemTester");
+
     Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
     Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
@@ -122,7 +124,16 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule doWrite(state == STATE_writing);
         memory.write(addr,addr);
-        addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        $display("Sending write %d", addr);
+        if(addr + stride[strideIdx] < bound * stride[strideIdx])
+        begin
+            addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        end
+        else 
+        begin
+            addr <= 0; 
+        end 
+
         count <= count + 1;
         if(count + 1 == 0)
         begin
@@ -163,7 +174,16 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
-        addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        $display("Sending write %d", addr);
+        if(addr + stride[strideIdx] < bound * stride[strideIdx])
+        begin
+            addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+        end
+        else 
+        begin
+            addr <= 0; 
+        end 
+
         operationStartCycle.enq(cycle);
         count <= count + 1;
         if(count + 1 == 0)

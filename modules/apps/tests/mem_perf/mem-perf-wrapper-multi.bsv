@@ -67,6 +67,8 @@ MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
+    messageM("Compiling mkSystem");
+
     let mem_tester <- mkMemTester();
     let mem_tester_alt <- mkMemTesterAlt();
 
