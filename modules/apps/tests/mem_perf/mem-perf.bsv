@@ -27,7 +27,7 @@ import GetPut::*;
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
-
+`include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"
 `include "asim/provides/common_services.bsh"
 
@@ -67,12 +67,11 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     messageM("Compiling mkMemTester");
 
-    Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
-    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
     //
     // Allocate scratchpads
     //
+    ServerStub_MEMPERFRRR serverStub <- mkServerStub_MEMPERFRRR();
 
     let private_caches = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
                                                           SCRATCHPAD_NO_PVT_CACHE);
@@ -111,7 +110,7 @@ module [CONNECTED_MODULE] mkMemTester ()
     endrule
 
     rule doInit (state == STATE_init);
-        linkStarterStartRun.deq();
+        let length <- serverStub.acceptRequest_RunTest();    
         state <= STATE_writing;
         startCycle <= cycle;
         totalLatency <= 0;
@@ -124,7 +123,7 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule doWrite(state == STATE_writing);
         memory.write(addr,addr);
-        $display("Sending write %d", addr);
+
         if(addr + stride[strideIdx] < bound * stride[strideIdx])
         begin
             addr <= (addr + stride[strideIdx]) /*& boundMask*/;
@@ -137,6 +136,9 @@ module [CONNECTED_MODULE] mkMemTester ()
         count <= count + 1;
         if(count + 1 == 0)
         begin
+            serverStub.sendResponse_RunTest(?,?); 
+
+            
             state <= STATE_write_reset;
             endCycle <= cycle;
         end
@@ -146,8 +148,9 @@ module [CONNECTED_MODULE] mkMemTester ()
         addr <= 0;
         startCycle <= cycle;
         correct <= True;
+        let length <- serverStub.acceptRequest_RunTest();		
         stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
-        if(bound << 1 == boundMax)
+        if((bound << 1 == boundMax) && (strideIdx == strideMax))
         begin
             bound <= boundMin;
             strideIdx <= 0;
@@ -203,6 +206,7 @@ module [CONNECTED_MODULE] mkMemTester ()
         totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycle.first);
         if(operationIsLast.first)
         begin
+	    serverStub.sendResponse_RunTest(?,?);	
             state <= STATE_read_reset;
             endCycle <= cycle;
         end
@@ -210,12 +214,14 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule doReadReset(state == STATE_read_reset);
         addr <= 0;
+        let length <- serverStub.acceptRequest_RunTest();    
+
         reqsDone <= False;
         startCycle <= cycle;
         totalLatency <= 0;
         correct <= True;
         stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
-        if(bound << 1 == boundMax)
+        if((bound << 1 == boundMax) && (strideIdx == strideMax))
         begin
             bound <= 1;
             strideIdx <= 0;
@@ -253,7 +259,7 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule finished (state == STATE_exit);
         let r <- stdio.sync_rsp();
-        linkStarterFinishRun.send(0);
+        serverStub.sendResponse_RunTest(?,?); 
     endrule
 
 endmodule

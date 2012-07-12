@@ -3,7 +3,7 @@
 
 %attributes scratchpad_test test
 
-%provides hardware_system
+%provides mem_perf_wrapper
 %requires mem_perf_tester
 
 %public mem-perf-wrapper.bsv

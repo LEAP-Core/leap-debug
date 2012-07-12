@@ -917,3 +917,31 @@ Directory modules/apps/tests/mem_perf
 
 Fixed perf bug in the memory performance test.
 
+
+----------
+kfleming    Date: Thu Jul 12 10:22:26 EDT 2012  CSN: CSN-leap-debug-28
+                  Thu Jul 12 14:22:26 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_exe.apm   Locally Modified           27 
+ mem_perf_hybrid_acp.apm   Locally Modified           27 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.awb              Locally Modified           27 
+ mem-perf.bsv              Locally Modified           27 
+ connected_application/    Locally Added               0 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Added               0 
+ connected-application-test.h Locally Added               0 
+ connected-application-test.awb Locally Added               0 
+ connected-application-test.bsv Locally Added               0 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-wrapper-multi.awb Locally Modified           27 
+ mem-perf.rrr              Locally Added               0 
+ mem-perf-wrapper.awb      Locally Modified           27 
+
+
+Upgrades to the mem-perf test.  It can now dump statistics for single experiments. 

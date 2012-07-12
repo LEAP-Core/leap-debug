@@ -7,6 +7,7 @@
 
 %public mem-perf.bsv
 %public mem-perf.dic
+%public mem-perf.rrr
 
 %param MEM_TEST_PRIVATE_CACHES 1  "Enable (1) / disable (0) private scratchpad caches"
 

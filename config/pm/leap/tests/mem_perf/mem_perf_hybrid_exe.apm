@@ -16,13 +16,6 @@ RootProvides=model
 DefaultAttributes=scratchpad_test test connected slave hybrid project exe
 model=HW/SW Hybrid Pipeline Build
 
-[Default Software Connected Application]
-File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
-Packagehint=leap
-
-[Default Software Connected Application/Requires]
-hardware_system=Scratchpad Memory Performance Test System Wrapper
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
@@ -37,7 +30,7 @@ fpgaenv=Hybrid Simulation FPGA Environment
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment/Requires]
-connected_application=Default Software Connected Application
+connected_application=Scratchpad Perf Test Connected Application
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
@@ -57,3 +50,10 @@ mem_perf_tester=Scratchpad Memory Performance Test System
 [Scratchpad Memory Performance Test System Wrapper]
 File=modules/apps/tests/mem_perf/mem-perf-wrapper.awb
 Packagehint=leap-debug
+
+[Scratchpad Perf Test Connected Application]
+File=modules/apps/tests/mem_perf/connected_application/connected-application-test.awb
+Packagehint=leap-debug
+
+[Scratchpad Perf Test Connected Application/Requires]
+mem_perf_wrapper=Scratchpad Memory Performance Test System Wrapper
