@@ -23,7 +23,7 @@ import GetPut::*;
 
 `include "asim/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
@@ -87,14 +87,15 @@ module [CONNECTED_MODULE] mkMemTester ()
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
     Reg#(Bit#(64))       totalLatency <- mkReg(0);
-    FIFO#(CYCLE_COUNTER) operationStartCycle <- mkSizedBRAMFIFO(128);
+    CONNECTION_SEND#(CYCLE_COUNTER) operationStartCycleSend <- mkConnectionSend("cycleFIFO");
+    CONNECTION_RECV#(CYCLE_COUNTER) operationStartCycleReceive <- mkConnectionRecv("cycleFIFO");
     FIFO#(Bool)          operationIsLast     <- mkSizedBRAMFIFO(128);
     Reg#(STATE)          state <- mkReg(STATE_init);
     Reg#(Bool)           correct <- mkReg(True);
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
     MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,2,3,4,5,6,7,8,16,32,64,128};
-    Reg#(Bit#(18))    count <- mkReg(0);  
+    Reg#(Bit#(14))    count <- mkReg(0);  
     FIFO#(MEM_ADDRESS) expected <- mkSizedBRAMFIFO(128);
     Reg#(MEM_ADDRESS) strideIdx <- mkReg(1);
     Reg#(MEM_ADDRESS) bound  <- mkReg(boundMin);
@@ -148,7 +149,8 @@ module [CONNECTED_MODULE] mkMemTester ()
         addr <= 0;
         startCycle <= cycle;
         correct <= True;
-        let length <- serverStub.acceptRequest_RunTest();		
+        let length <- serverStub.acceptRequest_RunTest();	
+	
         stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
         if((bound << 1 == boundMax) && (strideIdx == strideMax))
         begin
@@ -177,7 +179,6 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
-        $display("Sending write %d", addr);
         if(addr + stride[strideIdx] < bound * stride[strideIdx])
         begin
             addr <= (addr + stride[strideIdx]) /*& boundMask*/;
@@ -187,7 +188,7 @@ module [CONNECTED_MODULE] mkMemTester ()
             addr <= 0; 
         end 
 
-        operationStartCycle.enq(cycle);
+        operationStartCycleSend.send(cycle);
         count <= count + 1;
         if(count + 1 == 0)
         begin
@@ -202,8 +203,8 @@ module [CONNECTED_MODULE] mkMemTester ()
         correct <= correct && (resp == expected.first);
         expected.deq();
         operationIsLast.deq;
-        operationStartCycle.deq;
-        totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycle.first);
+        operationStartCycleReceive.deq;
+        totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycleReceive.receive);
         if(operationIsLast.first)
         begin
 	    serverStub.sendResponse_RunTest(?,?);	
@@ -220,6 +221,7 @@ module [CONNECTED_MODULE] mkMemTester ()
         startCycle <= cycle;
         totalLatency <= 0;
         correct <= True;
+	
         stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
         if((bound << 1 == boundMax) && (strideIdx == strideMax))
         begin

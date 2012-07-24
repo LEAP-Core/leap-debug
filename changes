@@ -945,3 +945,14 @@ Directory modules/apps/tests/mem_perf
 
 
 Upgrades to the mem-perf test.  It can now dump statistics for single experiments. 
+
+----------
+kfleming    Date: Tue Jul 24 13:48:02 EDT 2012  CSN: CSN-leap-debug-29
+                  Tue Jul 24 17:48:02 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           28 
+
+
+Added latency and fifo depth controls to memory performance test.
