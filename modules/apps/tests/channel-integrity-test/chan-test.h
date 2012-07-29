@@ -39,10 +39,9 @@ class TEST_ITERATIONS_SWITCH_CLASS : public COMMAND_SWITCH_INT_CLASS
     {};
 
     void ProcessSwitchInt(int arg) { testIter = arg; };
-    bool ShowSwitch(char *buff)
+    void ShowSwitch(std::ostream& ostr, const string& prefix)
     {
-        strcpy(buff, "[--test-iterations=<n>] Channel test iterations");
-        return true;
+        ostr << prefix << "[--test-iterations=<n>] Channel test iterations" << endl;
     };
 
     int Value(void) const { return testIter; }

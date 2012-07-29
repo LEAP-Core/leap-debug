@@ -956,3 +956,14 @@ Directory modules/apps/tests/mem_perf
 
 
 Added latency and fifo depth controls to memory performance test.
+
+----------
+mcadler     Date: Sun Jul 29 14:32:27 EDT 2012  CSN: CSN-leap-debug-30
+                  Sun Jul 29 18:32:27 UTC 2012
+
+
+Directory modules/apps/tests/channel-integrity-test
+ chan-test-16.h            Locally Modified           29 
+ chan-test.h               Locally Modified           29 
+
+Update for new --help argument interface.
