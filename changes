@@ -967,3 +967,31 @@ Directory modules/apps/tests/channel-integrity-test
  chan-test.h               Locally Modified           29 
 
 Update for new --help argument interface.
+
+----------
+mcadler     Date: Mon Jul 30 13:12:07 EDT 2012  CSN: CSN-leap-debug-31
+                  Mon Jul 30 17:12:07 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.bsv              Locally Modified           30 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           30 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf.rrr              Locally Modified           30 
+
+- Take advantage of the existing RRR control logic and run the test from
+  software.  Parameters are now passed over RRR and each test then reverts
+  to waiting for a command.  Removed a bunch of hardware control logic.
+  (Now it is easy to build a shorter test in the software controller when
+  running in Bluesim.)
+
+- Eliminated 2nd stride 128 test.
+
+- Apply a trivial mix function to data to force a test that values stored
+  are != the address of the value.
+
+- The printf in the hardware side isn't really necessary anymore, since test
+  results could be returned via RRR.  Left the printf for now.

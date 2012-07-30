@@ -4,7 +4,7 @@
 #include "asim/rrr/client_stub_MEMPERFRRR.h"
 #include "asim/provides/connected_application.h"
 
-
+static UINT32 stride[] = {1,2,3,4,5,6,7,8,16,32,64,128};
 
 using namespace std;
 
@@ -30,23 +30,35 @@ CONNECTED_APPLICATION_CLASS::Init()
 int
 CONNECTED_APPLICATION_CLASS::Main()
 {
-    // We call start for each of the test cases.                      
-    // May need to call starter once to start           
-    for(int rw = 0; rw < 2; rw = rw + 1) {
-        for(int ws = 9; ws < 26; ws = ws + 1) {
-            for(int stride = 0; stride < 13; stride = stride + 1) {
-    	        stringstream filename;
-		OUT_TYPE_RunTest result = clientStub->RunTest(65000);
-                filename << "cache_" << rw << "_" << stride << "_" << ws << ".stats";
+    int max_stride_idx = sizeof(stride) / sizeof(stride[0]);
+
+    //
+    // Software controls the order of tests.  NOTE:  Writes for a given pattern
+    // must precede reads!  The writes initialize memory values and are required
+    // for read value error detection.
+    //
+
+    for (int rw = 0; rw < 2; rw++) {
+        for (int ws = 9; ws < 26; ws++) {
+            for (int stride_idx = 0; stride_idx < max_stride_idx; stride_idx++) {
+                stringstream filename;
+                OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
+                                                              stride[stride_idx],
+                                                              16384,
+                                                              rw);
+
+                filename << "cache_" << rw << "_" << stride_idx << "_" << ws << ".stats";
                 STATS_SERVER_CLASS::GetInstance()->DumpStats();
-		STATS_SERVER_CLASS::GetInstance()->EmitFile(filename.str());
-		STATS_SERVER_CLASS::GetInstance()->ResetStatValues();
-	    }
-	}
+                STATS_SERVER_CLASS::GetInstance()->EmitFile(filename.str());
+                STATS_SERVER_CLASS::GetInstance()->ResetStatValues();
+            }
+        }
     }
 
+    // Send "done" command
+    clientStub->RunTest(0, 0, 0, 2);
 
-  STARTER_DEVICE_SERVER_CLASS::GetInstance()->End(0);
+    STARTER_DEVICE_SERVER_CLASS::GetInstance()->End(0);
   
-  return 0;
+    return 0;
 }

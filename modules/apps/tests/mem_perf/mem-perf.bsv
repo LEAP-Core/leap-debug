@@ -37,11 +37,10 @@ import GetPut::*;
 
 typedef enum
 {
-    STATE_init,
+    STATE_get_command,
+    STATE_test_done,
     STATE_writing,
-    STATE_write_reset,
     STATE_reading,
-    STATE_read_reset,
     STATE_finished,
     STATE_sync,
     STATE_exit
@@ -57,16 +56,12 @@ typedef 26 MAX_WORKING_SET;
 typedef 9 MIN_WORKING_SET;
 typedef 12 STRIDE_INDEXES;
 
-MEM_ADDRESS boundMaskBase = (1 << fromInteger(valueof(MIN_WORKING_SET))) - 1;
 MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
-MEM_ADDRESS boundMax      =  1 << fromInteger(valueof(MAX_WORKING_SET));
-MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 
 module [CONNECTED_MODULE] mkMemTester ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
     messageM("Compiling mkMemTester");
-
 
     //
     // Allocate scratchpads
@@ -89,45 +84,64 @@ module [CONNECTED_MODULE] mkMemTester ()
     Reg#(Bit#(64))       totalLatency <- mkReg(0);
     CONNECTION_SEND#(CYCLE_COUNTER) operationStartCycleSend <- mkConnectionSend("cycleFIFO");
     CONNECTION_RECV#(CYCLE_COUNTER) operationStartCycleReceive <- mkConnectionRecv("cycleFIFO");
-    FIFO#(Bool)          operationIsLast     <- mkSizedBRAMFIFO(128);
-    Reg#(STATE)          state <- mkReg(STATE_init);
-    Reg#(Bool)           correct <- mkReg(True);
+    FIFO#(Bool)          operationIsLast     <- mkSizedFIFO(256);
+    Reg#(Bool)           reqsDone <- mkReg(False);
+    Reg#(STATE)          state <- mkReg(STATE_get_command);
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
-    MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,2,3,4,5,6,7,8,16,32,64,128};
-    Reg#(Bit#(14))    count <- mkReg(0);  
-    FIFO#(MEM_ADDRESS) expected <- mkSizedBRAMFIFO(128);
-    Reg#(MEM_ADDRESS) strideIdx <- mkReg(1);
-    Reg#(MEM_ADDRESS) bound  <- mkReg(boundMin);
-    Reg#(MEM_ADDRESS) boundMask  <- mkReg(boundMaskBase);
 
+    Reg#(Bit#(32)) count <- mkRegU();
+    Reg#(Bit#(32)) iterations <- mkRegU();
+    Reg#(Bit#(32)) errors <- mkRegU();
+
+    FIFO#(MEM_ADDRESS) expected <- mkSizedBRAMFIFO(256);
+    Reg#(MEM_ADDRESS) stride <- mkRegU();
+    Reg#(MEM_ADDRESS) bound  <- mkRegU();
+
+    // Simple mixing function to swizzle write values a little bit
+    function MEM_ADDRESS addrMix(MEM_ADDRESS a) = a + (a << 3);
 
     // Messages
-    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu:correct:%llu\n");
+    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu:errors:%llu\n");
     
     (* fire_when_enabled *)
     rule cycleCount (True);
         cycle <= cycle + 1;
     endrule
 
-    rule doInit (state == STATE_init);
-        let length <- serverStub.acceptRequest_RunTest();    
-        state <= STATE_writing;
-        startCycle <= cycle;
-        totalLatency <= 0;
-        strideIdx <= 0;
-        bound <= boundMin;
-        boundMask <= boundMaskBase;
+    rule doGetCommand (state == STATE_get_command);
+        let cmd <- serverStub.acceptRequest_RunTest();    
+
+        addr <= 0;
+        bound <= zeroExtend(cmd.workingSet);
+        stride <= zeroExtend(cmd.stride);
+        iterations <= cmd.iterations;
+
+        case (cmd.command[1:0])
+            0: state <= STATE_writing;
+            1: state <= STATE_reading;
+            2: state <= STATE_finished;
+        endcase
+
+        errors <= 0;
         count <= 0;
+        totalLatency <= 0;
+        startCycle <= cycle;
+        reqsDone <= False;
     endrule
 
+    rule doTestDone (state == STATE_test_done);
+        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride), 0, zeroExtend(endCycle - startCycle), zeroExtend(errors)));
+        serverStub.sendResponse_RunTest(errors, zeroExtend(endCycle - startCycle));
+        state <= STATE_get_command;
+    endrule
 
     rule doWrite(state == STATE_writing);
-        memory.write(addr,addr);
+        memory.write(addr, addrMix(addr));
 
-        if(addr + stride[strideIdx] < bound * stride[strideIdx])
+        if(addr + stride < bound * stride)
         begin
-            addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+            addr <= (addr + stride);
         end
         else 
         begin
@@ -135,53 +149,18 @@ module [CONNECTED_MODULE] mkMemTester ()
         end 
 
         count <= count + 1;
-        if(count + 1 == 0)
+        if(count + 1 == iterations)
         begin
-            serverStub.sendResponse_RunTest(?,?); 
-
-            
-            state <= STATE_write_reset;
+            state <= STATE_test_done;
             endCycle <= cycle;
         end
     endrule
 
-    rule doWriteReset(state == STATE_write_reset);
-        addr <= 0;
-        startCycle <= cycle;
-        correct <= True;
-        let length <- serverStub.acceptRequest_RunTest();	
-	
-        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
-        if((bound << 1 == boundMax) && (strideIdx == strideMax))
-        begin
-            bound <= boundMin;
-            strideIdx <= 0;
-            boundMask <= boundMaskBase;
-            state <= STATE_reading;
-        end
-        else
-        begin
-            state <= STATE_writing;
-            if(strideIdx == strideMax)
-            begin
-                strideIdx <= 0;         
-                bound <= bound << 1;
-                boundMask <= truncate({boundMask,1'b1});
-            end
-            else
-            begin
-                strideIdx <= strideIdx + 1;
-            end
-        end
-    endrule
-
-    Reg#(Bool) reqsDone <- mkReg(False);
-
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
-        if(addr + stride[strideIdx] < bound * stride[strideIdx])
+        if(addr + stride < bound * stride)
         begin
-            addr <= (addr + stride[strideIdx]) /*& boundMask*/;
+            addr <= (addr + stride);
         end
         else 
         begin
@@ -190,61 +169,37 @@ module [CONNECTED_MODULE] mkMemTester ()
 
         operationStartCycleSend.send(cycle);
         count <= count + 1;
-        if(count + 1 == 0)
+        Bool is_last = (count + 1 == iterations);
+        if(is_last)
         begin
             reqsDone <= True;
         end 
-        expected.enq(addr);
-        operationIsLast.enq(count + 1 == 0);
+        expected.enq(addrMix(addr));
+        operationIsLast.enq(is_last);
     endrule
 
     rule readResp;
         let resp <- memory.readRsp();
-        correct <= correct && (resp == expected.first);
+
+        if (resp != expected.first)
+        begin
+            errors <= errors + 1;
+        end
+
         expected.deq();
         operationIsLast.deq;
         operationStartCycleReceive.deq;
         totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycleReceive.receive);
+
         if(operationIsLast.first)
         begin
-	    serverStub.sendResponse_RunTest(?,?);	
-            state <= STATE_read_reset;
+            state <= STATE_test_done;
             endCycle <= cycle;
         end
     endrule
 
-    rule doReadReset(state == STATE_read_reset);
-        addr <= 0;
-        let length <- serverStub.acceptRequest_RunTest();    
 
-        reqsDone <= False;
-        startCycle <= cycle;
-        totalLatency <= 0;
-        correct <= True;
-	
-        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle), zeroExtend(pack(correct))));
-        if((bound << 1 == boundMax) && (strideIdx == strideMax))
-        begin
-            bound <= 1;
-            strideIdx <= 0;
-            state <= STATE_finished;
-        end
-        else
-        begin
-            state <= STATE_reading;
-            if(strideIdx == strideMax)
-            begin
-                strideIdx <= 0;         
-                bound <= bound << 1;
-                boundMask <= truncate({boundMask,1'b1});
-            end
-            else
-            begin
-                strideIdx <= strideIdx + 1;
-            end
-        end
-    endrule
-
+    // ====================================================================
     //
     // End of program.
     //
