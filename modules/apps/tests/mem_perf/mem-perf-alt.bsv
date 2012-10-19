@@ -23,13 +23,15 @@ import GetPut::*;
 
 `include "asim/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
-
+`include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"
 `include "asim/provides/common_services.bsh"
+`include "awb/provides/mem_perf_tester.bsh"
+`include "awb/provides/mem_perf_common.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 
@@ -37,11 +39,10 @@ import GetPut::*;
 
 typedef enum
 {
-    STATE_init,
+    STATE_get_command,
+    STATE_test_done,
     STATE_writing,
-    STATE_write_reset,
     STATE_reading,
-    STATE_read_reset,
     STATE_finished,
     STATE_sync,
     STATE_exit
@@ -57,21 +58,17 @@ typedef 26 MAX_WORKING_SET;
 typedef 9 MIN_WORKING_SET;
 typedef 12 STRIDE_INDEXES;
 
-MEM_ADDRESS boundMaskBase = (1 << fromInteger(valueof(MIN_WORKING_SET))) - 1;
 MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
-MEM_ADDRESS boundMax      =  1 << fromInteger(valueof(MAX_WORKING_SET));
-MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 
 module [CONNECTED_MODULE] mkMemTesterAlt ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
-
+    messageM("Compiling mkMemTester");
 
     //
     // Allocate scratchpads
     //
-
-    let private_caches = (`MEM_TEST_PRIVATE_CACHES_ALT != 0 ? SCRATCHPAD_CACHED :
+    let private_caches = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
                                                           SCRATCHPAD_NO_PVT_CACHE);
 
     // Large data (multiple containers for single datum)
@@ -85,132 +82,130 @@ module [CONNECTED_MODULE] mkMemTesterAlt ()
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
     Reg#(Bit#(64))       totalLatency <- mkReg(0);
-    FIFO#(CYCLE_COUNTER) operationStartCycle <- mkSizedBRAMFIFO(128);
-    FIFO#(Bool)          operationIsLast     <- mkSizedBRAMFIFO(128);
-    Reg#(STATE)          state <- mkReg(STATE_init);
-
+    CONNECTION_RECV#(CommandType) cmdIn <- mkConnectionRecv("altCmd");
+    CONNECTION_SEND#(Bit#(1)) finishOut <- mkConnectionSend("altFinish");
+    CONNECTION_SEND#(CYCLE_COUNTER) operationStartCycleSend <- mkConnectionSend("cycleFIFOAlt");
+    CONNECTION_RECV#(CYCLE_COUNTER) operationStartCycleReceive <- mkConnectionRecv("cycleFIFOAlt");
+    FIFO#(Bool)          operationIsLast     <- mkSizedFIFO(128);
+    Reg#(Bool)           reqsDone <- mkReg(False);
+    Reg#(STATE)          state <- mkReg(STATE_get_command);
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
-    MEM_ADDRESS       stride[valueof(STRIDE_INDEXES)] = {1,2,3,4,5,6,7,8,16,32,64,128};
-    Reg#(Bit#(18))    count <- mkReg(0);  
-    Reg#(MEM_ADDRESS) strideIdx <- mkReg(1);
-    Reg#(MEM_ADDRESS) bound  <- mkReg(boundMin);
-    Reg#(MEM_ADDRESS) boundMask  <- mkReg(boundMaskBase);
 
+    Reg#(Bit#(32)) count <- mkRegU();
+    Reg#(Bit#(32)) iterations <- mkRegU();
+    Reg#(Bit#(32)) errors <- mkRegU();
+
+    FIFO#(MEM_ADDRESS) expected <- mkSizedBRAMFIFO(128);
+    Reg#(MEM_ADDRESS) stride <- mkRegU();
+    Reg#(MEM_ADDRESS) bound  <- mkRegU();
+
+    // Simple mixing function to swizzle write values a little bit
+    function MEM_ADDRESS addrMix(MEM_ADDRESS a) = a + (a << 3);
 
     // Messages
-    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu\n");
+    let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu:Alt:%llu\n");
+    let errMsg <-  getGlobalStringUID("expected:%llu:got:%llu:Alt\n");
     
     (* fire_when_enabled *)
     rule cycleCount (True);
         cycle <= cycle + 1;
     endrule
 
-    rule doInit (False);
-        
-        state <= STATE_writing;
-        startCycle <= cycle;
-        totalLatency <= 0;
-        strideIdx <= 0;
-        bound <= boundMin;
-        boundMask <= boundMaskBase;
+    rule doGetCommand (state == STATE_get_command);
+        let cmd = cmdIn.receive;
+	cmdIn.deq;    
+
+        addr <= 0;
+        bound <= zeroExtend(pack(cmd.workingSet));
+        stride <= zeroExtend(pack(cmd.stride));
+        iterations <= pack(cmd.iterations);
+
+        case (pack(cmd.command)[1:0])
+            0: state <= STATE_writing;
+            1: state <= STATE_reading;
+            2: state <= STATE_finished;
+        endcase
+
+        errors <= 0;
         count <= 0;
+        totalLatency <= 0;
+        startCycle <= cycle;
+        reqsDone <= False;
     endrule
 
+    rule doTestDone (state == STATE_test_done);
+        stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride), 0, zeroExtend(endCycle - startCycle), zeroExtend(errors)));
+        
+        state <= STATE_get_command;
+	finishOut.send(?);
+    endrule
 
     rule doWrite(state == STATE_writing);
-        memory.write(addr,addr);
-        addr <= (addr + stride[strideIdx]) & boundMask;
-        count <= count + 1;
-        if(count + 1 == 0)
+        memory.write(addr, addrMix(addr));
+
+        if(addr + stride < bound * stride)
         begin
-            state <= STATE_write_reset;
+            addr <= (addr + stride);
+        end
+        else 
+        begin
+            addr <= 0; 
+        end 
+
+        count <= count + 1;
+        if(count + 1 == iterations)
+        begin
+            state <= STATE_test_done;
             endCycle <= cycle;
         end
     endrule
 
-    rule doWriteReset(state == STATE_write_reset);
-        addr <= 0;
-        startCycle <= cycle;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), 0, zeroExtend(endCycle - startCycle)));
-        if(bound << 1 == boundMax)
-        begin
-            bound <= boundMin;
-            strideIdx <= 0;
-            boundMask <= boundMaskBase;
-            state <= STATE_reading;
-        end
-        else
-        begin
-            state <= STATE_writing;
-            if(strideIdx == strideMax)
-            begin
-                strideIdx <= 0;         
-                bound <= bound << 1;
-                boundMask <= truncate({boundMask,1'b1});
-            end
-            else
-            begin
-                strideIdx <= strideIdx + 1;
-            end
-        end
-    endrule
-
-    Reg#(Bool) reqsDone <- mkReg(False);
-
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
-        addr <= (addr + stride[strideIdx]) & boundMask;
-        operationStartCycle.enq(cycle);
+        if(addr + stride < bound * stride)
+        begin
+            addr <= (addr + stride);
+        end
+        else 
+        begin
+            addr <= 0; 
+        end 
+
+        operationStartCycleSend.send(cycle);
         count <= count + 1;
-        if(count + 1 == 0)
+        Bool is_last = (count + 1 == iterations);
+        if(is_last)
         begin
             reqsDone <= True;
         end 
-
-        operationIsLast.enq(count + 1 == 0);
+        expected.enq(addrMix(addr));
+        operationIsLast.enq(is_last);
     endrule
 
     rule readResp;
         let resp <- memory.readRsp();
+
+        if (resp != expected.first)
+        begin
+            stdio.printf(errMsg, list2(zeroExtend(resp), zeroExtend(expected.first)));
+            errors <= errors + 1;
+        end
+
+        expected.deq();
         operationIsLast.deq;
-        operationStartCycle.deq;
-        totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycle.first);
+        operationStartCycleReceive.deq;
+        totalLatency <= totalLatency + zeroExtend(cycle - operationStartCycleReceive.receive);
+
         if(operationIsLast.first)
         begin
-            state <= STATE_read_reset;
+            state <= STATE_test_done;
             endCycle <= cycle;
         end
     endrule
 
-    rule doReadReset(state == STATE_read_reset);
-        addr <= 0;
-        reqsDone <= False;
-        startCycle <= cycle;
-        totalLatency <= 0;
-        stdio.printf(perfMsg, list4(zeroExtend(bound), zeroExtend(stride[strideIdx]), zeroExtend(totalLatency), zeroExtend(endCycle - startCycle)));
-        if(bound << 1 == boundMax)
-        begin
-            bound <= 1;
-            strideIdx <= 0;
-            state <= STATE_finished;
-        end
-        else
-        begin
-            state <= STATE_reading;
-            if(strideIdx == strideMax)
-            begin
-                strideIdx <= 0;         
-                bound <= bound << 1;
-                boundMask <= truncate({boundMask,1'b1});
-            end
-            else
-            begin
-                strideIdx <= strideIdx + 1;
-            end
-        end
-    endrule
 
+    // ====================================================================
     //
     // End of program.
     //
@@ -226,7 +221,7 @@ module [CONNECTED_MODULE] mkMemTesterAlt ()
     endrule
 
     rule finished (state == STATE_exit);
-        let r <- stdio.sync_rsp();
+        let r <- stdio.sync_rsp();        
     endrule
 
 endmodule

@@ -28,6 +28,7 @@ import GetPut::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/mem_perf_tester.bsh"
+`include "awb/provides/mem_perf_tester_alt.bsh"
 
 
 `include "asim/provides/mem_services.bsh"
@@ -68,5 +69,6 @@ module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
     let mem_tester <- mkMemTester();
+    let mem_tester_alt <- mkMemTesterAlt();
 
 endmodule

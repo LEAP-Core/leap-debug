@@ -29,6 +29,7 @@ import GetPut::*;
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"
+`include "asim/provides/mem_perf_common.bsh"
 `include "asim/provides/common_services.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
@@ -82,6 +83,8 @@ module [CONNECTED_MODULE] mkMemTester ()
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
     Reg#(Bit#(64))       totalLatency <- mkReg(0);
+    CONNECTION_SEND#(CommandType) cmdOut <- mkConnectionSend("altCmd");
+    CONNECTION_RECV#(Bit#(1)) finishIn <- mkConnectionRecv("altFinish");
     CONNECTION_SEND#(CYCLE_COUNTER) operationStartCycleSend <- mkConnectionSend("cycleFIFO");
     CONNECTION_RECV#(CYCLE_COUNTER) operationStartCycleReceive <- mkConnectionRecv("cycleFIFO");
     FIFO#(Bool)          operationIsLast     <- mkSizedFIFO(256);
@@ -103,7 +106,8 @@ module [CONNECTED_MODULE] mkMemTester ()
 
     // Messages
     let perfMsg <- getGlobalStringUID("size:%llu:stride:%llu:latency:%llu:time:%llu:errors:%llu\n");
-    
+    let errMsg <-  getGlobalStringUID("expected:%llu:got:%llu:Alt\n");	    
+
     (* fire_when_enabled *)
     rule cycleCount (True);
         cycle <= cycle + 1;
@@ -116,6 +120,11 @@ module [CONNECTED_MODULE] mkMemTester ()
         bound <= zeroExtend(cmd.workingSet);
         stride <= zeroExtend(cmd.stride);
         iterations <= cmd.iterations;
+
+        cmdOut.send(CommandType{workingSet: unpack(cmd.workingSet),
+                                stride: unpack(cmd.stride),
+                                iterations: unpack(cmd.iterations),
+                                command: unpack(cmd.command)});
 
         case (cmd.command[1:0])
             0: state <= STATE_writing;
@@ -133,6 +142,7 @@ module [CONNECTED_MODULE] mkMemTester ()
     rule doTestDone (state == STATE_test_done);
         stdio.printf(perfMsg, list5(zeroExtend(bound), zeroExtend(stride), 0, zeroExtend(endCycle - startCycle), zeroExtend(errors)));
         serverStub.sendResponse_RunTest(errors, zeroExtend(endCycle - startCycle));
+        finishIn.deq();
         state <= STATE_get_command;
     endrule
 
@@ -183,6 +193,7 @@ module [CONNECTED_MODULE] mkMemTester ()
 
         if (resp != expected.first)
         begin
+            stdio.printf(errMsg, list2(zeroExtend(resp), zeroExtend(expected.first)));
             errors <= errors + 1;
         end
 

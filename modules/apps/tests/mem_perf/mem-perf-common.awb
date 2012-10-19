@@ -1,0 +1,13 @@
+%name Mem perf common types
+%desc Mem perf common types
+
+%attributes scratchpad_test test
+
+%provides mem_perf_common
+
+%public mem-perf-common.bsv
+
+%param MEM_TEST_ALT 1  "Should we test the second scratchpad"
+
+
+

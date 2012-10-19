@@ -4,7 +4,9 @@
 %attributes scratchpad_test test
 
 %provides mem_perf_wrapper
+%requires mem_perf_common
 %requires mem_perf_tester
+%requires mem_perf_tester_alt
 
 %public mem-perf-wrapper.bsv
 

@@ -4,7 +4,8 @@
 #include "asim/rrr/client_stub_MEMPERFRRR.h"
 #include "asim/provides/connected_application.h"
 
-static UINT32 stride[] = {1,2,3,4,5,6,7,8,16,32,64,128};
+//static UINT32 stride[] = {1,2,3,4,5,6,7,8,16,32,64,128};
+static UINT32 stride[] = {128};
 
 using namespace std;
 
@@ -39,12 +40,12 @@ CONNECTED_APPLICATION_CLASS::Main()
     //
 
     for (int rw = 0; rw < 2; rw++) {
-        for (int ws = 9; ws < 26; ws++) {
+        for (int ws = 16; ws < 26; ws++) {
             for (int stride_idx = 0; stride_idx < max_stride_idx; stride_idx++) {
                 stringstream filename;
                 OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
                                                               stride[stride_idx],
-                                                              16384,
+                                                              1<<16,
                                                               rw);
 
                 filename << "cache_" << rw << "_" << stride_idx << "_" << ws << ".stats";
