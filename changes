@@ -1016,3 +1016,14 @@ Directory modules/apps/tests/mem_perf
 
 
 Multifpga testbench now does experiments approxiamately in parallel.
+
+----------
+kfleming    Date: Sun Oct 21 15:02:01 EDT 2012  CSN: CSN-leap-debug-33
+                  Sun Oct 21 19:02:01 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           32 
+
+
+Adjusted perf test parameters back to original values.
