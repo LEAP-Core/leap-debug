@@ -1027,3 +1027,14 @@ Directory modules/apps/tests/mem_perf/connected_application
 
 
 Adjusted perf test parameters back to original values.
+
+----------
+kfleming    Date: Sun Oct 21 20:28:49 EDT 2012  CSN: CSN-leap-debug-34
+                  Mon Oct 22 00:28:49 UTC 2012
+
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           33 
+
+
+Removed erroneous include from matrix multiply code.
