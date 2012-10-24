@@ -1038,3 +1038,27 @@ Directory modules/apps/tests/mem_perf/connected_application
 
 
 Removed erroneous include from matrix multiply code.
+
+----------
+kfleming    Date: Wed Oct 24 14:50:59 EDT 2012  CSN: CSN-leap-debug-35
+                  Wed Oct 24 18:50:59 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_ml605.apm Locally Added               0 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_ml605.apm Locally Added               0 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           34 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           34 
+ platform-debugger.cpp     Locally Modified           34 
+ platform-debugger.awb     Locally Modified           34 
+
+
+Changed sram debugger to use parameters from the memory controller.
+Most modern memory controllers do not support unaligned accesses, and
+the test bench must honor this. 

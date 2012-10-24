@@ -36,7 +36,7 @@ File=modules/leap/virtual-platform/low-level-platform-interface/hybrid-llpi.awb
 Packagehint=leap
 
 [Low Level Platform Interface Hybrid/Requires]
-physical_platform=ACP M2 Compute Module With SRAM (Nallatech)
+physical_platform=ML605 V6 Platform with BlueNoC
 remote_memory=Null Remote Memory
 channelio=Basic Virtual Channel Multiplexer
 rrr=RRR Clients and Servers
@@ -46,10 +46,6 @@ local_mem=NULL Local Memory Interface
 [ACP DDR2 SRAM Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/ddr-sram/ddr-sram-device.awb
 Packagehint=leap-platforms-acp
-
-[Null Clocks Device]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/null/null-clocks-device.awb
-Packagehint=leap-platforms
 
 [RRR Clients and Servers]
 File=modules/leap/virtual-platform/rrr/basic/basic-rrr.awb
@@ -65,19 +61,8 @@ low_level_platform_interface=Low Level Platform Interface Hybrid
 virtual_devices=NULL Virtual Devices
 platform_services=NULL Platform Services
 
-[ACP M2 Compute Module With SRAM (Nallatech)/Requires]
-clocks_device=Null Clocks Device
-physical_platform_utils=Common Physical Platform Utilities
-ddr2_device=ACP DDR2 SRAM Device
-nallatech_edge_device=Nallatech Edge Physical Device v2
-led_device=General LED Device
-
 [Nallatech Edge Physical Channel]
 File=modules/bluespec/common/fpgaenv/virtual-platform/channelio/physical-channel/nallatech-edge/nallatech-edge-channel.awb
-Packagehint=leap-platforms-acp
-
-[ACP M2 Compute Module With SRAM (Nallatech)]
-File=modules/bluespec/common/fpgaenv/physical-platform/acp-m2c-with-sram/acp-m2c.awb
 Packagehint=leap-platforms-acp
 
 [Basic Virtual Channel Multiplexer]
@@ -124,10 +109,6 @@ soft_services=Soft Services Submodel
 [Little-Endian Unified Message Format/Params]
 UMF_CHUNK_BYTES=8
 
-[ACP DDR2 SRAM Device/Params]
-SRAM_DEBUG=1
-SRAM_MAX_OUTSTANDING_READS=32
-
 [RRR Common Module]
 File=modules/leap/virtual-platform/rrr/rrr-common/rrr-common.awb
 Packagehint=leap
@@ -145,17 +126,6 @@ Packagehint=leap
 
 [SRAM Debugger Application/Params]
 MEM_CHECK_LATENCY=1
-
-[Null Clocks Device/Params]
-CRYSTAL_CLOCK_FREQ=200
-
-[General LED Device]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/general-led-device.awb
-Packagehint=leap-platforms
-
-[Nallatech Edge Physical Device v2]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/nallatech-edge/nallatech-edge-device.awb
-Packagehint=leap-platforms-acp
 
 [FPGA Build Pipeline Xilinx]
 File=config/pm/leap/submodels/pipelines/build-pipeline-xilinx.apm
@@ -192,3 +162,31 @@ starter_service=Starter Service
 [Starter Service]
 File=modules/leap/libraries/platform-services/starter-service/starter-service.awb
 Packagehint=leap
+
+[ML605 V6 Platform with BlueNoC/Requires]
+pcie_device=Bluespec PCIE Device (Bluenoc)
+clocks_device=Differential Crystal Clocks Device
+ddr2_device=ACP DDR2 SRAM Device
+physical_platform_utils=Common Physical Platform Utilities
+
+[ML605 V6 Platform with BlueNoC]
+File=modules/bluespec/common/fpgaenv/physical-platform/ml605/pcie-bluenoc/xilinx-xup-pcie.awb
+Packagehint=leap-platforms
+
+[Bluespec PCIE Device (Bluenoc)]
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-bluenoc/pcie-bluenoc.awb
+Packagehint=leap-platforms
+
+[Differential Crystal Clocks Device]
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/differential/differential-clocks-device.awb
+Packagehint=leap-platforms
+
+[BlueNoC Core for ML605]
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-bluenoc/bluenoc-core/bluenoc-core.awb
+Packagehint=leap-platforms
+
+[Bluespec PCIE Device (Bluenoc)/Requires]
+bluenoc_core=BlueNoC Core for ML605
+
+[Differential Crystal Clocks Device/Params]
+CRYSTAL_CLOCK_FREQ=200

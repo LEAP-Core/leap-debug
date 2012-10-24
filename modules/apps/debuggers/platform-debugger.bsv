@@ -85,7 +85,7 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     // read requests work.
     //
     FIFOF#(Tuple2#(Bit#(TLog#(FPGA_DDR_BANKS)), Bit#(32))) readReqQ <- mkSizedFIFOF(valueOf(FPGA_DDR_BANKS) * 32);
-    Vector#(FPGA_DDR_BANKS, FIFO#(Bit#(64))) readRspQ <- replicateM(mkSizedFIFO(`MEM_BURST_COUNT * 32));
+    Vector#(FPGA_DDR_BANKS, FIFO#(Bit#(64))) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
 
     rule accept_load_req (state == STATE_running);
 

@@ -46,6 +46,8 @@ getIdxName(const int idx)
         case 5:  return "mergeReqQ.ports[1].notFull()";
         case 6:  return "syncReadDataQ.notEmpty()";
         case 7:  return "syncReadDataQ.notFull()";
+        case 8:  return "initDone";
+        case 9:  return "phy reset asserted";
         case 10: return "syncRequestQ.notEmpty()";
         case 11: return "syncRequestQ.notFull()";
         case 12: return "syncWriteDataQ.notEmpty()";
@@ -120,6 +122,10 @@ HYBRID_APPLICATION_CLASS::Main()
     UINT64 sts, oldsts;
     UINT64 data;
 
+    // Different memory styles have different minimum offsets This is
+    // a combination of DRAM_MIN_BURST and DRAM_WORD_WIDTH.
+    int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_WORD_WIDTH / DIMM_WIDTH;
+
     // print banner
     cout << "\n";
     cout << "Welcome to the Platform Debugger\n";
@@ -135,8 +141,12 @@ HYBRID_APPLICATION_CLASS::Main()
     sts = clientStub->StartDebug(0);
     cout << "debugging started, sts = " << sts << endl << flush;
 
+    sts = clientStub->StatusCheck(0);
+    oldsts = sts;
+    printRAMStatus(sts);
+
     // Write a pattern to memory.
-    for (int i = 0; i <= 10000; i += 3)
+    for (int i = 0; i <= 10000; i += MIN_IDX_OFFSET)
     {
         int addr = i;
         for (int bank = 0; bank < MEM_BANKS; bank++)
@@ -148,9 +158,10 @@ HYBRID_APPLICATION_CLASS::Main()
             }
 
             sts = clientStub->WriteReq(bank, addr);
-            for (int burst = 0; burst < MEM_BURST_COUNT; burst++)
+            for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
             {
                 sts = clientStub->WriteData(bank, data, 0);
+                oldsts = sts;
                 data = ~data;
             }
         }
@@ -160,12 +171,13 @@ HYBRID_APPLICATION_CLASS::Main()
 
     // Read the pattern back.  Alternate banks on each request.
     int errors = 0;
-    for (int j = 0; j <= 10000 - (33 * 3); j += 3)
+    int reads = 0;
+    for (int j = 0; j <= 10000 - (33 * 3); j += MIN_IDX_OFFSET)
     {
         // Generate a burst of 32 read requests.  The actual reads won't be
         // triggered unto the DoReads() below so that the RAM read bus
         // is stressed.
-        for (int i = j; i < j + 32 * 3; i += 3)
+        for (int i = j; i < j + 32 * 3; i += MIN_IDX_OFFSET)
         {
             int addr = i;
     
@@ -178,7 +190,7 @@ HYBRID_APPLICATION_CLASS::Main()
         // Tell the hardware to do the reads
         clientStub->DoReads(0);
 
-        for (int i = j; i < j + 32 * 3; i += 3)
+        for (int i = j; i < j + 32 * 3; i += MIN_IDX_OFFSET)
         {
             int addr = i;
     
@@ -190,7 +202,7 @@ HYBRID_APPLICATION_CLASS::Main()
                     expect <<= bank;
                 }
 
-                for (int burst = 0; burst < MEM_BURST_COUNT; burst++)
+                for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
                 {
                     data = clientStub->ReadRsp(bank);
                     if (data != expect)
@@ -198,14 +210,14 @@ HYBRID_APPLICATION_CLASS::Main()
                         cout << hex << "error read data 0x" << addr << " = 0x" << data << " expect 0x" << expect << dec << endl;
                         errors += 1;
                     }
-
+                    reads++;
                     expect = ~expect;
                 }
             }
         }
     }
 
-    cout << errors << " read errors" << endl << endl << flush;
+    cout << errors << " errors on " << reads << " reads" <<endl << endl << flush;
 
     //
     // Optimal read buffer size calibration
@@ -214,7 +226,7 @@ HYBRID_APPLICATION_CLASS::Main()
     cout << "Latencies:" << endl;
     int min_idx = 0;
     int min_latency = 0;
-    for (int i = 1; i <= SRAM_MAX_OUTSTANDING_READS; i++)
+    for (int i = 1; i <= DRAM_MAX_OUTSTANDING_READS; i++)
     {
         OUT_TYPE_ReadLatency r = clientStub->ReadLatency(256, i);
         cout << i << ": first " << r.firstReadLatency << " cycles, average "
@@ -234,20 +246,20 @@ HYBRID_APPLICATION_CLASS::Main()
     for (int m = 0; m < 8; m++)
     {
         clientStub->WriteReq(0, 0);
-        for (int b = 0; b < MEM_BURST_COUNT; b++)
+        for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
             clientStub->WriteData(0, 0xffffffffffffffff, 0);
         }
 
         clientStub->WriteReq(0, 0);
-        for (int b = 0; b < MEM_BURST_COUNT; b++)
+        for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
             clientStub->WriteData(0, 0, 1 << m);
         }
 
         clientStub->ReadReq(0, 0);
         clientStub->DoReads(0);
-        for (int b = 0; b < MEM_BURST_COUNT; b++)
+        for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
             UINT64 data = clientStub->ReadRsp(0);
             UINT64 expect = 0xffL << (m * 8);
