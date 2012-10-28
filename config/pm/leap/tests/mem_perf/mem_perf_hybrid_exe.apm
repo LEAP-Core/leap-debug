@@ -46,6 +46,8 @@ Packagehint=leap-debug
 
 [Scratchpad Memory Performance Test System Wrapper/Requires]
 mem_perf_tester=Scratchpad Memory Performance Test System
+mem_perf_tester_alt=Scratchpad Memory Performance Test System (FPGA1)
+mem_perf_common=Mem perf common types
 
 [Scratchpad Memory Performance Test System Wrapper]
 File=modules/apps/tests/mem_perf/mem-perf-wrapper.awb
@@ -57,3 +59,11 @@ Packagehint=leap-debug
 
 [Scratchpad Perf Test Connected Application/Requires]
 mem_perf_wrapper=Scratchpad Memory Performance Test System Wrapper
+
+[Scratchpad Memory Performance Test System (FPGA1)]
+File=modules/apps/tests/mem_perf/mem-perf-alt.awb
+Packagehint=leap-debug
+
+[Mem perf common types]
+File=modules/apps/tests/mem_perf/mem-perf-common.awb
+Packagehint=leap-debug

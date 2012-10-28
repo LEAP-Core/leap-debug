@@ -1062,3 +1062,26 @@ Directory modules/apps/debuggers
 Changed sram debugger to use parameters from the memory controller.
 Most modern memory controllers do not support unaligned accesses, and
 the test bench must honor this. 
+
+----------
+mcadler     Date: Sun Oct 28 10:10:42 EDT 2012  CSN: CSN-leap-debug-36
+                  Sun Oct 28 14:10:42 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_exe.apm   Locally Modified           35 
+ mem_perf_hybrid_acp.apm   Locally Modified           35 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_ml605.apm Locally Modified           35 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           35 
+ sram_debugger_ml605.apm   Locally Added               0 
+
+- Add memory debugger for ML605.
+
+- Restore ACP debugger.  Somebody reconfigured it for ML605 and checked it in.
+  (It wasn't me.)  The ACP version is still broken because parameters were
+  added for DDR3 memory that the generic driver reads but doesn't find for
+  ACP's memory.
