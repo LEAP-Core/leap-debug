@@ -126,19 +126,16 @@ File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/gen
 Packagehint=leap-platforms
 
 [Driver Header for PCIe Kernel Module]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-driver-header/pchnl_if.awb
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express/pcie-csr/pcie-driver-header/pchnl_if.awb
 Packagehint=leap-platforms
 
 [HTG Virtex 5 PCIE Enabled/Requires]
-pci_express_device=PCI Express Physical Device (mmap-based)
+pci_express_device=CSR/mmap-based PCIe Physical Device
 clocks_device=Single-Ended Crystal Clocks Device
 physical_platform_utils=Common Physical Platform Utilities
 ddr2_device=DDR2 SDRAM Physical Device
 led_device=General LED Device
 switch_device=General Switch Device
-
-[PCI Express Physical Device (mmap-based)/Requires]
-pci_express_driver_header=Driver Header for PCIe Kernel Module
 
 [General Switch Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/switches/general-switch-device.awb
@@ -148,19 +145,12 @@ Packagehint=leap-platforms
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/ddr2-sdram/ddr2-sdram-device.awb
 Packagehint=leap-platforms
 
-[PCI Express Physical Device (mmap-based)]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express-new/pci-express-device-mmap.awb
-Packagehint=leap-platforms
-
 [Single-Ended Crystal Clocks Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/clocks/single-ended/single-ended-clocks-device.awb
 Packagehint=leap-platforms
 
 [DDR2 SDRAM Physical Device/Params]
 DRAM_DEBUG=1
-
-[SRAM Debugger Application/Params]
-MEM_BURST_COUNT=2
 
 [FPGA Build Pipeline Xilinx]
 File=config/pm/leap/submodels/pipelines/build-pipeline-xilinx.apm
@@ -197,3 +187,10 @@ starter_service=Starter Service
 [Starter Service]
 File=modules/leap/libraries/platform-services/starter-service/starter-service.awb
 Packagehint=leap
+
+[CSR/mmap-based PCIe Physical Device]
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express/pcie-csr/pci-express-device-mmap.awb
+Packagehint=leap-platforms
+
+[CSR/mmap-based PCIe Physical Device/Requires]
+pci_express_driver_header=Driver Header for PCIe Kernel Module
