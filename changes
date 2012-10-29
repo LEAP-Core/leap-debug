@@ -1095,3 +1095,13 @@ Directory config/pm/leap/debuggers/sram
  sram_debugger_htg.apm     Locally Modified           36 
 
 Moved PCIe driver.
+
+----------
+mcadler     Date: Mon Oct 29 09:50:58 EDT 2012  CSN: CSN-leap-debug-38
+                  Mon Oct 29 13:50:58 UTC 2012
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_ml605.apm   Locally Modified           37 
+
+Boost model clock to 85MHz.

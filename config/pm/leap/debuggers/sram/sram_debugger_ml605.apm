@@ -49,3 +49,4 @@ Packagehint=leap
 
 [Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache/Params]
 DRAM_DEBUG=1
+MODEL_CLOCK_FREQ=85
