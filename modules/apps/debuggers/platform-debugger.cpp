@@ -29,7 +29,7 @@
 #include "asim/ioformat.h"
 #include "asim/provides/hybrid_application.h"
 #include "asim/provides/clocks_device.h"
-#include "asim/provides/ddr2_device.h"
+#include "asim/provides/ddr_sdram_device.h"
 
 using namespace std;
 
@@ -124,7 +124,7 @@ HYBRID_APPLICATION_CLASS::Main()
 
     // Different memory styles have different minimum offsets This is
     // a combination of DRAM_MIN_BURST and DRAM_WORD_WIDTH.
-    int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_WORD_WIDTH / DIMM_WIDTH;
+    int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_WORD_WIDTH / DRAM_DIMM_WIDTH;
 
     // print banner
     cout << "\n";
@@ -149,7 +149,7 @@ HYBRID_APPLICATION_CLASS::Main()
     for (int i = 0; i <= 10000; i += MIN_IDX_OFFSET)
     {
         int addr = i;
-        for (int bank = 0; bank < MEM_BANKS; bank++)
+        for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
             data = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
             if (bank != 0)
@@ -181,7 +181,7 @@ HYBRID_APPLICATION_CLASS::Main()
         {
             int addr = i;
     
-            for (int bank = 0; bank < MEM_BANKS; bank++)
+            for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
             {
                 clientStub->ReadReq(bank, addr);
             }
@@ -194,7 +194,7 @@ HYBRID_APPLICATION_CLASS::Main()
         {
             int addr = i;
     
-            for (int bank = 0; bank < MEM_BANKS; bank++)
+            for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
             {
                 UINT64 expect = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
                 if (bank != 0)

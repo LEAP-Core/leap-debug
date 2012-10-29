@@ -1,10 +1,10 @@
 
 [Global]
 SaveParameters=0
-Description=Hybrid Virtual Memory Test Model with Private Caches for ACP
+Description=Hybrid Virtual Memory Test Model with Private Caches for ML605
 File=mem_test_hybrid_ml605
 Version=2.2
-Name=Hybrid Virtual Memory Test Model with Private Caches for ACP
+Name=Hybrid Virtual Memory Test Model with Private Caches for ML605
 Type=Leap
 Class=Asim::Model
 DefaultBenchmark=
@@ -46,7 +46,6 @@ connected_application=Default Software Connected Application
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
-
 
 [Hybrid ML605 PCIE FPGA Environment]
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie.apm

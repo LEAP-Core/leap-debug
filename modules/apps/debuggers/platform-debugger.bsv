@@ -26,7 +26,7 @@ import Vector::*;
 `include "asim/provides/virtual_platform.bsh"
 `include "asim/provides/virtual_devices.bsh"
 `include "asim/provides/physical_platform.bsh"
-`include "asim/provides/ddr2_device.bsh"
+`include "asim/provides/ddr_sdram_device.bsh"
 `include "asim/provides/low_level_platform_interface.bsh"
 
 `include "asim/provides/hybrid_application.bsh"
@@ -51,7 +51,7 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     
     LowLevelPlatformInterface llpi    = vp.llpint;
     PHYSICAL_DRIVERS          drivers = llpi.physicalDrivers;
-    let sram = drivers.ddr2Driver;
+    let sram = drivers.ddrDriver;
     
     Reg#(STATE) state <- mkReg(STATE_idle);
     

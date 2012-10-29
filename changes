@@ -1105,3 +1105,20 @@ Directory config/pm/leap/debuggers/sram
  sram_debugger_ml605.apm   Locally Modified           37 
 
 Boost model clock to 85MHz.
+
+----------
+mcadler     Date: Mon Oct 29 18:48:29 EDT 2012  CSN: CSN-leap-debug-39
+                  Mon Oct 29 22:48:29 UTC 2012
+
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_ml605.apm Locally Modified           38 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_htg.apm     Locally Modified           38 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           38 
+ platform-debugger.cpp     Locally Modified           38 
+
+Name changes in DDR SDRAM drivers.
