@@ -6,9 +6,17 @@ service PLATFORM_DEBUGGER
         method StatusCheck(in UINT8[8] bank, out UINT64[64] status);
         method ReadReq   (in UINT8[8] bank, in UINT32[32] addr, out UINT8[8] status);
         method DoReads   (in UINT8[8] dummy, out UINT8[8] status);
-        method ReadRsp   (in UINT8[8] bank, out UINT64[64] data);
+        method ReadRsp   (in UINT8[8] bank,
+                          out UINT64[64] data3, out UINT64[64] data2,
+                          out UINT64[64] data1, out UINT64[64] data0);
+
         method WriteReq  (in UINT8[8] bank, in UINT32[32] addr, out UINT8[8] status);
-        method WriteData (in UINT8[8] bank, in UINT64[64] data, in UINT32[32] mask, out UINT8[8] status);
+        // Mask bit 0 corresponds to data0[7:0].  Mask bit 63 corresponds
+        // to data3[63:56].
+        method WriteData (in UINT8[8] bank,
+                          in UINT64[64] data3, in UINT64[64] data2,
+                          in UINT64[64] data1, in UINT64[64] data0,
+                          in UINT32[32] mask, out UINT8[8] status);
 
         // Calibrate max outstanding reads
         method ReadLatency(in UINT16[16] nReads, in UINT16[16] maxOutstanding,

@@ -85,7 +85,7 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     // read requests work.
     //
     FIFOF#(Tuple2#(Bit#(TLog#(FPGA_DDR_BANKS)), Bit#(32))) readReqQ <- mkSizedFIFOF(valueOf(FPGA_DDR_BANKS) * 32);
-    Vector#(FPGA_DDR_BANKS, FIFO#(Bit#(64))) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
+    Vector#(FPGA_DDR_BANKS, FIFO#(FPGA_DDR_DUALEDGE_DATA)) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
 
     rule accept_load_req (state == STATE_running);
 
@@ -133,8 +133,11 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     rule accept_load_rsp (state == STATE_running);
 
         let bank <- serverStub.acceptRequest_ReadRsp();
-        serverStub.sendResponse_ReadRsp(readRspQ[bank].first());
+
+        Vector#(4, Bit#(64)) data = unpack(resize(readRspQ[bank].first()));
         readRspQ[bank].deq();
+
+        serverStub.sendResponse_ReadRsp(data[3], data[2], data[1], data[0]);
 
     endrule
 
@@ -151,8 +154,9 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     rule accept_write_data (state == STATE_running);
         
         let req <- serverStub.acceptRequest_WriteData();
-        sram[req.bank].writeData(zeroExtend(req.data), truncate(req.mask));
+        let data = { req.data3, req.data2, req.data1, req.data0 };
 
+        sram[req.bank].writeData(truncate(data), truncate(req.mask));
         serverStub.sendResponse_WriteData(0);
         
     endrule

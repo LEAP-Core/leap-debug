@@ -145,6 +145,12 @@ HYBRID_APPLICATION_CLASS::Main()
     oldsts = sts;
     printRAMStatus(sts);
 
+    // Masks so each data value is different
+    static const UINT64 masks[4] = { 0,
+                                     0x73a90e9844958762,
+                                     0x8893450971234443,
+                                     0xe87681345d506812 };
+
     // Write a pattern to memory.
     for (int i = 0; i <= 10000; i += MIN_IDX_OFFSET)
     {
@@ -160,7 +166,12 @@ HYBRID_APPLICATION_CLASS::Main()
             sts = clientStub->WriteReq(bank, addr);
             for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
             {
-                sts = clientStub->WriteData(bank, data, 0);
+                sts = clientStub->WriteData(bank,
+                                            data ^ masks[3],
+                                            data ^ masks[2],
+                                            data ^ masks[1],
+                                            data ^ masks[0],
+                                            0);
                 oldsts = sts;
                 data = ~data;
             }
@@ -204,11 +215,15 @@ HYBRID_APPLICATION_CLASS::Main()
 
                 for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
                 {
-                    data = clientStub->ReadRsp(bank);
-                    if (data != expect)
+                    OUT_TYPE_ReadRsp d = clientStub->ReadRsp(bank);
+                    const UINT64 data[4] = { d.data0, d.data1, d.data2, d.data3 };
+                    for (int w = 0; w < (DRAM_WORD_WIDTH / 64); w += 1)
                     {
-                        cout << hex << "error read data 0x" << addr << " = 0x" << data << " expect 0x" << expect << dec << endl;
-                        errors += 1;
+                        if ((data[w] ^ masks[w]) != expect)
+                        {
+                            cout << hex << "error read data 0x" << addr << " [" << w << "] = 0x" << data[w] << " expect 0x" << expect << dec << endl;
+                            errors += 1;
+                        }
                     }
                     reads++;
                     expect = ~expect;
@@ -243,31 +258,41 @@ HYBRID_APPLICATION_CLASS::Main()
 #endif
 
     errors = 0;
-    for (int m = 0; m < 8; m++)
+    for (int m = 0; m < (DRAM_WORD_WIDTH / 8); m++)
     {
         clientStub->WriteReq(0, 0);
         for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
-            clientStub->WriteData(0, 0xffffffffffffffff, 0);
+            clientStub->WriteData(0,
+                                  -1, -1, -1, -1,
+                                  0);
         }
 
         clientStub->WriteReq(0, 0);
         for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
-            clientStub->WriteData(0, 0, 1 << m);
+            clientStub->WriteData(0,
+                                  0, 0, 0, 0,
+                                  1 << m);
         }
 
         clientStub->ReadReq(0, 0);
         clientStub->DoReads(0);
         for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
-            UINT64 data = clientStub->ReadRsp(0);
-            UINT64 expect = 0xffL << (m * 8);
+            OUT_TYPE_ReadRsp d = clientStub->ReadRsp(0);
+            const UINT64 data[4] = { d.data0, d.data1, d.data2, d.data3 };
 
-            if (data != expect)
+            UINT64 expect[4] = { 0, 0, 0, 0 };
+            expect[m / 8] = 0xffL << ((m % 8) * 8);
+
+            for (int w = 0; w < (DRAM_WORD_WIDTH / 64); w += 1)
             {
-                printf("Mask error %d:  0x%016llx, expect 0x%016llx\n", m, data, expect);
-                errors += 1;
+                if (data[w] != expect[w])
+                {
+                    printf("Mask error %d:  0x%016llx, expect 0x%016llx\n", m, data[w], expect[w]);
+                    errors += 1;
+                }
             }
         }
     }

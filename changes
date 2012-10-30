@@ -1122,3 +1122,16 @@ Directory modules/apps/debuggers
  platform-debugger.cpp     Locally Modified           38 
 
 Name changes in DDR SDRAM drivers.
+
+----------
+mcadler     Date: Tue Oct 30 11:47:43 EDT 2012  CSN: CSN-leap-debug-40
+                  Tue Oct 30 15:47:43 UTC 2012
+
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           39 
+ platform-debugger.cpp     Locally Modified           39 
+ platform-debugger.rrr     Locally Modified           39 
+
+Test data values and masks up to 256 bit chunks (thus supporting DDR3 512 bit
+bursts).
