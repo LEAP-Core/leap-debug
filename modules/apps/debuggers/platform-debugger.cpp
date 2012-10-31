@@ -125,6 +125,7 @@ HYBRID_APPLICATION_CLASS::Main()
     // Different memory styles have different minimum offsets This is
     // a combination of DRAM_MIN_BURST and DRAM_WORD_WIDTH.
     int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_WORD_WIDTH / DRAM_DIMM_WIDTH;
+    UINT64 ADDR_END = 1LL << DRAM_ADDR_BITS;
 
     // print banner
     cout << "\n";
@@ -152,12 +153,39 @@ HYBRID_APPLICATION_CLASS::Main()
                                      0xe87681345d506812 };
 
     // Write a pattern to memory.
-    for (int i = 0; i <= 10000; i += MIN_IDX_OFFSET)
+    for (UINT64 addr = 0; addr < 10000; addr += MIN_IDX_OFFSET)
     {
-        int addr = i;
         for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
-            data = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
+            data = ((addr + 123456) << 32) | (addr + 1001);
+            if (bank != 0)
+            {
+                data <<= bank;
+            }
+
+            sts = clientStub->WriteReq(bank, addr);
+            for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
+            {
+                sts = clientStub->WriteData(bank,
+                                            data ^ masks[3],
+                                            data ^ masks[2],
+                                            data ^ masks[1],
+                                            data ^ masks[0],
+                                            0);
+                oldsts = sts;
+                data = ~data;
+            }
+        }
+    }
+
+    // Test for overrun.  Write a different pattern to the end of memory to
+    // be sure that address bits are configured correctly.  The test
+    // deliberately overruns by one write.
+    for (UINT64 addr = ADDR_END - 1000 * MIN_IDX_OFFSET; addr <= ADDR_END; addr += MIN_IDX_OFFSET)
+    {
+        for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
+        {
+            data = ((addr + 654321) << 32) | (addr + 1001);
             if (bank != 0)
             {
                 data <<= bank;
@@ -183,31 +211,35 @@ HYBRID_APPLICATION_CLASS::Main()
     // Read the pattern back.  Alternate banks on each request.
     int errors = 0;
     int reads = 0;
-    for (int j = 0; j <= 10000 - (33 * 3); j += MIN_IDX_OFFSET)
+    for (int j = 0; j <= 10000 - (32 * MIN_IDX_OFFSET); j += 32 * MIN_IDX_OFFSET)
     {
-        // Generate a burst of 32 read requests.  The actual reads won't be
-        // triggered unto the DoReads() below so that the RAM read bus
-        // is stressed.
-        for (int i = j; i < j + 32 * 3; i += MIN_IDX_OFFSET)
+        for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
-            int addr = i;
-    
-            for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
+            // Generate a burst of 32 read requests.  The actual reads won't be
+            // triggered until the DoReads() below so that the RAM read bus
+            // is stressed.
+            for (int i = 0; i < 31; i += 1)
             {
+                int addr = j + i * MIN_IDX_OFFSET;
+
                 clientStub->ReadReq(bank, addr);
             }
-        }
 
-        // Tell the hardware to do the reads
-        clientStub->DoReads(0);
+            // Tell the hardware to do the reads
+            clientStub->DoReads(0);
 
-        for (int i = j; i < j + 32 * 3; i += MIN_IDX_OFFSET)
-        {
-            int addr = i;
-    
-            for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
+            for (int i = 0; i < 31; i += 1)
             {
-                UINT64 expect = ((UINT64(i) + 123456) << 32) | (UINT64(i) + 1001);
+                UINT64 addr = j + i * MIN_IDX_OFFSET;
+    
+                UINT64 expect = ((addr + 123456) << 32) | (addr + 1001);
+                if (addr == 0)
+                {
+                    // Address 0 is a special case.  It is written twice.
+                    // The second time is the overrun test.
+                    expect = ((ADDR_END + 654321) << 32) | (ADDR_END + 1001);
+                }
+
                 if (bank != 0)
                 {
                     expect <<= bank;
@@ -219,9 +251,9 @@ HYBRID_APPLICATION_CLASS::Main()
                     const UINT64 data[4] = { d.data0, d.data1, d.data2, d.data3 };
                     for (int w = 0; w < (DRAM_WORD_WIDTH / 64); w += 1)
                     {
-                        if ((data[w] ^ masks[w]) != expect)
+                        if (data[w] != (masks[w] ^ expect))
                         {
-                            cout << hex << "error read data 0x" << addr << " [" << w << "] = 0x" << data[w] << " expect 0x" << expect << dec << endl;
+                            cout << hex << "error read data 0x" << addr << " [" << w << "] = 0x" << data[w] << " expect 0x" << (expect ^ masks[w]) << dec << endl;
                             errors += 1;
                         }
                     }

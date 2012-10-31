@@ -1135,3 +1135,16 @@ Directory modules/apps/debuggers
 
 Test data values and masks up to 256 bit chunks (thus supporting DDR3 512 bit
 bursts).
+
+----------
+mcadler     Date: Tue Oct 30 20:47:12 EDT 2012  CSN: CSN-leap-debug-41
+                  Wed Oct 31 00:47:12 UTC 2012
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           40 
+
+Directory modules/apps/debuggers
+ platform-debugger.cpp     Locally Modified           40 
+
+ACP memory tester works again.
