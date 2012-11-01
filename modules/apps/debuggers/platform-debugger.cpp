@@ -123,8 +123,8 @@ HYBRID_APPLICATION_CLASS::Main()
     UINT64 data;
 
     // Different memory styles have different minimum offsets This is
-    // a combination of DRAM_MIN_BURST and DRAM_WORD_WIDTH.
-    int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_WORD_WIDTH / DRAM_DIMM_WIDTH;
+    // a combination of DRAM_MIN_BURST and DRAM_BEAT_WIDTH.
+    int MIN_IDX_OFFSET = DRAM_MIN_BURST * DRAM_BEAT_WIDTH / DRAM_WORD_WIDTH;
     UINT64 ADDR_END = 1LL << DRAM_ADDR_BITS;
 
     // print banner
@@ -153,7 +153,8 @@ HYBRID_APPLICATION_CLASS::Main()
                                      0xe87681345d506812 };
 
     // Write a pattern to memory.
-    for (UINT64 addr = 0; addr < 10000; addr += MIN_IDX_OFFSET)
+    UINT64 write_test_end = min(UINT64(10000), ADDR_END / MIN_IDX_OFFSET / 2);
+    for (UINT64 addr = 0; addr < write_test_end; addr += MIN_IDX_OFFSET)
     {
         for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
@@ -181,7 +182,7 @@ HYBRID_APPLICATION_CLASS::Main()
     // Test for overrun.  Write a different pattern to the end of memory to
     // be sure that address bits are configured correctly.  The test
     // deliberately overruns by one write.
-    for (UINT64 addr = ADDR_END - 1000 * MIN_IDX_OFFSET; addr <= ADDR_END; addr += MIN_IDX_OFFSET)
+    for (UINT64 addr = ADDR_END - 100 * MIN_IDX_OFFSET; addr <= ADDR_END; addr += MIN_IDX_OFFSET)
     {
         for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
@@ -211,7 +212,7 @@ HYBRID_APPLICATION_CLASS::Main()
     // Read the pattern back.  Alternate banks on each request.
     int errors = 0;
     int reads = 0;
-    for (int j = 0; j <= 10000 - (32 * MIN_IDX_OFFSET); j += 32 * MIN_IDX_OFFSET)
+    for (int j = 0; j <= write_test_end - (32 * MIN_IDX_OFFSET); j += 32 * MIN_IDX_OFFSET)
     {
         for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
@@ -249,7 +250,7 @@ HYBRID_APPLICATION_CLASS::Main()
                 {
                     OUT_TYPE_ReadRsp d = clientStub->ReadRsp(bank);
                     const UINT64 data[4] = { d.data0, d.data1, d.data2, d.data3 };
-                    for (int w = 0; w < (DRAM_WORD_WIDTH / 64); w += 1)
+                    for (int w = 0; w < (DRAM_BEAT_WIDTH / 64); w += 1)
                     {
                         if (data[w] != (masks[w] ^ expect))
                         {
@@ -290,7 +291,7 @@ HYBRID_APPLICATION_CLASS::Main()
 #endif
 
     errors = 0;
-    for (int m = 0; m < (DRAM_WORD_WIDTH / 8); m++)
+    for (int m = 0; m < (DRAM_BEAT_WIDTH / 8); m++)
     {
         clientStub->WriteReq(0, 0);
         for (int b = 0; b < DRAM_MIN_BURST; b++)
@@ -318,7 +319,7 @@ HYBRID_APPLICATION_CLASS::Main()
             UINT64 expect[4] = { 0, 0, 0, 0 };
             expect[m / 8] = 0xffL << ((m % 8) * 8);
 
-            for (int w = 0; w < (DRAM_WORD_WIDTH / 64); w += 1)
+            for (int w = 0; w < (DRAM_BEAT_WIDTH / 64); w += 1)
             {
                 if (data[w] != expect[w])
                 {

@@ -64,9 +64,9 @@ platform_services=NULL Platform Services
 [ACP M2 Compute Module With SRAM (Nallatech)/Requires]
 clocks_device=Null Clocks Device
 physical_platform_utils=Common Physical Platform Utilities
-ddr2_device=ACP Fake DDR2 SRAM Device
 nallatech_edge_device=Nallatech Edge Physical Device v2
 led_device=General LED Device
+ddr_sdram_device=ACP Fake DDR2 SRAM Device
 
 [Nallatech Edge Physical Channel]
 File=modules/bluespec/common/fpgaenv/virtual-platform/channelio/physical-channel/nallatech-edge/nallatech-edge-channel.awb

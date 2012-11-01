@@ -1148,3 +1148,18 @@ Directory modules/apps/debuggers
  platform-debugger.cpp     Locally Modified           40 
 
 ACP memory tester works again.
+
+----------
+mcadler     Date: Thu Nov  1 08:11:53 EDT 2012  CSN: CSN-leap-debug-42
+                  Thu Nov  1 12:11:53 UTC 2012
+
+
+Directory config/pm/leap/debuggers/sram
+ nallatech_fake_sram_debugger.apm Locally Modified           41 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           41 
+ platform-debugger.cpp     Locally Modified           41 
+
+- New AWB parameter naming for clarity.
+- Work with smaller memories (e.g. DDR emulator using BRAM).

@@ -85,7 +85,7 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     // read requests work.
     //
     FIFOF#(Tuple2#(Bit#(TLog#(FPGA_DDR_BANKS)), Bit#(32))) readReqQ <- mkSizedFIFOF(valueOf(FPGA_DDR_BANKS) * 32);
-    Vector#(FPGA_DDR_BANKS, FIFO#(FPGA_DDR_DUALEDGE_DATA)) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
+    Vector#(FPGA_DDR_BANKS, FIFO#(FPGA_DDR_DUALEDGE_BEAT)) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
 
     rule accept_load_req (state == STATE_running);
 
@@ -199,7 +199,7 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
     rule read_latency_req ((state == STATE_calibrating) &&
                            (calReqCnt < calReads));
         sram[0].readReq(calAddr);
-        calAddr <= calAddr + fromInteger(valueOf(TMul#(FPGA_DDR_BURST_LENGTH, TDiv#(FPGA_DDR_DUALEDGE_DATA_SZ, FPGA_DDR_WORD_SZ))));
+        calAddr <= calAddr + fromInteger(valueOf(TMul#(FPGA_DDR_BURST_LENGTH, TDiv#(FPGA_DDR_DUALEDGE_BEAT_SZ, FPGA_DDR_WORD_SZ))));
         calReqCnt <= calReqCnt + 1;
     endrule
 
