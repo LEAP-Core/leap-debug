@@ -1173,3 +1173,20 @@ Directory config/pm/leap/tests/mem_perf
  mem_perf_hybrid_ml605.apm Locally Modified           42 
 
 XST_INSERT_IOBUF was set incorrectly, leading to reset wire being dropped.
+
+----------
+mcadler     Date: Mon Nov 12 15:27:55 EST 2012  CSN: CSN-leap-debug-44
+                  Mon Nov 12 20:27:55 UTC 2012
+
+
+Directory config/pm/leap/tests/chantest
+ chantest16_hybrid_ml605.apm Locally Added               0 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           43 
+ mem-perf.bsv              Locally Modified           43 
+
+- Lack of predicate on readResp allowed Bluespec to conclude it conflicted
+  with doTestDone rule.
+
+- Add ML605 PCIe channel integrity test.

@@ -1,0 +1,50 @@
+
+[Global]
+SaveParameters=0
+Description=Channel Integrity Test and Benchmarking Program for ML605
+File=chantest16_hybrid_ml605
+Version=2.2
+Name=Channel Integrity Test and Benchmarking Program for ML605
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=hybrid acp bluespec
+model=HW/SW Hybrid Pipeline Build
+
+[Base Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
+Packagehint=leap
+
+[Base Hybrid Application Environment/Requires]
+hybrid_application=Bluespec Channel Integrity Test (16-wide)
+
+[Bluespec Channel Integrity Test (16-wide)]
+File=modules/apps/tests/channel-integrity-test/chan-test-16.awb
+Packagehint=leap-debug
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache
+application_env=Base Hybrid Application Environment
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+
+[Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache/Params]
+MODEL_CLOCK_FREQ=70
+
+[Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie-no-memory.apm
+Packagehint=leap

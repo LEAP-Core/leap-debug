@@ -188,7 +188,7 @@ module [CONNECTED_MODULE] mkMemTester ()
         operationIsLast.enq(is_last);
     endrule
 
-    rule readResp;
+    rule readResp (state == STATE_reading);
         let resp <- memory.readRsp();
 
         if (resp != expected.first)
