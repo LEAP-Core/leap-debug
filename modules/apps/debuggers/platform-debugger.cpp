@@ -76,6 +76,8 @@ printRAMStatus(UINT64 status)
     {
         cout << "    [" << getIdxName(x) << "]: " << getBit(status, x, 1) << endl;
     }
+
+    cout << endl;
 }
 
 void
@@ -128,11 +130,11 @@ HYBRID_APPLICATION_CLASS::Main()
     UINT64 ADDR_END = 1LL << DRAM_ADDR_BITS;
 
     // print banner
-    cout << "\n";
-    cout << "Welcome to the Platform Debugger\n";
-    cout << "--------------------------------\n";
+    cout << endl
+         << "Welcome to the Platform Debugger" << endl
+         << "--------------------------------" << endl << endl;
 
-    cout << endl << "Initializing hardware\n";
+    cout << "Initializing hardware" << endl;
 
     sts = clientStub->StatusCheck(0);
     oldsts = sts;
@@ -145,6 +147,18 @@ HYBRID_APPLICATION_CLASS::Main()
     sts = clientStub->StatusCheck(0);
     oldsts = sts;
     printRAMStatus(sts);
+
+    UINT64 total_mem_mb = ADDR_END / (1024 * 1024) *
+                          (DRAM_WORD_WIDTH / 8) *
+                          DRAM_NUM_BANKS;
+    cout << "Configured for " << total_mem_mb << " MB of board memory"
+         << " in " << DRAM_NUM_BANKS << (DRAM_NUM_BANKS == 1 ? " bank" : " banks") << endl
+         << "  Word size: " << DRAM_WORD_WIDTH << " bits" << endl;
+    if (DRAM_NUM_BANKS > 1)
+    {
+        cout << "  " << total_mem_mb / DRAM_NUM_BANKS << " MB per bank" << endl;
+    }
+    cout << endl;
 
     // Masks so each data value is different
     static const UINT64 masks[4] = { 0,
@@ -159,34 +173,6 @@ HYBRID_APPLICATION_CLASS::Main()
         for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
         {
             data = ((addr + 123456) << 32) | (addr + 1001);
-            if (bank != 0)
-            {
-                data <<= bank;
-            }
-
-            sts = clientStub->WriteReq(bank, addr);
-            for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
-            {
-                sts = clientStub->WriteData(bank,
-                                            data ^ masks[3],
-                                            data ^ masks[2],
-                                            data ^ masks[1],
-                                            data ^ masks[0],
-                                            0);
-                oldsts = sts;
-                data = ~data;
-            }
-        }
-    }
-
-    // Test for overrun.  Write a different pattern to the end of memory to
-    // be sure that address bits are configured correctly.  The test
-    // deliberately overruns by one write.
-    for (UINT64 addr = ADDR_END - 100 * MIN_IDX_OFFSET; addr <= ADDR_END; addr += MIN_IDX_OFFSET)
-    {
-        for (int bank = 0; bank < DRAM_NUM_BANKS; bank++)
-        {
-            data = ((addr + 654321) << 32) | (addr + 1001);
             if (bank != 0)
             {
                 data <<= bank;
@@ -232,14 +218,7 @@ HYBRID_APPLICATION_CLASS::Main()
             for (int i = 0; i < 31; i += 1)
             {
                 UINT64 addr = j + i * MIN_IDX_OFFSET;
-    
                 UINT64 expect = ((addr + 123456) << 32) | (addr + 1001);
-                if (addr == 0)
-                {
-                    // Address 0 is a special case.  It is written twice.
-                    // The second time is the overrun test.
-                    expect = ((ADDR_END + 654321) << 32) | (ADDR_END + 1001);
-                }
 
                 if (bank != 0)
                 {
@@ -266,6 +245,52 @@ HYBRID_APPLICATION_CLASS::Main()
     }
 
     cout << errors << " errors on " << reads << " reads" <<endl << endl << flush;
+
+    //
+    // Test that the number of address bits is correct.
+    //
+
+    // Start by storing 0's at address 0
+    cout << "Alias test:" << endl;
+    errors = 0;
+    
+    clientStub->WriteReq(0, 0);
+    for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
+    {
+        clientStub->WriteData(0, 0, 0, 0, 0, 0);
+    }
+
+    // Write at increasing address and look for an alias
+    for (UINT64 i = 2; i <= DRAM_ADDR_BITS; i += 1)
+    {
+        UINT64 addr = 1LL << (i - 1);
+
+        if (addr >= MIN_IDX_OFFSET)
+        {
+            clientStub->WriteReq(0, addr);
+            for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
+            {
+                clientStub->WriteData(0, i, i, i, i, 0);
+            }
+
+            // Read back address 0 and make sure it is still 0
+            clientStub->ReadReq(0, 0);
+            clientStub->DoReads(0);
+            for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
+            {
+                OUT_TYPE_ReadRsp d = clientStub->ReadRsp(0);
+                if ((burst == 0) && (d.data0 != 0))
+                {
+                    cout << "  ERROR:  Address bit " << i << " is aliased!" << endl;
+                    errors += 1;
+                }
+            }
+        }
+    }
+
+    if (! errors) cout << "  Pass" << endl;
+    cout << endl;
+
 
     //
     // Optimal read buffer size calibration

@@ -1190,3 +1190,13 @@ Directory modules/apps/tests/mem_perf
   with doTestDone rule.
 
 - Add ML605 PCIe channel integrity test.
+
+----------
+mcadler     Date: Sat Nov 17 09:28:06 EST 2012  CSN: CSN-leap-debug-45
+                  Sat Nov 17 14:28:06 UTC 2012
+
+
+Directory modules/apps/debuggers
+ platform-debugger.cpp     Locally Modified           44 
+
+Check that memory is sized properly by looking for address aliases.
