@@ -30,6 +30,8 @@
 #include "asim/provides/hybrid_application.h"
 #include "asim/provides/clocks_device.h"
 #include "asim/provides/ddr_sdram_device.h"
+#include "asim/provides/debug_scan_service.h"
+
 
 using namespace std;
 
@@ -159,6 +161,14 @@ HYBRID_APPLICATION_CLASS::Main()
         cout << "  " << total_mem_mb / DRAM_NUM_BANKS << " MB per bank" << endl;
     }
     cout << endl;
+
+    // Hardware side doesn't implement the automatic debug scan.  Use the dynamic
+    // parameter to trigger a scan from software.
+    if (DEBUG_SCAN_DEADLINK_TIMEOUT != 0)
+    {
+        sleep(2);
+        DEBUG_SCAN_SERVER_CLASS::GetInstance()->Scan();
+    }
 
     // Masks so each data value is different
     static const UINT64 masks[4] = { 0,

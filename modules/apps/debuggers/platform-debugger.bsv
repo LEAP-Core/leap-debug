@@ -23,15 +23,17 @@ import FIFO::*;
 import FIFOF::*;
 import Vector::*;
 
-`include "asim/provides/virtual_platform.bsh"
-`include "asim/provides/virtual_devices.bsh"
-`include "asim/provides/physical_platform.bsh"
-`include "asim/provides/ddr_sdram_device.bsh"
-`include "asim/provides/low_level_platform_interface.bsh"
+`include "awb/provides/virtual_platform.bsh"
+`include "awb/provides/virtual_devices.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/physical_platform.bsh"
+`include "awb/provides/ddr_sdram_device.bsh"
+`include "awb/provides/low_level_platform_interface.bsh"
 
-`include "asim/provides/hybrid_application.bsh"
+`include "awb/provides/soft_connections.bsh"
+`include "awb/provides/hybrid_application.bsh"
 
-`include "asim/rrr/server_stub_PLATFORM_DEBUGGER.bsh"
+`include "awb/rrr/server_stub_PLATFORM_DEBUGGER.bsh"
 
 // types
 
@@ -47,7 +49,7 @@ STATE
 
 // mkApplication
 
-module mkApplication#(VIRTUAL_PLATFORM vp)();
+module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
     
     LowLevelPlatformInterface llpi    = vp.llpint;
     PHYSICAL_DRIVERS          drivers = llpi.physicalDrivers;
@@ -223,5 +225,29 @@ module mkApplication#(VIRTUAL_PLATFORM vp)();
 
         calRespCnt <= calRespCnt + 1;
     endrule
+
+
+    // ====================================================================
+    //
+    // Debugging
+    //
+    // ====================================================================
+    
+    DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
+
+    // Collect debug scan state for physical memory controllers
+    for (Integer b = 0; b < valueOf(FPGA_DDR_BANKS); b = b + 1)
+    begin
+        List#(Tuple2#(String, Bool)) lm_scan = drivers.ddrDriver[b].debugScanState();
+        while (lm_scan matches tagged Nil ? False : True)
+        begin
+            let fld = List::head(lm_scan);
+            dbg_list <- addDebugScanField(dbg_list, tpl_1(fld), tpl_2(fld));
+
+            lm_scan = List::tail(lm_scan);
+        end
+    end
+
+    let dbgNode <- mkDebugScanNode("Top level", dbg_list);
 
 endmodule
