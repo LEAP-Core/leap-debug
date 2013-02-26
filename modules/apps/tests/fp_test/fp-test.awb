@@ -6,11 +6,9 @@
 %provides hardware_system
 
 %sources -t BSV  -v PUBLIC fp-test.bsv
-%sources -t DICT -v PUBLIC fp-test-streams.dic
-%sources -t DICT -v PUBLIC fp-test-streamid.dic
 
 %param --dynamic OP1 0 "Operand 1 value."
 %param --dynamic OP2 0 "Operand 2 value."
 %param --dynamic ROUND 0 "Round to single precision."
 
-%param DATAPATH mkFPAcceleratorCvtItoS "Datapath to instantiate."
+%param DATAPATH mkFPAcceleratorCvtDtoS "Datapath to instantiate."

@@ -1211,3 +1211,33 @@ Directory modules/apps/debuggers
  platform-debugger.cpp     Locally Modified           45 
 
 Add DRAM controller's debug scan state to the debug scan chain.
+
+----------
+mcadler     Date: Tue Feb 26 07:39:06 EST 2013  CSN: CSN-leap-debug-47
+                  Tue Feb 26 12:39:06 UTC 2013
+
+
+Directory config/pm/leap/tests/fp_test
+ fp_test_acp.apm           Locally Added               0 
+ fp_test_vc707.apm         Locally Added               0 
+ fp_test_cvt_i_to_s.apm    Locally Removed            46 
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_vc707.apm Locally Added               0 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_hybrid_vc707.apm Locally Added               0 
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_exe.apm     Locally Added               0 
+ sram_debugger_vc707.apm   Locally Added               0 
+
+Directory modules/apps/tests/fp_test
+ fp-test-streamid.dic      Locally Removed            46 
+ fp-test.awb               Locally Modified           46 
+ fp-test.bsv               Locally Modified           46 
+ fp-test-streams.dic       Locally Removed            46 
+
+- Updates for VC707
+
+- Simplify the FP test code.  More work is needed here.

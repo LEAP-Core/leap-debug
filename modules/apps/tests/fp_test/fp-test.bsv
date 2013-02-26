@@ -29,58 +29,81 @@
 
 import Vector::*;
 
-`include "asim/provides/librl_bsv_base.bsh"
-`include "asim/provides/soft_connections.bsh"
-`include "asim/provides/common_services.bsh"
-`include "asim/provides/fpga_components.bsh"
+`include "awb/provides/librl_bsv_base.bsh"
+`include "awb/provides/soft_connections.bsh"
+`include "awb/provides/soft_services.bsh"
+`include "awb/provides/soft_services_lib.bsh"
+`include "awb/provides/soft_services_deps.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/fpga_components.bsh"
+`include "awb/provides/stdio_service.bsh"
 
-`include "asim/dict/STREAMID.bsh"
-`include "asim/dict/STREAMS_FPTEST.bsh"
-`include "asim/dict/STREAMS_MESSAGE.bsh"
-`include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
+`include "awb/dict/PARAMS_HARDWARE_SYSTEM.bsh"
+
+typedef enum
+{
+    STATE_START,
+    STATE_RUNNING,
+    STATE_END_SYNC_REQ,
+    STATE_END_SYNC_RSP
+}
+STATE
+    deriving (Eq, Bits);
 
 
 module [CONNECTED_MODULE] mkSystem ();
 
-    // Link to streams
-    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_FPTEST);
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
+    let msg <- getGlobalStringUID("0x%016llx  0x%016llx\n");
 
     // Dynamic parameters to feed to datapath.
     PARAMETER_NODE paramNode <- mkDynamicParameterNode();
-    Param#(32) paramOp1 <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_OP1, paramNode);
-    Param#(32) paramOp2 <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_OP2, paramNode);
-    Param#(32) paramRnd <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_ROUND, paramNode);
-    Bool rounding = paramRnd != 0;
+    Param#(64) paramOp1 <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_OP1, paramNode);
+    Param#(64) paramOp2 <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_OP2, paramNode);
+
+    Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
+    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
     // Datapath instantiation based on AWB parameter.
-    FP_ACCEL dp <- mkFPAcceleratorCvtItoS();
+    FP_ACCEL dp <- `DATAPATH();
     
     // Only send the answer once.
     Reg#(Bool) done <- mkReg(False);
 
+    Reg#(STATE) state <- mkReg(STATE_START);
+
+    rule start (state == STATE_START);
+        linkStarterStartRun.deq();
+        state <= STATE_RUNNING;
+    endrule
 
     // Rule to read the dynamic parameters and send them to the datapath.
-
-    rule dpReq (!done);
-
+    rule dpReq ((state == STATE_RUNNING) && !done);
         FP_INPUT inp;
-        inp.operandA = zeroExtend(paramOp1);
-        inp.operandB = zeroExtend(paramOp2);
+        inp.operandA = paramOp1;
+        inp.operandB = paramOp2;
 
         dp.makeReq(inp);
         done <= True;
-
     endrule
 
     // Rule to read the results and report them via streams.
-    
-
-    rule dpRsp (True);
-
+    rule dpRsp (state == STATE_RUNNING);
         let outp <- dp.getRsp();
-        Bit#(64) res2 = (rounding) ? toDouble(roundToSingle(outp.result)) : outp.result;
+        Bit#(64) res = outp.result;
 
-        link_streams.send(`STREAMS_FPTEST_RESULT, res2[63:32], res2[31:0]);
+        stdio.printf(msg, list(res, fpSingleInDouble(truncate(res))));
+        state <= STATE_END_SYNC_REQ;
+    endrule
+
+    rule sync (state == STATE_END_SYNC_REQ);
+        stdio.sync_req();
+        state <= STATE_END_SYNC_RSP;
+    endrule
+
+    rule exit (state == STATE_END_SYNC_RSP);
+        stdio.sync_rsp();
+        linkStarterFinishRun.send(0);
     endrule
 
 endmodule
