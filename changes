@@ -1241,3 +1241,26 @@ Directory modules/apps/tests/fp_test
 - Updates for VC707
 
 - Simplify the FP test code.  More work is needed here.
+
+----------
+mcadler     Date: Wed Feb 27 09:33:23 EST 2013  CSN: CSN-leap-debug-48
+                  Wed Feb 27 14:33:23 UTC 2013
+
+
+Directory modules/apps/tests/stdio_test
+ stdio-test.bsv            Locally Modified           47 
+
+Directory modules/apps/tests/fp_test
+ fp-test.bsv               Locally Modified           47 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.bsv  Locally Modified           47 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           47 
+ mem-perf.bsv              Locally Modified           47 
+
+Directory modules/apps/tests/mem_test
+ mem-test.bsv              Locally Modified           47 
+
+STDIO sync at end of run now automatic.

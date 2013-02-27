@@ -40,7 +40,6 @@ typedef enum
     STATE_enq,
     STATE_deq,
     STATE_finished,
-    STATE_sync,
     STATE_done
 }
 STATE
@@ -153,18 +152,12 @@ module [CONNECTED_MODULE] mkSystem ();
 
         // Write the data so it can't be optimized away
         stdio.printf(msgDone, list1(d));
-        state <= STATE_sync;
-    endrule
-
-    rule sync (state == STATE_sync);
-        stdio.sync_req();
+        linkStarterFinishRun.send(0);
         state <= STATE_done;
     endrule
 
     rule done (state == STATE_done);
-        let r <- stdio.sync_rsp();
-        linkStarterFinishRun.send(0);
+        noAction;
     endrule
 
 endmodule
-

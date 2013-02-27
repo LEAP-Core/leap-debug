@@ -43,9 +43,7 @@ typedef enum
     STATE_test_done,
     STATE_writing,
     STATE_reading,
-    STATE_finished,
-    STATE_sync,
-    STATE_exit
+    STATE_finished
 }
 STATE
     deriving (Bits, Eq);
@@ -211,17 +209,8 @@ module [CONNECTED_MODULE] mkMemTesterAlt ()
     //
     // ====================================================================
 
-    rule sendDone (state == STATE_finished);
-        state <= STATE_sync;
-    endrule
-
-    rule sync (state == STATE_sync);
-        stdio.sync_req();
-        state <= STATE_exit;
-    endrule
-
-    rule finished (state == STATE_exit);
-        let r <- stdio.sync_rsp();        
+    rule finished (state == STATE_finished);
+        noAction;
     endrule
 
 endmodule

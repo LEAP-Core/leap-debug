@@ -54,7 +54,6 @@ typedef enum
     STATE_read_timing,
     STATE_read_timing_emit,
     STATE_finished,
-    STATE_sync,
     STATE_exit
 }
 STATE
@@ -556,17 +555,12 @@ module [CONNECTED_MODULE] mkSystem ()
 
     rule sendDone (state == STATE_finished);
         stdio.printf(msgDone, List::nil);
-        state <= STATE_sync;
-    endrule
-
-    rule sync (state == STATE_sync);
-        stdio.sync_req();
+        linkStarterFinishRun.send(0);
         state <= STATE_exit;
     endrule
 
     rule finished (state == STATE_exit);
-        let r <- stdio.sync_rsp();
-        linkStarterFinishRun.send(0);
+        noAction;
     endrule
 
 endmodule

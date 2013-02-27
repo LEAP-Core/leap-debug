@@ -44,8 +44,6 @@ typedef enum
     STATE_frw_rw_files,
     STATE_frw_close_files,
 
-    STATE_sync,
-    STATE_exit,
     STATE_finish
 } 
 STATE deriving (Bits, Eq);
@@ -402,30 +400,6 @@ module [CONNECTED_MODULE] mkSystem ();
         stdio16.fclose(fHandle[1]);
         stdio32.fclose(fHandle[2]);
         stdio64.fclose(fHandle[3]);
-
-        state <= STATE_sync;
-    endrule
-
-
-    rule sync (state == STATE_sync);
-        stdio08.sync_req();
-        stdio16.sync_req();
-        stdio32.sync_req();
-        stdio64.sync_req();
-
-        stdiop.sync_req();
-
-        state <= STATE_exit;
-    endrule
-
-
-    rule exit (state == STATE_exit);
-        stdio08.sync_rsp();
-        stdio16.sync_rsp();
-        stdio32.sync_rsp();
-        stdio64.sync_rsp();
-
-        stdiop.sync_rsp();
 
         linkStarterFinishRun.send(0);
         state <= STATE_finish;
