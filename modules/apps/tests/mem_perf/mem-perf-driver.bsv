@@ -28,6 +28,7 @@ import GetPut::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/mem_perf_tester.bsh"
+`include "awb/provides/mem_perf_tester_alt.bsh"
 `include "awb/provides/mem_perf_common.bsh"
 `include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"
@@ -35,10 +36,41 @@ import GetPut::*;
 
 
 
-module [CONNECTED_MODULE] mkSystem ()
+module [CONNECTED_MODULE] mkMemPerfDriver ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
-    let mem_tester <- mkMemTester();
-    let mem_perf_driver <- mkMemPerfDriver();
-  
+    ServerStub_MEMPERFRRR serverStub <- mkServerStub_MEMPERFRRR();
+
+    CONNECTION_CHAIN#(CommandType) cmdOut <- mkConnectionChain("command");
+    CONNECTION_ADDR_RING#(Bit#(8), Bit#(1)) finishIn <- mkConnectionAddrRingNode("finish",0);
+
+    Reg#(Bit#(8)) operationsComplete <- mkReg(0);
+
+    rule injectOperation;
+        let cmd <- serverStub.acceptRequest_RunTest();
+
+        cmdOut.sendToNext(CommandType{workingSet: unpack(cmd.workingSet),
+                                      stride: unpack(cmd.stride),
+                                      iterations: unpack(cmd.iterations),
+                                      command: unpack(cmd.command)});
+        
+    endrule
+
+    rule drainOperation;
+        let cmd <- cmdOut.recvFromPrev();
+    endrule
+
+    rule collectResponses;
+        finishIn.deq;
+        if(operationsComplete + 1 == finishIn.maxID)
+        begin
+            serverStub.sendResponse_RunTest(0, 0);
+            operationsComplete <= 0;
+        end
+        else 
+        begin
+            operationsComplete <= operationsComplete + 1;
+        end
+    endrule
+
 endmodule

@@ -8,6 +8,7 @@
 %requires mem_perf_tester_alt
 
 %public mem-perf-wrapper-multi.bsv
+%public mem-perf-driver.bsv
 
 %param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
 

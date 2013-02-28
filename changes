@@ -1289,3 +1289,20 @@ scaling the code to more interesting multifpga systems difficult.
 This change only introduces the rings - it does not change the code
 structure.  More refactoring will be needed to support single/multiple
 FPGA builds.  This will occur shortly.
+
+----------
+kfleming    Date: Wed Feb 27 22:05:19 EST 2013  CSN: CSN-leap-debug-50
+                  Thu Feb 28 03:05:19 UTC 2013
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-wrapper.bsv      Locally Modified           49 
+ mem-perf-wrapper-multi.awb Locally Modified           49 
+ mem-perf-driver.bsv       Locally Added               0 
+ mem-perf-wrapper.awb      Locally Modified           49 
+ mem-perf-wrapper-multi.bsv Locally Modified           49 
+
+
+Finished refactoring the memory performance test.  Now adding extra
+scratchpads requires only adding and slightly modifying the test
+wrapper code, as opposed to large amounts of code replication.
