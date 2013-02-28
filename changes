@@ -1264,3 +1264,28 @@ Directory modules/apps/tests/mem_test
  mem-test.bsv              Locally Modified           47 
 
 STDIO sync at end of run now automatic.
+
+----------
+kfleming    Date: Wed Feb 27 20:06:52 EST 2013  CSN: CSN-leap-debug-49
+                  Thu Feb 28 01:06:52 UTC 2013
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           48 
+ mem-perf-wrapper.bsv      Locally Modified           48 
+ mem-perf.awb              Locally Modified           48 
+ mem-perf.bsv              Locally Modified           48 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           48 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           48 
+ mem-perf-wrapper.awb      Locally Modified           48 
+
+
+Refactored mem-perf test to use rings.  Point-to-point links made
+scaling the code to more interesting multifpga systems difficult.
+This change only introduces the rings - it does not change the code
+structure.  More refactoring will be needed to support single/multiple
+FPGA builds.  This will occur shortly.

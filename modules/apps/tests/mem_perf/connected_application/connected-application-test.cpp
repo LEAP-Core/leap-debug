@@ -40,12 +40,12 @@ CONNECTED_APPLICATION_CLASS::Main()
     //
 
     for (int rw = 0; rw < 2; rw++) {
-        for (int ws = 9; ws < 26; ws++) {
-            for (int stride_idx = 0; stride_idx < max_stride_idx; stride_idx++) {
+        for (int ws = 9; ws < 10; ws++) {
+            for (int stride_idx = 0; stride_idx < 2; stride_idx++) {
                 stringstream filename;
                 OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
                                                               stride[stride_idx],
-                                                              1<<20,
+                                                              1<<12,
                                                               rw);
 
                 filename << "cache_" << rw << "_" << stride_idx << "_" << ws << ".stats";
@@ -55,9 +55,6 @@ CONNECTED_APPLICATION_CLASS::Main()
             }
         }
     }
-
-    // Send "done" command
-    clientStub->RunTest(0, 0, 0, 2);
 
     STARTER_DEVICE_SERVER_CLASS::GetInstance()->End(0);
   

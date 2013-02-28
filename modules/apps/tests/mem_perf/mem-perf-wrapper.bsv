@@ -29,41 +29,12 @@ import GetPut::*;
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/mem_perf_tester.bsh"
 `include "awb/provides/mem_perf_tester_alt.bsh"
-
-
+`include "awb/provides/mem_perf_common.bsh"
+`include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"
 `include "asim/provides/common_services.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
 
-`define START_ADDR 0
-
-typedef enum
-{
-    STATE_init,
-    STATE_writing,
-    STATE_write_reset,
-    STATE_reading,
-    STATE_read_reset,
-    STATE_finished,
-    STATE_sync,
-    STATE_exit
-}
-STATE
-    deriving (Bits, Eq);
-
-
-typedef Bit#(32) CYCLE_COUNTER;
-
-typedef Bit#(32) MEM_ADDRESS;
-typedef 26 MAX_WORKING_SET;
-typedef 9 MIN_WORKING_SET;
-typedef 12 STRIDE_INDEXES;
-
-MEM_ADDRESS boundMaskBase = (1 << fromInteger(valueof(MIN_WORKING_SET))) - 1;
-MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
-MEM_ADDRESS boundMax      =  1 << fromInteger(valueof(MAX_WORKING_SET));
-MEM_ADDRESS strideMax     = fromInteger(valueof(STRIDE_INDEXES));
 
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
@@ -71,4 +42,37 @@ module [CONNECTED_MODULE] mkSystem ()
     let mem_tester <- mkMemTester();
     let mem_tester_alt <- mkMemTesterAlt();
 
+    ServerStub_MEMPERFRRR serverStub <- mkServerStub_MEMPERFRRR();
+
+    CONNECTION_CHAIN#(CommandType) cmdOut <- mkConnectionChain("command");
+    CONNECTION_ADDR_RING#(Bit#(8), Bit#(1)) finishIn <- mkConnectionAddrRingNode("finish",0);
+
+    Reg#(Bit#(8)) operationsComplete <- mkReg(0);
+
+    rule injectOperation;
+        let cmd <- serverStub.acceptRequest_RunTest();
+
+        cmdOut.sendToNext(CommandType{workingSet: unpack(cmd.workingSet),
+                                      stride: unpack(cmd.stride),
+                                      iterations: unpack(cmd.iterations),
+                                      command: unpack(cmd.command)});
+        
+    endrule
+
+    rule drainOperation;
+        let cmd <- cmdOut.recvFromPrev();
+    endrule
+
+    rule collectResponses;
+        finishIn.deq;
+        if(operationsComplete + 1 == finishIn.maxID)
+        begin
+            serverStub.sendResponse_RunTest(0, 0);
+            operationsComplete <= 0;
+        end
+        else 
+        begin
+            operationsComplete <= operationsComplete + 1;
+        end
+    endrule
 endmodule
