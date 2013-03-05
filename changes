@@ -1306,3 +1306,17 @@ Directory modules/apps/tests/mem_perf
 Finished refactoring the memory performance test.  Now adding extra
 scratchpads requires only adding and slightly modifying the test
 wrapper code, as opposed to large amounts of code replication.
+
+----------
+kfleming    Date: Tue Mar  5 17:19:49 EST 2013  CSN: CSN-leap-debug-51
+                  Tue Mar  5 22:19:49 UTC 2013
+
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           50 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-wrapper.awb      Locally Modified           50 
+
+
+Removed second scratchpad from mem-perf.
