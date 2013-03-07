@@ -22,8 +22,10 @@
 import FIFO::*;
 import FIFOF::*;
 import Vector::*;
+import LFSR::*;
 
 `include "awb/provides/virtual_platform.bsh"
+`include "awb/provides/librl_bsv_storage.bsh"
 `include "awb/provides/virtual_devices.bsh"
 `include "awb/provides/common_services.bsh"
 `include "awb/provides/physical_platform.bsh"
@@ -60,7 +62,7 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
     // instantiate stubs
     ServerStub_PLATFORM_DEBUGGER serverStub <- mkServerStub_PLATFORM_DEBUGGER(llpi.rrrServer);
     
-    Reg#(Bit#(64)) curCycle <- mkReg(0);
+    Reg#(Bit#(48)) curCycle <- mkReg(0);
     (* no_implicit_conditions *)
     (* fire_when_enabled *)
     rule updateCycle (True);
@@ -179,11 +181,16 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
     //
 
     Reg#(FPGA_DDR_ADDRESS) calAddr <- mkRegU();
-    Reg#(Bit#(64)) calStartCycle <- mkRegU();
-    Reg#(Bit#(16)) calReads <- mkRegU();
-    Reg#(Maybe#(Bit#(64))) calFirstRespCycle <- mkRegU();
-    Reg#(Bit#(16)) calReqCnt <- mkRegU();
-    Reg#(Bit#(16)) calRespCnt <- mkRegU();
+    Reg#(Bit#(48)) calStartCycle <- mkRegU();
+    Reg#(Bit#(32)) calReads <- mkRegU();
+    Reg#(Maybe#(Bit#(48))) calFirstRespCycle <- mkRegU();
+    Reg#(Bit#(32)) calReqCnt <- mkRegU();
+    Reg#(Bit#(32)) calRespCnt <- mkRegU();
+    Reg#(Bool) calRandomize <- mkRegU();
+    LFSR#(Bit#(32)) lfsr <- mkLFSR_32(); 
+    FIFO#(Bit#(48)) latencyFIFO <- mkSizedBRAMFIFO(2048); //Make this big in case we have a lot of inter-fpga latency.
+    Reg#(Bit#(48)) totalLatency <- mkReg(0);
+    Reg#(Bit#(TAdd#(1, TLog#(FPGA_DDR_BURST_LENGTH)))) burstCnt <- mkReg(0);
 
     rule accept_read_latency (state == STATE_running);
         let cal <- serverStub.acceptRequest_ReadLatency();
@@ -196,18 +203,37 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
         calFirstRespCycle <= tagged Invalid;
         calReqCnt <= 0;
         calRespCnt <= 0;
+        lfsr.seed(zeroExtend(cal.randomize));
+        calRandomize <= cal.randomize > 0; 
+        totalLatency <= 0;
     endrule
 
     rule read_latency_req ((state == STATE_calibrating) &&
                            (calReqCnt < calReads));
-        sram[0].readReq(calAddr);
+        let randomizer = (calRandomize) ? {lfsr.value,lfsr.value} : 0;
+        sram[0].readReq(calAddr ^ truncate(randomizer));
         calAddr <= calAddr + fromInteger(valueOf(TMul#(FPGA_DDR_BURST_LENGTH, TDiv#(FPGA_DDR_DUALEDGE_BEAT_SZ, FPGA_DDR_WORD_SZ))));
         calReqCnt <= calReqCnt + 1;
+        latencyFIFO.enq(curCycle);
     endrule
 
     (* descending_urgency = "accept_status_check, read_latency_resp" *)
     rule read_latency_resp (state == STATE_calibrating);
         let data  <- sram[0].readRsp();
+
+        // We expect some number of bursts, so we only dequeue when the op is 
+        // complete
+        if(burstCnt + 1 == fromInteger(valueOf(FPGA_DDR_BURST_LENGTH)))
+        begin
+            totalLatency <= totalLatency + (curCycle - latencyFIFO.first);
+            latencyFIFO.deq;
+            burstCnt <= 0;
+        end 
+        else
+        begin
+            burstCnt <= burstCnt + 1;
+        end
+
         if (! isValid(calFirstRespCycle))
         begin
             calFirstRespCycle <= tagged Valid curCycle;
@@ -216,9 +242,9 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
         if (calRespCnt + 1 == (calReads * fromInteger(valueOf(FPGA_DDR_BURST_LENGTH))))
         begin
             let first_read_latency = validValue(calFirstRespCycle) - calStartCycle;
-            let total_latency = curCycle - calStartCycle;
-            serverStub.sendResponse_ReadLatency(truncate(first_read_latency),
-                                                truncate(total_latency));
+            serverStub.sendResponse_ReadLatency(zeroExtend(first_read_latency),
+                                                zeroExtend(totalLatency + (curCycle - latencyFIFO.first)),
+                                                zeroExtend(curCycle - calStartCycle));
             
             state <= STATE_running;
         end

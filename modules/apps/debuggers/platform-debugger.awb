@@ -18,6 +18,6 @@
 %sources -t CPP  -v PRIVATE platform-debugger.cpp
 %sources -t RRR  -v PUBLIC  platform-debugger.rrr
 
-%param MEM_CHECK_LATENCY 0   "Test DDR latency"
+%param MEM_CHECK_LATENCY 1   "Test DDR latency"
 
 %AWB_END

@@ -1320,3 +1320,39 @@ Directory modules/apps/tests/mem_perf
 
 
 Removed second scratchpad from mem-perf.
+
+----------
+kfleming    Date: Thu Mar  7 12:26:47 EST 2013  CSN: CSN-leap-debug-52
+                  Thu Mar  7 17:26:47 UTC 2013
+
+
+Directory config/pm/leap/debuggers/sram
+ sram_debugger_nallatech_acp.apm Locally Modified           51 
+ sram_debugger_ml605.apm   Locally Modified           51 
+
+Directory config/pm/leap
+ submodels/                Locally Added               0 
+
+Directory config/pm/leap/submodels
+ fpgaenv-hybrid-ml605-sram-debugger.apm Locally Added               0 
+
+Directory modules/apps/debuggers
+ platform-debugger.bsv     Locally Modified           51 
+ platform-debugger.cpp     Locally Modified           51 
+ platform-debugger.rrr     Locally Modified           51 
+ platform-debugger.awb     Locally Modified           51 
+
+
+Fixed multiple horiffic bugs in the platform debugger code.
+
+1) Changed apms to target the external RAM memory on the various
+boards.  Previously we were targeting the BRAM memory.
+
+2) Fixed latency calculation.  Latency must be measured for each
+memory op, as opposed to just measuring the total test time.
+
+3) Added throughput calculation - or renamed "latency" to throughput.
+
+4) Increased the number of requests in-flight.  The buggy "latency"
+calculation was misleading us as to the true properties of our memory
+system.

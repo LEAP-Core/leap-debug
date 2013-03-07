@@ -27,9 +27,6 @@ hybrid_application=SRAM Debugger Application
 File=modules/apps/debuggers/platform-debugger.awb
 Packagehint=leap-debug
 
-[SRAM Debugger Application/Params]
-MEM_CHECK_LATENCY=1
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
@@ -40,12 +37,9 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid ACP M2 Compute Environment - No local memory (Nallatech)
+fpgaenv=Hybrid ACP M2 Compute Environment - SRAM Debugger (Nallatech)
 application_env=Base Hybrid Application Environment
 
-[Hybrid ACP M2 Compute Environment - No local memory (Nallatech)]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech-no-local-mem.apm
+[Hybrid ACP M2 Compute Environment - SRAM Debugger (Nallatech)]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech-debugger-mem.apm
 Packagehint=leap-platforms-acp
-
-[Hybrid ACP M2 Compute Environment - No local memory (Nallatech)/Params]
-DRAM_DEBUG=1

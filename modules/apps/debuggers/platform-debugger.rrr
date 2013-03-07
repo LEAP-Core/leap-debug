@@ -19,9 +19,10 @@ service PLATFORM_DEBUGGER
                           in UINT32[32] mask, out UINT8[8] status);
 
         // Calibrate max outstanding reads
-        method ReadLatency(in UINT16[16] nReads, in UINT16[16] maxOutstanding,
-                           out UINT32[32] firstReadLatency,
-                           out UINT32[32] totalLatency);
+        method ReadLatency(in UINT32[32] nReads, in UINT16[16] randomize, in UINT16[16] maxOutstanding,
+                           out UINT64[64] firstReadLatency,
+                           out UINT64[64] totalLatency,
+                           out UINT64[64] testCycles);
     };
 };
 

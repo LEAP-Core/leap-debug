@@ -27,9 +27,6 @@ hybrid_application=SRAM Debugger Application
 File=modules/apps/debuggers/platform-debugger.awb
 Packagehint=leap-debug
 
-[SRAM Debugger Application/Params]
-MEM_CHECK_LATENCY=1
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
@@ -40,13 +37,12 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache
+fpgaenv=Hybrid ML605 PCIE FPGA Environment - SRAM Debugger
 application_env=Base Hybrid Application Environment
 
-[Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie-no-memory.apm
-Packagehint=leap
-
-[Hybrid ML605 PCIE FPGA Environment - No Memory/Central Cache/Params]
-DRAM_DEBUG=1
+[Hybrid ML605 PCIE FPGA Environment - SRAM Debugger/Params]
 MODEL_CLOCK_FREQ=85
+
+[Hybrid ML605 PCIE FPGA Environment - SRAM Debugger]
+File=config/pm/leap/submodels/fpgaenv-hybrid-ml605-sram-debugger.apm
+Packagehint=leap-debug

@@ -176,6 +176,7 @@ HYBRID_APPLICATION_CLASS::Main()
                                      0x8893450971234443,
                                      0xe87681345d506812 };
 
+
     // Write a pattern to memory.
     UINT64 write_test_end = min(UINT64(10000), ADDR_END / MIN_IDX_OFFSET / 2);
     for (UINT64 addr = 0; addr < write_test_end; addr += MIN_IDX_OFFSET)
@@ -308,21 +309,32 @@ HYBRID_APPLICATION_CLASS::Main()
 #if (MEM_CHECK_LATENCY != 0)
     cout << "Latencies:" << endl;
     int min_idx = 0;
-    int min_latency = 0;
-    for (int i = 1; i <= DRAM_MAX_OUTSTANDING_READS; i++)
-    {
-        OUT_TYPE_ReadLatency r = clientStub->ReadLatency(256, i);
-        cout << i << ": first " << r.firstReadLatency << " cycles, average "
-             << r.totalLatency / 256.0 << " per load" << endl << flush;
+    float min_latency = 0;
+    for(UINT16 randomize = 0; randomize < 2; randomize++)
+      {
+        for (int i = 1; i <= DRAM_MAX_OUTSTANDING_READS; i++)
+	  {
+            UINT32 loads = 1<<20;
+            OUT_TYPE_ReadLatency result = clientStub->ReadLatency(loads, randomize, i);
+            float averageLatency = (((float)result.totalLatency/loads/(MODEL_CLOCK_FREQ*1000000)) * 1000000000);
+            float throughput = (((float)loads) * (DRAM_MIN_BURST*DRAM_BEAT_WIDTH)/(8000000))/((float)result.testCycles/(MODEL_CLOCK_FREQ*1000000));
 
-        if ((min_idx == 0) || (r.totalLatency < min_latency))
-        {
-            min_idx = i;
-            min_latency = r.totalLatency;
-        }
-    }
+            cout << i << ": first " << result.firstReadLatency <<
+	      " cycles: "  << result.testCycles  <<
+	      " totalLatency: "  << result.totalLatency  <<
+	      " throughput: "  << throughput << " MB/s" <<
+	      " average latency: " << averageLatency << " nS " <<endl << flush;
 
-    cout << "Optimal reads in flight: " << min_idx << endl << endl << flush;
+            if ((min_idx == 0) || (result.totalLatency < min_latency))
+	      {
+                min_idx = i;
+                min_latency = result.totalLatency;
+	      }
+	  }
+
+        cout << "Optimal reads in flight: " << min_idx << endl << endl << flush;
+      }
+
 #endif
 
     errors = 0;
