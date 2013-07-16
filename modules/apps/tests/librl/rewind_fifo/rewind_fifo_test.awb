@@ -1,0 +1,13 @@
+********************************************************************
+* RewindFIFO Test
+********************************************************************
+
+%AWB_START
+
+%name LIBRL RewindFIFO Test
+%desc Testbench for RewindFIFO
+%provides hw_only_application
+
+%sources -t BSV -v PUBLIC RewindFIFOTest.bsv
+
+%AWB_END

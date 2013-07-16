@@ -1356,3 +1356,31 @@ memory op, as opposed to just measuring the total test time.
 4) Increased the number of requests in-flight.  The buggy "latency"
 calculation was misleading us as to the true properties of our memory
 system.
+
+----------
+keflemin    Date: Tue Jul 16 10:34:17 EDT 2013  CSN: CSN-leap-debug-53
+                  Tue Jul 16 14:34:17 UTC 2013
+
+
+Directory config/pm/leap/tests
+ librl/                    Locally Added               0 
+
+Directory config/pm/leap/tests/librl
+ rewind_fifo/              Locally Added               0 
+
+Directory config/pm/leap/tests/librl/rewind_fifo
+ rewind_fifo_test_exe.apm  Locally Added               0 
+
+Directory modules/apps/tests
+ librl/                    Locally Added               0 
+
+Directory modules/apps/tests/librl
+ rewind_fifo/              Locally Added               0 
+
+Directory modules/apps/tests/librl/rewind_fifo
+ rewind_fifo_test.awb      Locally Added               0 
+ RewindFIFOTest.bsv        Locally Added               0 
+
+
+Ported the rewind fifo unit test from the old bsv-libraries
+repository.  
