@@ -28,7 +28,6 @@ import GetPut::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/mem_perf_tester.bsh"
-`include "awb/provides/mem_perf_tester_alt.bsh"
 `include "awb/provides/mem_perf_common.bsh"
 `include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
 `include "asim/provides/mem_services.bsh"

@@ -1384,3 +1384,14 @@ Directory modules/apps/tests/librl/rewind_fifo
 
 Ported the rewind fifo unit test from the old bsv-libraries
 repository.  
+
+----------
+keflemin    Date: Tue Jul 16 17:44:45 EDT 2013  CSN: CSN-leap-debug-54
+                  Tue Jul 16 21:44:45 UTC 2013
+
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-driver.bsv       Locally Modified           53 
+
+
+Removed spurious include that was causing compilation errors.
