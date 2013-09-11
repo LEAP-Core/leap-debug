@@ -16,31 +16,33 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-
 import FIFO::*;
 import Vector::*;
 import GetPut::*;
 import LFSR::*;
+import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/librl_bsv.bsh"
+
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/scratchpad_memory_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/PARAMS_HARDWARE_SYSTEM.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
 // scratchpads.  mem-test includes it only to get the value of
 // SCRATCHPAD_MEM_VALUE in order to pick data sizes that will force
 // the three possible container scenarios:  multiple containers per
 // datum, one container per datum, multiple data per container.
-`include "asim/provides/scratchpad_memory.bsh"
+`include "awb/provides/scratchpad_memory.bsh"
 
 `define START_ADDR 0
 `define LAST_ADDR  'h1ff
@@ -90,21 +92,25 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate scratchpads
     //
-
-    let private_caches = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
-                                                          SCRATCHPAD_NO_PVT_CACHE);
+    SCRATCHPAD_CONFIG sconf = defaultValue;
+    sconf.cacheMode = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
+                                                       SCRATCHPAD_NO_PVT_CACHE);
 
     // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_LG) memoryLG <- mkScratchpad(`VDEV_SCRATCH_MEMTEST_LG, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_LG) memoryLG <-
+        mkScratchpad(`VDEV_SCRATCH_MEMTEST_LG, sconf);
 
     // Medium data (same container size as data)
-    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD <- mkScratchpad(`VDEV_SCRATCH_MEMTEST_MD, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD <-
+        mkScratchpad(`VDEV_SCRATCH_MEMTEST_MD, sconf);
 
     // Small data (multiple data per container)
-    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM <- mkScratchpad(`VDEV_SCRATCH_MEMTEST_SM, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM <-
+        mkScratchpad(`VDEV_SCRATCH_MEMTEST_SM, sconf);
 
     // Heap
-    MEMORY_HEAP#(MEM_ADDRESS, t_MEM_DATA_SM) heap <- mkMemoryHeapUnionScratchpad(`VDEV_SCRATCH_MEMTEST_HEAP, private_caches);
+    MEMORY_HEAP#(MEM_ADDRESS, t_MEM_DATA_SM) heap <-
+        mkMemoryHeapUnionScratchpad(`VDEV_SCRATCH_MEMTEST_HEAP, sconf);
 
 
     DEBUG_FILE debugLog <- mkDebugFile("mem_test.out");

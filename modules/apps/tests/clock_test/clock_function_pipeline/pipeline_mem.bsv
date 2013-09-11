@@ -1,4 +1,5 @@
 import FIFO::*;
+import DefaultValue::*;
 
 `include "asim/provides/soft_connections.bsh"
 `include "asim/provides/clocks_device.bsh"
@@ -7,6 +8,7 @@ import FIFO::*;
 `include "asim/provides/scratchpad_memory.bsh"
 `include "asim/provides/librl_bsv_base.bsh"
 `include "asim/provides/mem_services.bsh"
+`include "asim/provides/scratchpad_memory_common.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 
@@ -44,7 +46,9 @@ typedef Bit#(16) Addr;
 
 module [CONNECTED_MODULE] mkClockTestStage1();
 
-   MEMORY_IFC#(Addr, Bit#(32))   scratchpad <- mkScratchpad(`VDEV_SCRATCH_PIPELINE_MEM, SCRATCHPAD_UNCACHED);
+   SCRATCHPAD_CONFIG sconf = defaultValue;
+   sconf.cacheMode = SCRATCHPAD_UNCACHED;
+   MEMORY_IFC#(Addr, Bit#(32))   scratchpad <- mkScratchpad(`VDEV_SCRATCH_PIPELINE_MEM, sconf);
    
    Connection_Send#(Bit#(32)) to_pipeline2 <- mkConnection_Send("to_pipeline2");
    Connection_Receive#(Bit#(32)) from_out <- mkConnection_Receive("to_pipeline");

@@ -1,6 +1,7 @@
 // Copyright 2000--2006 Bluespec, Inc.  All rights reserved.
 
 import FIFO::*;
+import DefaultValue::*;
 
 `include "soft_connections.bsh"
 `include "front_panel_service.bsh"
@@ -8,6 +9,7 @@ import FIFO::*;
 `include "soft_clocks.bsh"
 `include "fpga_components.bsh"
 `include "asim/provides/scratchpad_memory.bsh"
+`include "asim/provides/scratchpad_memory_common.bsh"
 `include "asim/provides/librl_bsv_base.bsh"
 `include "asim/provides/mem_services.bsh"
 
@@ -17,7 +19,9 @@ typedef Bit#(16) Addr;
 
 module [CONNECTED_MODULE] mkClockTestStage1();
 
-   MEMORY_IFC#(Addr, Bit#(32))   scratchpad <- mkScratchpad(`VDEV_SCRATCH_PIPELINE_MEM, SCRATCHPAD_UNCACHED);
+   SCRATCHPAD_CONFIG sconf = defaultValue;
+   sconf.cacheMode = SCRATCHPAD_UNCACHED;
+   MEMORY_IFC#(Addr, Bit#(32)) scratchpad <- mkScratchpad(`VDEV_SCRATCH_PIPELINE_MEM, sconf);
    
    Connection_Send#(Bit#(32)) to_pipeline2 <- mkConnection_Send("to_pipeline2");
    Connection_Receive#(Bit#(32)) from_out <- mkConnection_Receive("to_pipeline");

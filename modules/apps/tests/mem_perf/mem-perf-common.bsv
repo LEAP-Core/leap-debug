@@ -19,19 +19,21 @@
 import FIFO::*;
 import Vector::*;
 import GetPut::*;
+import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
 `include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/rrr/remote_server_stub_MEMPERFRRR.bsh"
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/mem_perf_common.bsh"
-`include "asim/provides/common_services.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/mem_perf_common.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/scratchpad_memory_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
 
 `define START_ADDR 0
 
@@ -74,11 +76,12 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     // Allocate scratchpads
     //
 
-    let private_caches = (addCaches ? SCRATCHPAD_CACHED :
-                                      SCRATCHPAD_NO_PVT_CACHE);
+    SCRATCHPAD_CONFIG sconf = defaultValue;
+    sconf.cacheMode = (addCaches ? SCRATCHPAD_CACHED :
+                                   SCRATCHPAD_NO_PVT_CACHE);
 
     // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkScratchpad(scratchpadID, private_caches);
+    MEMORY_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkScratchpad(scratchpadID, sconf);
 
     // Output
     STDIO#(Bit#(64))     stdio <- mkStdIO();

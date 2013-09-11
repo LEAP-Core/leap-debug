@@ -1395,3 +1395,26 @@ Directory modules/apps/tests/mem_perf
 
 
 Removed spurious include that was causing compilation errors.
+
+----------
+mcadler     Date: Wed Sep 11 15:56:56 EDT 2013  CSN: CSN-leap-debug-55
+                  Wed Sep 11 19:56:56 UTC 2013
+
+
+Directory config/pm/leap/tests/interconnect_test
+ interconnect_test_hybrid_exe.apm Locally Modified           54 
+
+Directory modules/apps/tests/clock_test/clock_function_pipeline/synth_pipeline
+ stage1_mem.bsv            Locally Modified           54 
+
+Directory modules/apps/tests/clock_test/clock_function_pipeline
+ pipeline_mem.bsv          Locally Modified           54 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           54 
+
+Directory modules/apps/tests/mem_test
+ mem-test.bsv              Locally Modified           54 
+
+- New scratchpad parameters.
+- Update models for new interconnect modules.
