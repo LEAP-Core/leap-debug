@@ -1,0 +1,12 @@
+%name Coherent Scratchpad Memory Test System
+%desc Coherent Scratchpad Memory Test System
+
+%attributes coherent_scratchpad_test test
+
+%provides hardware_system
+
+%public coh-mem-test.bsv
+%public coh-mem-test.dic
+
+%param --dynamic COH_MEM_TEST_VERBOSE    0  "0: disable, 1: enable verbose output"
+

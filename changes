@@ -1418,3 +1418,25 @@ Directory modules/apps/tests/mem_test
 
 - New scratchpad parameters.
 - Update models for new interconnect modules.
+
+----------
+hjyang      Date: Wed Oct  2 14:15:28 EDT 2013  CSN: CSN-leap-debug-56
+                  Wed Oct  2 18:15:28 UTC 2013
+
+
+Directory config/pm/leap/tests
+ coh_mem_test/             Locally Added               0 
+
+Directory config/pm/leap/tests/coh_mem_test
+ coh_mem_test_hybrid_exe.apm Locally Added               0 
+ coh_mem_test_hybrid_ml605.apm Locally Added               0 
+
+Directory modules/apps/tests
+ coh_mem_test/             Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_test
+ coh-mem-test.awb          Locally Added               0 
+ coh-mem-test.bsv          Locally Added               0 
+ coh-mem-test.dic          Locally Added               0 
+
+Add coh-mem-test to test coherent scratchpads
