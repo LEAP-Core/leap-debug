@@ -1,0 +1,4 @@
+// Coherent Scratchpads
+def VDEV.SCRATCH.SHARED_QUEUE_DATA     "shared_queue_coherent_scratch_data";
+def VDEV.SCRATCH.SHARED_QUEUE_BITS     "shared_queue_coherent_scratch_bits";
+
