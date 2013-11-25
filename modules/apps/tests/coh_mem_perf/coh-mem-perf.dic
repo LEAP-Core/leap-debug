@@ -1,0 +1,14 @@
+// Scratchpads
+// Coherent scratchpad
+def VDEV.SCRATCH.COH_MEMPERF_DATA     "coh_scratch_memperf_data";
+def VDEV.SCRATCH.COH_MEMPERF_BITS     "coh_scratch_memperf_bits";
+// Private scratchpad
+def VDEV.SCRATCH.MEMPERF_1            "scratch_memperf_1";
+def VDEV.SCRATCH.MEMPERF_2            "scratch_memperf_2";
+def VDEV.SCRATCH.MEMPERF_3            "scratch_memperf_3";
+def VDEV.SCRATCH.MEMPERF_4            "scratch_memperf_4";
+def VDEV.SCRATCH.MEMPERF_5            "scratch_memperf_5";
+def VDEV.SCRATCH.MEMPERF_6            "scratch_memperf_6";
+def VDEV.SCRATCH.MEMPERF_7            "scratch_memperf_7";
+def VDEV.SCRATCH.MEMPERF_8            "scratch_memperf_8";
+

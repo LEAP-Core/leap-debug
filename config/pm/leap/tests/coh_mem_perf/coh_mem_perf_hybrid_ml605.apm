@@ -1,0 +1,53 @@
+
+[Global]
+SaveParameters=0
+Description=Hybrid Virtual Coherent Memory Performance Test Model with Private Caches for ML605
+File=coh_mem_perf_hybrid_ml605
+Version=2.2
+Name=Hybrid Virtual Coherent Memory Performance Test Model with Private Caches for ML605
+Type=Leap
+Class=Asim::Model
+DefaultBenchmark=
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=bram-test hasim hybrid
+model=HW/SW Hybrid Pipeline Build
+
+[Default Software Connected Application]
+File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
+Packagehint=leap
+
+[Default Software Connected Application/Requires]
+hardware_system=Coherent Scratchpad Memory Performance Test System
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid ML605 PCIE FPGA Environment
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Default Software Connected Application
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[Hybrid ML605 PCIE FPGA Environment]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie.apm
+Packagehint=leap
+
+
+[Coherent Scratchpad Memory Performance Test System]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf.awb
+Packagehint=leap-debug

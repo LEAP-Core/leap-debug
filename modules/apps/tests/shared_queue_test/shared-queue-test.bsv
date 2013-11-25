@@ -41,13 +41,14 @@ import LFSR::*;
 `define START_ADDR  8
 
 typedef Bit#(32) CYCLE_COUNTER;
-typedef Bit#(15) MEM_ADDRESS;
+typedef Bit#(16) MEM_ADDRESS;
+typedef Bit#(9) WORKING_SET;
 
 typedef Bit#(4) PRODUCER_IDX;
 typedef Bit#(4) CONSUMER_IDX;
-typedef 2 N_PRODUCERS;
-typedef 2 N_CONSUMERS;
-typedef 6 SHARED_QUEUE_SIZE_LOG;
+typedef  2 N_PRODUCERS;
+typedef  2 N_CONSUMERS;
+typedef 15 SHARED_QUEUE_SIZE_LOG;
 
 typedef enum
 {
@@ -62,7 +63,7 @@ STATE
 typedef struct
 {
     PRODUCER_IDX idx;
-    Bit#(8)      data;
+    Bit#(40)     data;
 }
 TEST_DATA
     deriving (Bits, Eq);
@@ -125,6 +126,7 @@ module [CONNECTED_MODULE] mkSystem ()
     let verbose = verboseMode == 1;
 
     Param#(16) testNumParam <-mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_SHARED_QUEUE_TEST_TEST_NUM, paramNode);
+    Param#(16) queueSizeNumParam <-mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_SHARED_QUEUE_TEST_QUEUE_SIZE, paramNode);
 
     // Output
     STDIO#(Bit#(64)) stdio <- mkStdIO();
@@ -137,7 +139,7 @@ module [CONNECTED_MODULE] mkSystem ()
     let msgDataErr <- getGlobalStringUID("deq: consumer id=%x, producer id=%x, data=0x%x, (expected: p_id=%x, data=0x%x) ERROR! \n");
     let msgInit <- getGlobalStringUID("sharedQueueTest: start\n");
     let msgInitDone <- getGlobalStringUID("sharedQueueTest: initialization done, cycle: %012d\n");
-    let msgDone <- getGlobalStringUID("sharedQueueTest: done, cycle: %012d, test cycle count: %012d\n");
+    let msgDone <- getGlobalStringUID("sharedQueueTest: done (# test: %08d, queue size: %08d), cycle: %012d, test cycle count: %012d, totalLatency: %012d\n");
     //let msgDone <- getGlobalStringUID("sharedQueueTest: done\n");
     
     (* fire_when_enabled *)
@@ -146,22 +148,27 @@ module [CONNECTED_MODULE] mkSystem ()
     endrule
 
     Reg#(Bool) done                               <- mkReg(False);
+    Reg#(Bool) warmCacheIssueDone                 <- mkReg(False);
+    Reg#(Bool) warmCacheDone                      <- mkReg(True);
     Reg#(Bit#(16)) numTests                       <- mkReg(0);
     Reg#(Bit#(16)) maxTests                       <- mkReg(`TEST_NUM);
     Reg#(Bit#(16)) completeTests                  <- mkReg(0);
-    FIFO#(TEST_DATA) expected                     <- mkSizedBRAMFIFO(valueOf(n_ENTRIES));
+    FIFO#(Tuple2#(TEST_DATA, Bit#(32))) expected  <- mkSizedBRAMFIFO(valueOf(n_ENTRIES));
     COUNTER#(t_QUEUE_IDX_SZ) numItems             <- mkLCounter(0);
+    Reg#(t_QUEUE_IDX) maxQueueSize                <- mkReg(fromInteger(valueOf(n_ENTRIES)));
     Reg#(Tuple2#(Bool, t_QUEUE_IDX)) head         <- mkReg(unpack(0));
     Reg#(Tuple2#(Bool, t_QUEUE_IDX)) tail         <- mkReg(unpack(0));
-    Reg#(Bit#(2)) initCnt                         <- mkReg(0);
+    Reg#(Bit#(3)) initCnt                         <- mkReg(0);
     Reg#(Bit#(32)) cycleCnt                       <- mkReg(0);
     Reg#(Bit#(32)) initCycleCnt                   <- mkReg(0);
+    Reg#(Bit#(48)) totalLatency                   <- mkReg(0);
+    Reg#(WORKING_SET) testAddr                    <- mkReg(0);
 
     rule countCycle(True);
         cycleCnt <= cycleCnt + 1;
     endrule
 
-    rule doInit (state == STATE_init);
+    rule doInit (state == STATE_init && warmCacheDone);
         if (initCnt == 0)
         begin
             linkStarterStartRun.deq();
@@ -186,12 +193,50 @@ module [CONNECTED_MODULE] mkSystem ()
         end
         else if (initCnt == 3 && !memoriesP[0].writePending() && !memoriesC[0].writePending())
         begin
+            initCnt <= initCnt + 1;
+            maxTests <= testNumParam;
+            warmCacheDone <= False;
+            maxQueueSize <= unpack(queueSizeNumParam);
+            debugLog.record($format("initialization done, cycle=0x%11d", cycleCnt));
+            debugLog.record($format("start warm up central cache"));
+        end
+        else if (initCnt == 4)
+        begin    
             initCnt <= 0;
             state <= STATE_test;
-            maxTests <= testNumParam; 
             initCycleCnt <= cycleCnt;
-            debugLog.record($format("initialization done, cycle=0x%11d", cycleCnt));
+            debugLog.record($format("central cache warm up done, cycle=0x%11d", cycleCnt));
             stdio.printf(msgInitDone, list1(zeroExtend(cycleCnt)));
+        end
+    endrule
+
+    // ====================================================================
+    //
+    // Warm up central cache
+    //
+    // ====================================================================
+
+    FIFOF#(Tuple2#(WORKING_SET, Bool)) warmCacheReqQ <- mkSizedFIFOF(32);
+
+    rule warmCacheIssue (state == STATE_init && initCnt == 4 && !warmCacheIssueDone);
+        MEM_ADDRESS r_addr = zeroExtend(testAddr);
+        memoriesP[0].readReq(r_addr);
+        warmCacheReqQ.enq(tuple2(testAddr, testAddr == maxBound));
+        testAddr <= testAddr + 1;
+        debugLog.record($format("warm up central cache: addr=0x%x", testAddr));
+        if (testAddr == maxBound)
+        begin
+            warmCacheIssueDone <= True;
+        end
+    endrule
+    rule warmCacheRecv (state == STATE_init && initCnt == 4 && !warmCacheDone);
+        let resp <- memoriesP[0].readRsp();
+        match {.addr, .is_done} = warmCacheReqQ.first();
+        warmCacheReqQ.deq();
+        debugLog.record($format("warm up central cache resp: addr=0x%x", addr));
+        if (is_done)
+        begin
+            warmCacheDone <= True;
         end
     endrule
 
@@ -211,7 +256,7 @@ module [CONNECTED_MODULE] mkSystem ()
         rule produceItem (state == STATE_test && producers[r].notFull());
             TEST_DATA d = ?;
             d.idx  = fromInteger(r);
-            d.data = truncate(lfsrs[r].value);
+            d.data = resize(lfsrs[r].value);
             producers[r].enq(d);
             lfsrs[r].next();
         endrule
@@ -250,9 +295,9 @@ module [CONNECTED_MODULE] mkSystem ()
             producers[producer].deq();
             memoriesP[producer].write(`START_ADDR + zeroExtend(pack(tail_val)), zeroExtend(pack(d)));
             memoriesP[producer].writeFence();
-            expected.enq(d);
+            expected.enq(tuple2(d, cycleCnt));
             debugLog.record($format("enq[%8x]: producer id=%x, data=0x%x, tail=0x%x", numItems.value(), d.idx, d.data, tail_val));
-            if (tail_val == (fromInteger(valueOf(n_ENTRIES))-1))
+            if (tail_val == (maxQueueSize-1))
             begin
                 tail <= tuple2(!tail_looped, 0);
             end
@@ -281,18 +326,18 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // ====================================================================
 
-    Vector#(N_CONSUMERS, FIFOF#(TEST_DATA)) consumers   <- replicateM(mkSizedFIFOF(8));
-    Vector#(N_CONSUMERS, FIFOF#(Bool)) consumerReqInfo  <- replicateM(mkSizedFIFOF(8));
-    Reg#(CONSUMER_IDX) consumer                         <- mkReg(0); 
-    Reg#(Bit#(2)) consumerPhase                         <- mkReg(0);
-    LOCAL_ARBITER#(N_CONSUMERS) consumerArb             <- mkLocalArbiter();
-    PulseWire queueNotEmptyW                            <- mkPulseWire();
-    Reg#(Bool) queueNotEmpty                            <- mkReg(False);
+    Vector#(N_CONSUMERS, FIFOF#(Tuple2#(TEST_DATA, Bit#(32)))) consumers  <- replicateM(mkSizedFIFOF(8));
+    Vector#(N_CONSUMERS, FIFOF#(Bool)) consumerReqInfo                    <- replicateM(mkSizedFIFOF(8));
+    Reg#(CONSUMER_IDX) consumer                                           <- mkReg(0); 
+    Reg#(Bit#(2)) consumerPhase                                           <- mkReg(0);
+    LOCAL_ARBITER#(N_CONSUMERS) consumerArb                               <- mkLocalArbiter();
+    PulseWire queueNotEmptyW                                              <- mkPulseWire();
+    Reg#(Bool) queueNotEmpty                                              <- mkReg(False);
 
     for (Integer c = 0; c < valueOf(N_CONSUMERS); c = c + 1)
     begin
         rule recvItem (state == STATE_test && consumers[c].notEmpty() && consumerReqInfo[c].first());
-            let ans = consumers[c].first();
+            match {.ans, .s_cycle} = consumers[c].first();
             consumers[c].deq();
             let resp <- memoriesC[c].readRsp();
             consumerReqInfo[c].deq();
@@ -307,13 +352,14 @@ module [CONNECTED_MODULE] mkSystem ()
             end
             else
             begin
-                debugLog.record($format("recvItem: consumer idx=%x, producer idx=%x, data=0x%x", c, d.idx, d.data));
+                debugLog.record($format("recvItem: consumer idx=%x, producer idx=%x, data=0x%x, latency=%d", c, d.idx, d.data, (cycleCnt-s_cycle)));
                 if (verbose)
                 begin
                     stdio.printf(msgData, list3(fromInteger(c), zeroExtend(d.idx), resize(pack(d.data))));
                 end
             end
             completeTests <= completeTests + 1;
+            totalLatency <= totalLatency + zeroExtend(cycleCnt - s_cycle);
             if ( (completeTests == numTests - 1) && done)
             begin
                 state <= STATE_finished;
@@ -367,7 +413,7 @@ module [CONNECTED_MODULE] mkSystem ()
         consumers[consumer].enq(d);
         expected.deq();
         debugLog.record($format("deq: consumer id=%x, head=0x%x, numItems=%x", consumer, head_val, numItems.value()));
-        if (head_val == (fromInteger(valueOf(n_ENTRIES))-1))
+        if (head_val == (maxQueueSize-1))
         begin
             head <= tuple2(!head_looped, 0);
         end
@@ -396,7 +442,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
     rule sendDone (state == STATE_finished);
         //stdio.printf(msgDone, List::nili);
-        stdio.printf(msgDone, list2(zeroExtend(cycleCnt), zeroExtend(cycleCnt-initCycleCnt)));
+        stdio.printf(msgDone, list5(zeroExtend(maxTests), zeroExtend(pack(maxQueueSize)), zeroExtend(cycleCnt), zeroExtend(cycleCnt-initCycleCnt), zeroExtend(totalLatency)));
         linkStarterFinishRun.send(0);
         state <= STATE_exit;
     endrule

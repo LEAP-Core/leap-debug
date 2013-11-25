@@ -1462,3 +1462,30 @@ Directory modules/apps/tests/shared_queue_test
  shared-queue-test.dic     Locally Added               0 
 
 Add a shared queue test that has multiple producers and consumers using coherent scratchpads. 
+
+----------
+hjyang      Date: Mon Nov 25 12:03:50 EST 2013  CSN: CSN-leap-debug-58
+                  Mon Nov 25 17:03:50 UTC 2013
+
+
+Directory config/pm/leap/tests
+ coh_mem_perf/             Locally Added               0 
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_exe.apm Locally Added               0 
+ coh_mem_perf_hybrid_ml605.apm Locally Added               0 
+
+Directory modules/apps/tests
+ coh_mem_perf/             Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf.awb          Locally Added               0 
+ coh-mem-perf.bsv          Locally Added               0 
+ coh-mem-perf.dic          Locally Added               0 
+
+Directory modules/apps/tests/shared_queue_test
+ shared-queue-test.awb     Locally Modified           57 
+ shared-queue-test.bsv     Locally Modified           57 
+
+(1) Modify the shared-queue-test benchmark to dynamically change the queue size
+(2) Add coh-mem-perf to measure the performance of coherent scratchpads

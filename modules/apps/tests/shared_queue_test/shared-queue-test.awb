@@ -8,5 +8,6 @@
 %public shared-queue-test.bsv
 %public shared-queue-test.dic
 
-%param --dynamic SHARED_QUEUE_TEST_VERBOSE        0  "0: disable, 1: enable verbose output"
-%param --dynamic SHARED_QUEUE_TEST_TEST_NUM    1024  "number of tests"
+%param --dynamic SHARED_QUEUE_TEST_VERBOSE          0  "0: disable, 1: enable verbose output"
+%param --dynamic SHARED_QUEUE_TEST_QUEUE_SIZE      64  "size of the shared queue"
+%param --dynamic SHARED_QUEUE_TEST_TEST_NUM      1024  "number of tests"
