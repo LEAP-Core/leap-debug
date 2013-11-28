@@ -16,13 +16,43 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
+// ========================================================================
 //
-// Implement shared queue (producer-consumer model) to test coherent 
-// scratchpads' functionality and performance
+// Shared queue test common definitions. 
 //
-module [CONNECTED_MODULE] mkSystem ();
-    let tester <- (`SHARED_QUEUE_TEST_LOCK_SERVICE_ENABLE == 1)? 
-                  mkSharedQueueTestWithLock():
-                  mkSharedQueueTestNoLock();
-endmodule
+// ========================================================================
+
+`define TEST_NUM 1024
+`define HEAD_ADDR   0
+`define TAIL_ADDR   4
+`define START_ADDR  8
+
+typedef Bit#(32) CYCLE_COUNTER;
+typedef Bit#(16) MEM_ADDRESS;
+typedef Bit#(9) WORKING_SET;
+
+typedef Bit#(4) PRODUCER_IDX;
+typedef Bit#(4) CONSUMER_IDX;
+typedef  2 N_PRODUCERS;
+typedef  2 N_CONSUMERS;
+typedef 15 SHARED_QUEUE_SIZE_LOG;
+
+typedef enum
+{
+    STATE_init,
+    STATE_test,
+    STATE_finished,
+    STATE_exit
+}
+STATE
+    deriving (Bits, Eq);
+
+typedef struct
+{
+    PRODUCER_IDX idx;
+    Bit#(40)     data;
+}
+TEST_DATA
+    deriving (Bits, Eq);
+
 

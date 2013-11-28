@@ -1489,3 +1489,21 @@ Directory modules/apps/tests/shared_queue_test
 
 (1) Modify the shared-queue-test benchmark to dynamically change the queue size
 (2) Add coh-mem-perf to measure the performance of coherent scratchpads
+
+----------
+hjyang      Date: Thu Nov 28 17:13:29 EST 2013  CSN: CSN-leap-debug-59
+                  Thu Nov 28 22:13:29 UTC 2013
+
+
+Directory modules/apps/tests/shared_queue_test
+ shared-queue-test.dic     Locally Modified           58 
+ consumer.bsv              Locally Added               0 
+ shared-queue-test-common.bsv Locally Added               0 
+ producer.bsv              Locally Added               0 
+ shared-queue-test.awb     Locally Modified           58 
+ shared-queue-test.bsv     Locally Modified           58 
+ shared-queue-with-lock.bsv Locally Added               0 
+ shared-queue-no-lock.bsv  Locally Added               0 
+
+Modify the shared queue test to use the distributed lock and synchronization services. 
+The shared queue test now can be split across multiple FPGAs. 

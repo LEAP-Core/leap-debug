@@ -6,8 +6,16 @@
 %provides hardware_system
 
 %public shared-queue-test.bsv
+%public shared-queue-test-common.bsv
+%public shared-queue-no-lock.bsv
+%public shared-queue-with-lock.bsv
+%public producer.bsv
+%public consumer.bsv
 %public shared-queue-test.dic
 
-%param --dynamic SHARED_QUEUE_TEST_VERBOSE          0  "0: disable, 1: enable verbose output"
-%param --dynamic SHARED_QUEUE_TEST_QUEUE_SIZE      64  "size of the shared queue"
-%param --dynamic SHARED_QUEUE_TEST_TEST_NUM      1024  "number of tests"
+%param --global SHARED_QUEUE_TEST_LOCK_SERVICE_ENABLE   1  "0: use global arbiter, 1: use lock service"
+
+%param --dynamic SHARED_QUEUE_TEST_VERBOSE              0  "0: disable, 1: enable verbose output"
+%param --dynamic SHARED_QUEUE_TEST_QUEUE_SIZE          64  "size of the shared queue"
+%param --dynamic SHARED_QUEUE_TEST_TEST_NUM          1024  "number of tests"
+
