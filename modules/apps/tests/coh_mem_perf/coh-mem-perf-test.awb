@@ -1,0 +1,14 @@
+%name Coherent Scratchpad Tester
+%desc Coherent Scratchpad Tester
+
+%attributes coherent_scratchpad_performance_test test
+
+%provides coherent_scratchpad_performance_test
+
+%public coh-mem-perf-test.bsv
+
+%param --dynamic COH_MEM_PERF_VERBOSE     0  "0: disable, 1: enable verbose output"
+%param --dynamic COH_MEM_PERF_TEST_NUM  512  "number of tests"
+%param --dynamic COH_MEM_PERF_FWD_TEST    0  "test fowarding latency"
+
+%param SYNTH_BOUNDARY mkCoherentScratchpadTest "name of synthesis boundary"

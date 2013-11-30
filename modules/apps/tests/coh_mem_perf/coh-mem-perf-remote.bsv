@@ -24,40 +24,24 @@ import GetPut::*;
 import LFSR::*;
 import DefaultValue::*;
 
-`include "awb/provides/librl_bsv.bsh"
+`include "asim/provides/librl_bsv.bsh"
 
-`include "awb/provides/soft_connections.bsh"
-`include "awb/provides/soft_services.bsh" 
+`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "awb/provides/mem_services.bsh"
-`include "awb/provides/common_services.bsh"
-`include "awb/provides/scratchpad_memory_common.bsh"
-`include "awb/provides/coherent_scratchpad_performance_common.bsh"
+`include "asim/provides/mem_services.bsh"
+`include "asim/provides/common_services.bsh"
 `include "awb/provides/coherent_scratchpad_performance_test.bsh"
-`include "awb/provides/coherent_scratchpad_performance_remote.bsh"
-`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/coherent_scratchpad_performance_common.bsh"
+`include "awb/provides/scratchpad_memory_common.bsh"
+`include "asim/provides/coherent_scratchpad_memory_service.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 `include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST.bsh"
 
-// It is normally NOT necessary to include scratchpad_memory.bsh to use
-// scratchpads.  mem-test includes it only to get the value of
-// SCRATCHPAD_MEM_VALUE in order to pick data sizes that will force
-// the three possible container scenarios:  multiple containers per
-// datum, one container per datum, multiple data per container.
-`include "awb/provides/scratchpad_memory.bsh"
-
-`define TEST_NUM   512
-
-typedef Bit#(32) MEM_DATA_SM;
-typedef Bit#(14) MEM_ADDRESS;
-typedef Bit#(14) WORKING_SET;
-typedef Bit#(32) CYCLE_COUNTER;
-typedef 2        N_SCRATCH;
-
-module [CONNECTED_MODULE] mkSystem ()
+module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ),
               Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Alias#(Bit#(TSub#(t_SCRATCHPAD_MEM_VALUE_SZ, 1)), t_MEM_DATA),
@@ -68,17 +52,12 @@ module [CONNECTED_MODULE] mkSystem ()
               NumAlias#(TAdd#(t_SCRATCH_IDX_SZ, t_MEM_ADDR_SZ), t_COH_SCRATCH_ADDR_SZ),
               Alias#(Bit#(t_COH_SCRATCH_ADDR_SZ), t_COH_SCRATCH_ADDR));
 
-    //
-    // Allocate scratchpads
-    //
 
     // Coherent scratchpads
-    NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ~0;
-    NumTypeParam#(t_MEM_DATA_SZ) data_size = ~0;
+    NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
+    NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
 
-    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size);
-
-    mkCoherentScratchpadTest();
-    mkCoherentScratchpadRemote();
-
+    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(valueOf(N_SCRATCH))+".out");
+    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, valueOf(N_SCRATCH), debugLogsCohScratch);
+  
 endmodule

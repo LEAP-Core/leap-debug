@@ -1,0 +1,11 @@
+%name Coherent Scratchpad Tester Remote Module
+%desc Coherent Scratchpad Tester Remote Module
+
+%attributes coherent_scratchpad_performance_test test
+
+%provides coherent_scratchpad_performance_remote
+
+%public coh-mem-perf-remote.bsv
+
+%param SYNTH_BOUNDARY mkCoherentScratchpadRemote "name of synthesis boundary"
+

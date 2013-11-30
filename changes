@@ -1507,3 +1507,29 @@ Directory modules/apps/tests/shared_queue_test
 
 Modify the shared queue test to use the distributed lock and synchronization services. 
 The shared queue test now can be split across multiple FPGAs. 
+
+----------
+keflemin    Date: Sat Nov 30 16:09:22 EST 2013  CSN: CSN-leap-debug-60
+                  Sat Nov 30 21:09:22 UTC 2013
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_exe.apm Locally Modified           59 
+ coh_mem_perf_hybrid_dual_exe.apm Locally Added               0 
+ coh_mem_perf_hybrid_dual_vc707.apm Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf-remote.awb   Locally Added               0 
+ coh-mem-perf-remote.bsv   Locally Added               0 
+ coh-mem-perf-test.awb     Locally Added               0 
+ coh-mem-perf-test.bsv     Locally Added               0 
+ coh-mem-perf.awb          Locally Modified           59 
+ coh-mem-perf.bsv          Locally Modified           59 
+ sim_mapping.awb           Locally Added               0 
+ coh-mem-perf-common.awb   Locally Added               0 
+ sim-mapping.map           Locally Added               0 
+ coh-mem-perf-common.bsv   Locally Added               0 
+
+
+Refactored coherent scratchpad peformance test, and added multiple
+FPGA mappings of this test.

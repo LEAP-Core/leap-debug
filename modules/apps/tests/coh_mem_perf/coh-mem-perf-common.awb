@@ -1,0 +1,11 @@
+%name Coherent Scratchpad Memory Performance Common
+%desc Coherent Scratchpad Memory Performance Common
+
+%attributes coherent_scratchpad_performance_test test
+
+%provides coherent_scratchpad_performance_common
+
+%public coh-mem-perf-common.bsv
+
+
+

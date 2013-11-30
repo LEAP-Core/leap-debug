@@ -47,7 +47,23 @@ Packagehint=leap
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
 Packagehint=leap
 
-
 [Coherent Scratchpad Memory Performance Test System]
 File=modules/apps/tests/coh_mem_perf/coh-mem-perf.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Tester]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-test.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Performance Test System/Requires]
+coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module
+coherent_scratchpad_performance_test=Coherent Scratchpad Tester
+coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
+
+[Coherent Scratchpad Tester Remote Module]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Performance Common]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-common.awb
 Packagehint=leap-debug

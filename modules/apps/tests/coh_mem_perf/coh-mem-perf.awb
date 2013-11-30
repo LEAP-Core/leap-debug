@@ -4,11 +4,12 @@
 %attributes coherent_scratchpad_performance_test test
 
 %provides hardware_system
+%requires coherent_scratchpad_performance_test
+%requires coherent_scratchpad_performance_remote
+%requires coherent_scratchpad_performance_common
 
 %public coh-mem-perf.bsv
 %public coh-mem-perf.dic
 
-%param --dynamic COH_MEM_PERF_VERBOSE     0  "0: disable, 1: enable verbose output"
-%param --dynamic COH_MEM_PERF_TEST_NUM  512  "number of tests"
-%param --dynamic COH_MEM_PERF_FWD_TEST    0  "test fowarding latency"
+%param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
 
