@@ -1,0 +1,5 @@
+// Coherent Scratchpads
+def VDEV.SCRATCH.HEAT_DATA          "heat_transfer_coherent_scratch_data";
+def VDEV.SCRATCH.HEAT_BITS          "heat_transfer_coherent_scratch_bits";
+def VDEV.SYNCGROUP.HEAT_TRANSFER    "heat_transfer_sync_group";
+
