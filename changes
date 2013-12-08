@@ -1556,3 +1556,22 @@ Directory modules/apps/tests/heat_transfer
  heat-engine.bsv           Locally Added               0 
 
 Add another coherent scratchpad benchmark: heat transfer function
+
+----------
+keflemin    Date: Sun Dec  8 18:32:57 EST 2013  CSN: CSN-leap-debug-62
+                  Sun Dec  8 23:32:57 UTC 2013
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_ml605.apm Locally Modified           61 
+ coh_mem_perf_hybrid_dual_exe.apm Locally Modified           61 
+ coh_mem_perf_hybrid_vc707.apm Locally Added               0 
+ coh_mem_perf_hybrid_dual_vc707.apm Locally Modified           61 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf.bsv          Locally Modified           61 
+ sim-mapping.map           Locally Modified           61 
+ coh-mem-perf-common.bsv   Locally Modified           61 
+
+
+Updates to coherent memory test in support of multiple FPGAs.

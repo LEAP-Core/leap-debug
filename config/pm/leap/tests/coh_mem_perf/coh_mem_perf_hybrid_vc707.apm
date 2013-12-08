@@ -2,7 +2,7 @@
 [Global]
 SaveParameters=0
 Description=Hybrid Virtual Coherent Memory Performance Test Model with Private Caches for ML605
-File=coh_mem_perf_hybrid_ml605
+File=coh_mem_perf_hybrid_vc707
 Version=2.2
 Name=Hybrid Virtual Coherent Memory Performance Test Model with Private Caches for ML605
 Type=Leap
@@ -51,10 +51,6 @@ Packagehint=leap
 File=modules/apps/tests/coh_mem_perf/coh-mem-perf.awb
 Packagehint=leap-debug
 
-[Coherent Scratchpad Tester Remote Module]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
-Packagehint=leap-debug
-
 [Coherent Scratchpad Memory Performance Common]
 File=modules/apps/tests/coh_mem_perf/coh-mem-perf-common.awb
 Packagehint=leap-debug
@@ -64,6 +60,10 @@ File=modules/apps/tests/coh_mem_perf/coh-mem-perf-test.awb
 Packagehint=leap-debug
 
 [Coherent Scratchpad Memory Performance Test System/Requires]
-coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module
+coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module Synth
 coherent_scratchpad_performance_test=Coherent Scratchpad Tester
 coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
+
+[Coherent Scratchpad Tester Remote Module Synth]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote-synth.awb
+Packagehint=leap-debug

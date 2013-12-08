@@ -2,6 +2,6 @@ model -> FPGA0;
 common_services -> FPGA0;
 connected_application -> FPGA0;
 hardware_system -> FPGA0;
-coherent_scratchpad_performance_test -> FPGA1;
-coherent_scratchpad_performance_remote -> FPGA0;
+coherent_scratchpad_performance_test -> FPGA0;
+coherent_scratchpad_performance_remote -> FPGA1;
 

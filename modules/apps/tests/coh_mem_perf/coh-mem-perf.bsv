@@ -55,7 +55,7 @@ typedef Bit#(32) MEM_DATA_SM;
 typedef Bit#(14) MEM_ADDRESS;
 typedef Bit#(14) WORKING_SET;
 typedef Bit#(32) CYCLE_COUNTER;
-typedef 2        N_SCRATCH;
+typedef 7        N_SCRATCH;
 
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ),

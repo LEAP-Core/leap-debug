@@ -82,10 +82,6 @@ Packagehint=leap-debug
 [Default Software Connected Application/Requires]
 hardware_system=Coherent Scratchpad Memory Performance Test System
 
-[Coherent Scratchpad Tester Remote Module]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
-Packagehint=leap-debug
-
 [Coherent Scratchpad Memory Performance Common]
 File=modules/apps/tests/coh_mem_perf/coh-mem-perf-common.awb
 Packagehint=leap-debug
@@ -95,12 +91,12 @@ File=modules/apps/tests/coh_mem_perf/coh-mem-perf-test.awb
 Packagehint=leap-debug
 
 [Coherent Scratchpad Memory Performance Test System/Requires]
-coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module
+coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module Synth
 coherent_scratchpad_performance_test=Coherent Scratchpad Tester
 coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
 
 [Coherent Mem Perf Mapping]
-File=modules/apps/tests/coh_mem_test/sim_mapping.awb
+File=modules/apps/tests/coh_mem_perf/sim_mapping.awb
 Packagehint=leap-debug
 
 [MultiFPGA Communication Complex Generator/Params]
@@ -109,3 +105,7 @@ MAX_NUMBER_OF_VIAS=1
 [VC707 Dual FPGA Environment (SMA)]
 File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_env.awb
 Packagehint=multifpga
+
+[Coherent Scratchpad Tester Remote Module Synth]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote-synth.awb
+Packagehint=leap-debug
