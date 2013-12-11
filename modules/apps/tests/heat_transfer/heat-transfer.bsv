@@ -42,7 +42,7 @@ typedef Bit#(64) CYCLE_COUNTER;
 
 typedef 256 N_X_POINTS;
 typedef 256 N_Y_POINTS;
-typedef   1 N_X_ENGINES;
+typedef   2 N_X_ENGINES;
 typedef   2 N_Y_ENGINES;
 typedef TMul#(N_X_ENGINES, N_Y_ENGINES) N_TOTAL_ENGINES;
 typedef TMul#(N_X_POINTS, N_Y_POINTS)  N_TOTAL_POINTS;
@@ -74,6 +74,9 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate coherent scratchpads for heat engines
     //
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
 
@@ -84,12 +87,12 @@ module [CONNECTED_MODULE] mkSystem ()
 
     if (valueOf(N_TOTAL_ENGINES)>1)
     begin
-        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size);
+        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, conf);
         for(Integer p = 0; p < valueOf(N_TOTAL_ENGINES); p = p + 1)
         begin
             debugLogMs[p] <- mkDebugFile("heat_engine_memory_"+integerToString(p)+".out");
             debugLogEs[p] <- mkDebugFile("heat_engine_"+integerToString(p)+".out");
-            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_HEAT_DATA, p, debugLogMs[p]);
+            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_HEAT_DATA, p, conf, debugLogMs[p]);
             engines[p] <- mkHeatEngine(p, memories[p], debugLogEs[p], p == 0);
         end
     end

@@ -55,7 +55,7 @@ typedef Bit#(32) MEM_DATA_SM;
 typedef Bit#(14) MEM_ADDRESS;
 typedef Bit#(14) WORKING_SET;
 typedef Bit#(32) CYCLE_COUNTER;
-typedef 7        N_SCRATCH;
+typedef 3        N_SCRATCH;
 
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ),
@@ -71,12 +71,14 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate scratchpads
     //
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = (`COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     // Coherent scratchpads
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ~0;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ~0;
 
-    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size);
+    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size, conf);
 
     mkCoherentScratchpadTest();
     mkCoherentScratchpadRemote();

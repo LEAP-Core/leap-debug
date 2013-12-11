@@ -8,5 +8,6 @@
 %public coh-mem-test.bsv
 %public coh-mem-test.dic
 
-%param --dynamic COH_MEM_TEST_VERBOSE    0  "0: disable, 1: enable verbose output"
+%param --global  COH_MEM_TEST_PVT_CACHE_ENABLE    1  "0: disable, 1: enable private caches"
+%param --dynamic COH_MEM_TEST_VERBOSE             0  "0: disable, 1: enable verbose output"
 

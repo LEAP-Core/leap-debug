@@ -20,6 +20,7 @@ import FIFOF::*;
 import Vector::*;
 import GetPut::*;
 import LFSR::*;
+import DefaultValue::*;
 
 `include "asim/provides/librl_bsv.bsh"
 
@@ -56,9 +57,12 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     //
     // Allocate coherent scratchpads (producers and consumers)
     //
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-    mkCoherentScratchpadController(`VDEV_SCRATCH_SHARED_QUEUE_DATA, `VDEV_SCRATCH_SHARED_QUEUE_BITS, addr_size, data_size);
+    mkCoherentScratchpadController(`VDEV_SCRATCH_SHARED_QUEUE_DATA, `VDEV_SCRATCH_SHARED_QUEUE_BITS, addr_size, data_size, conf);
     
     Vector#(N_PRODUCERS, DEBUG_FILE) debugLogsP = newVector();
     Vector#(N_PRODUCERS, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesP = newVector();
@@ -68,7 +72,7 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     for(Integer p = 0; p < valueOf(N_PRODUCERS); p = p + 1)
     begin
         debugLogsP[p] <- mkDebugFile("producer_"+integerToString(p)+".out");
-        memoriesP[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, p, debugLogsP[p]);
+        memoriesP[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, p, conf, debugLogsP[p]);
         lfsrs[p] <- mkLFSR_16();
     end
 
@@ -78,7 +82,7 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     for(Integer p = 0; p < valueOf(N_CONSUMERS); p = p + 1)
     begin
         debugLogsC[p] <- mkDebugFile("consumer_"+integerToString(p)+".out");
-        memoriesC[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, (p + valueOf(N_PRODUCERS)), debugLogsC[p]);
+        memoriesC[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, (p + valueOf(N_PRODUCERS)), conf, debugLogsC[p]);
     end
 
     DEBUG_FILE debugLog <- mkDebugFile("shared_queue_test.out");

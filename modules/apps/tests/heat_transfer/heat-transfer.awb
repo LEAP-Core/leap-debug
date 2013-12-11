@@ -9,6 +9,8 @@
 %public heat-transfer.dic
 %public heat-engine.bsv
 
-%param --dynamic HEAT_TRANSFER_TEST_VERBOSE     0  "0: disable, 1: enable verbose output"
-%param --dynamic HEAT_TRANSFER_TEST_ITER      128  "number of iterations"
+%param --global HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE    0  "0: disable, 1: enable private caches"
+
+%param --dynamic HEAT_TRANSFER_TEST_VERBOSE            0  "0: disable, 1: enable verbose output"
+%param --dynamic HEAT_TRANSFER_TEST_ITER             128  "number of iterations"
 

@@ -82,6 +82,8 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // Allocate scratchpads
     //
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = (`COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     // Coherent scratchpads
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
@@ -95,7 +97,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
     begin
         debugLogsCohScratch[p] <- mkDebugFile("coherent_scratchpad_"+integerToString(p)+".out");
-        memoriesCohScratch[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, p, debugLogsCohScratch[p]);
+        memoriesCohScratch[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, p, conf, debugLogsCohScratch[p]);
         lfsrsCohScratch[p] <- mkLFSR_16();
     end
    

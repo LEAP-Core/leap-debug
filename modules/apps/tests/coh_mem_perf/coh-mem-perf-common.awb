@@ -7,5 +7,6 @@
 
 %public coh-mem-perf-common.bsv
 
+%param --global COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE   0  "0: disable, 1: enable private caches"
 
 
