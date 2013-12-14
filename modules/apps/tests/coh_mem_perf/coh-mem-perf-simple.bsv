@@ -35,12 +35,11 @@ import DefaultValue::*;
 `include "awb/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
 `include "awb/provides/coherent_scratchpad_performance_common.bsh"
-`include "awb/provides/coherent_scratchpad_performance_test.bsh"
 `include "awb/provides/coherent_scratchpad_performance_remote.bsh"
 `include "awb/provides/coherent_scratchpad_memory_service.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST.bsh"
+`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
 // scratchpads.  mem-test includes it only to get the value of
@@ -80,7 +79,6 @@ module [CONNECTED_MODULE] mkSystem ()
 
     mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size, conf);
 
-    mkCoherentScratchpadTest();
     mkCoherentScratchpadRemote();
 
 endmodule

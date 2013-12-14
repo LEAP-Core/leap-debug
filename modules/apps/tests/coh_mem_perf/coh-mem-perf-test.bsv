@@ -71,7 +71,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
               Alias#(Bit#(TSub#(t_SCRATCHPAD_MEM_VALUE_SZ, 1)), t_MEM_DATA),
               //Alias#(MEM_DATA_SM, t_MEM_DATA),
               Bits#(t_MEM_DATA, t_MEM_DATA_SZ),
-              NumAlias#(TLog#(N_SCRATCH), t_SCRATCH_IDX_SZ),
+              NumAlias#(TLog#(`N_SCRATCH), t_SCRATCH_IDX_SZ),
               Alias#(Bit#(t_SCRATCH_IDX_SZ), t_SCRATCH_IDX),
               NumAlias#(TAdd#(t_SCRATCH_IDX_SZ, t_MEM_ADDR_SZ), t_COH_SCRATCH_ADDR_SZ),
               Alias#(Bit#(t_COH_SCRATCH_ADDR_SZ), t_COH_SCRATCH_ADDR));
@@ -89,12 +89,12 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
     
-    Vector#(N_SCRATCH, DEBUG_FILE) debugLogsCohScratch = newVector();
-    Vector#(N_SCRATCH, MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA)) memoriesCohScratch = newVector();
+    Vector#(`N_SCRATCH, DEBUG_FILE) debugLogsCohScratch = newVector();
+    Vector#(`N_SCRATCH, MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA)) memoriesCohScratch = newVector();
     // Random number generators
-    Vector#(N_SCRATCH, LFSR#(Bit#(16))) lfsrsCohScratch = newVector();
+    Vector#(`N_SCRATCH, LFSR#(Bit#(16))) lfsrsCohScratch = newVector();
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         debugLogsCohScratch[p] <- mkDebugFile("coherent_scratchpad_"+integerToString(p)+".out");
         memoriesCohScratch[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, p, conf, debugLogsCohScratch[p]);
@@ -102,12 +102,12 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     end
    
     // Private scratchpads
-    Vector#(N_SCRATCH, MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesScratch = newVector();
-    Vector#(N_SCRATCH, LFSR#(Bit#(16))) lfsrsScratch = newVector();
+    Vector#(`N_SCRATCH, MEMORY_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesScratch = newVector();
+    Vector#(`N_SCRATCH, LFSR#(Bit#(16))) lfsrsScratch = newVector();
     SCRATCHPAD_CONFIG sconf = defaultValue;
     sconf.cacheMode = SCRATCHPAD_CACHED;
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         memoriesScratch[p] <- mkScratchpad((`VDEV_SCRATCH_MEMPERF_1 + p), sconf);
         lfsrsScratch[p] <- mkLFSR_16();
@@ -161,13 +161,13 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     Reg#(Bool)        testCoherentScratchpad   <- mkReg(True);
     Reg#(Bool)        testFwd                  <- mkReg(False);
 
-    Vector#(N_SCRATCH, Reg#(Bit#(48)))    totalLatency <- replicateM(mkReg(0));
-    Vector#(N_SCRATCH, Reg#(WORKING_SET)) testAddrs    <- replicateM(mkReg(0));
-    Vector#(N_SCRATCH, Reg#(Bit#(16)))    numTests     <- replicateM(mkReg(0));
-    Vector#(N_SCRATCH, Reg#(Bool)) testDoneSignals     <- replicateM(mkReg(True));
-    Vector#(N_SCRATCH, Reg#(Bool)) issueDoneSignals    <- replicateM(mkReg(False));
-    Vector#(N_SCRATCH, FIFOF#(Tuple3#(MEM_ADDRESS, Bit#(32), Bool))) readReqQsCohScratch <- replicateM(mkSizedFIFOF(32));
-    Vector#(N_SCRATCH, FIFOF#(Tuple3#(MEM_ADDRESS, Bit#(32), Bool))) readReqQsScratch <- replicateM(mkSizedFIFOF(32));
+    Vector#(`N_SCRATCH, Reg#(Bit#(48)))    totalLatency <- replicateM(mkReg(0));
+    Vector#(`N_SCRATCH, Reg#(WORKING_SET)) testAddrs    <- replicateM(mkReg(0));
+    Vector#(`N_SCRATCH, Reg#(Bit#(16)))    numTests     <- replicateM(mkReg(0));
+    Vector#(`N_SCRATCH, Reg#(Bool)) testDoneSignals     <- replicateM(mkReg(True));
+    Vector#(`N_SCRATCH, Reg#(Bool)) issueDoneSignals    <- replicateM(mkReg(False));
+    Vector#(`N_SCRATCH, FIFOF#(Tuple3#(MEM_ADDRESS, Bit#(32), Bool))) readReqQsCohScratch <- replicateM(mkSizedFIFOF(32));
+    Vector#(`N_SCRATCH, FIFOF#(Tuple3#(MEM_ADDRESS, Bit#(32), Bool))) readReqQsScratch <- replicateM(mkSizedFIFOF(32));
     
     (* fire_when_enabled *)
     rule cycleCount (True);
@@ -179,7 +179,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
         if (initCnt == 0)
         begin
             linkStarterStartRun.deq();
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 lfsrsCohScratch[p].seed(fromInteger(p+1));
                 lfsrsScratch[p].seed(fromInteger(p+1));
@@ -203,7 +203,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             initCnt       <= initCnt + 1;
             debugLog.record($format("initialization done, cycle=%012d", cycleCnt));
             stdio.printf(msgInitDone, list1(zeroExtend(cycleCnt)));
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 testDoneSignals[p]  <= False;
             end
@@ -211,7 +211,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
         else if (initCnt == 3)
         begin
             initCnt       <= initCnt + 1;
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 testDoneSignals[p]  <= False;
                 issueDoneSignals[p] <= False;
@@ -223,7 +223,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             initCnt       <= 0;
             state         <= STATE_latecy_test;
             startCycleCnt <= cycleCnt;
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 testDoneSignals[p]  <= False;
                 issueDoneSignals[p] <= False;
@@ -240,7 +240,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // ====================================================================
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule warmCacheCohScratch (state == STATE_init && initCnt == 3 && !issueDoneSignals[p] && !testDoneSignals[p]);
             MEM_ADDRESS r_addr = zeroExtend(testAddrs[p]);
@@ -264,7 +264,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
         endrule
     end
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule warmCachePrivScratch (state == STATE_init && initCnt == 4 && !issueDoneSignals[p] && !testDoneSignals[p]);
             MEM_ADDRESS r_addr = zeroExtend(testAddrs[p]);
@@ -305,7 +305,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             STATE_read_random: msg_test = msgReadRand;
             STATE_read_write_random: msg_test = msgReadWriteRand;
         endcase
-        stdio.printf(msgTestInit, list4(zeroExtend(msg_scratch), zeroExtend(msg_test), zeroExtend(maxTests), fromInteger(valueOf(N_SCRATCH))));
+        stdio.printf(msgTestInit, list4(zeroExtend(msg_scratch), zeroExtend(msg_test), zeroExtend(maxTests), fromInteger(valueOf(`N_SCRATCH))));
         testInitialized <= True;
     endrule
     
@@ -315,7 +315,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
         if (testIdleCnt == 0)
         begin
             Bit#(64) total_latency = 0;
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 total_latency        = total_latency + zeroExtend(totalLatency[p]);
             end
@@ -346,7 +346,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             state                  <= new_state;
             startCycleCnt          <= cycleCnt;
             testCnt                <= 0;
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 totalLatency[p]     <= 0;
                 testDoneSignals[p]  <= False;
@@ -389,9 +389,9 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             if (testCnt == 4)
             begin
                 testCnt <= testCnt + 1;
-                if (testFwd == False || (valueOf(N_SCRATCH)<2))
+                if (testFwd == False || (valueOf(`N_SCRATCH)<2))
                 begin
-                    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+                    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
                     begin
                         testDoneSignals[p]  <= True;
                     end
@@ -410,7 +410,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
         idleCnt <= new_idle_cnt;
     endrule
 
-    rule cohLatencyFwdTest (state == STATE_latecy_test && ((testCnt == 5) || (testCnt == 6)) && testCoherentScratchpad && testFwd && (valueOf(N_SCRATCH)>1));
+    rule cohLatencyFwdTest (state == STATE_latecy_test && ((testCnt == 5) || (testCnt == 6)) && testCoherentScratchpad && testFwd && (valueOf(`N_SCRATCH)>1));
         idleCnt <= idleCnt + 1;
         if (testCnt == 5 && idleCnt == maxBound)
         begin
@@ -425,7 +425,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             readReqQsCohScratch[1].deq();
             debugLog.record($format("cohRead[%02x]: addr 0x%x (coh addr 0x%x), data 0x%x, latency=%8d", 1, r_addr, r_addr, resp, (cycleCnt-s_cycle) ));
             stdio.printf(msgCohData, list4(fromInteger(1), zeroExtend(r_addr), zeroExtend(resp), zeroExtend(cycleCnt-s_cycle)));
-            for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+            for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
             begin
                 testDoneSignals[p]  <= True;
             end
@@ -459,7 +459,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
             if (testCnt == 4)
             begin
                 testCnt <= testCnt + 1;
-                for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+                for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
                 begin
                     testDoneSignals[p]  <= True;
                 end
@@ -483,7 +483,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // ====================================================================
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule sendCohWriteSeq (state == STATE_write_seq && testCoherentScratchpad && !testDoneSignals[p]);
             MEM_ADDRESS w_addr = zeroExtend(testAddrs[p]);
@@ -520,7 +520,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // ====================================================================
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule issueCohReadSeq (state == STATE_read_seq && testCoherentScratchpad && !issueDoneSignals[p]);
             MEM_ADDRESS r_addr = zeroExtend(testAddrs[p]);
@@ -573,7 +573,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // ====================================================================
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule sendPrivWriteSeq (state == STATE_write_seq && !testCoherentScratchpad && !testDoneSignals[p]);
             MEM_ADDRESS w_addr = zeroExtend(testAddrs[p]); 
@@ -608,7 +608,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     //
     // ====================================================================
 
-    for(Integer p = 0; p < valueOf(N_SCRATCH); p = p + 1)
+    for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
         rule issuePrivReadSeq (state == STATE_read_seq && !testCoherentScratchpad && !issueDoneSignals[p]);
             MEM_ADDRESS r_addr = zeroExtend(testAddrs[p]);

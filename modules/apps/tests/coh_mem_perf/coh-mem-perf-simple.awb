@@ -1,0 +1,14 @@
+%name Coherent Scratchpad Memory Performance Test System (Simple)
+%desc Coherent Scratchpad Memory Performance Test System (Simple)
+
+%attributes coherent_scratchpad_performance_test test
+
+%provides hardware_system
+%requires coherent_scratchpad_performance_remote
+%requires coherent_scratchpad_performance_common
+
+%public coh-mem-perf-simple.bsv
+%public coh-mem-perf.dic
+
+%param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
+

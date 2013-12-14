@@ -7,6 +7,11 @@
 
 %public coh-mem-perf-common.bsv
 
-%param --global COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE   0  "0: disable, 1: enable private caches"
+%param --dynamic COH_MEM_PERF_VERBOSE     0  "0: disable, 1: enable verbose output"
+%param --dynamic COH_MEM_PERF_TEST_NUM  512  "number of tests"
+%param --dynamic COH_MEM_PERF_FWD_TEST    0  "test fowarding latency"
+%param  N_SCRATCH 2  "number of sharers"
+%param --global COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE   1  "0: disable, 1: enable private caches"
+
 
 

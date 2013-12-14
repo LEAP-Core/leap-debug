@@ -1603,3 +1603,27 @@ Directory modules/apps/tests/shared_queue_test
 
 Modify the coherent scratchpad tests to take the new coherent 
 scratchpad argument (the config object). 
+
+----------
+keflemin    Date: Sat Dec 14 13:18:46 EST 2013  CSN: CSN-leap-debug-64
+                  Sat Dec 14 18:18:46 UTC 2013
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_dual_exe_simple.apm Locally Added               0 
+ coh_mem_perf_hybrid_dual_vc707_simple.apm Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf-remote-synth.awb Locally Added               0 
+ coh-mem-perf-test.bsv     Locally Modified           63 
+ coh-mem-perf-common.bsv   Locally Modified           63 
+ coh-mem-perf-simple.bsv   Locally Added               0 
+ coh-mem-perf-remote.bsv   Locally Modified           63 
+ coh-mem-perf-test.awb     Locally Modified           63 
+ coh-mem-perf-remote-synth.bsv Locally Added               0 
+ coh-mem-perf.bsv          Locally Modified           63 
+ coh-mem-perf-common.awb   Locally Modified           63 
+ coh-mem-perf-simple.awb   Locally Added               0 
+
+
+Added some more test cases for coherent scratchpads.
