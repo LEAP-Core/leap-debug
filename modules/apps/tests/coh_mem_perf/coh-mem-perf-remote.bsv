@@ -47,7 +47,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
               Alias#(Bit#(TSub#(t_SCRATCHPAD_MEM_VALUE_SZ, 1)), t_MEM_DATA),
               //Alias#(MEM_DATA_SM, t_MEM_DATA),
               Bits#(t_MEM_DATA, t_MEM_DATA_SZ),
-              NumAlias#(TLog#(N_SCRATCH), t_SCRATCH_IDX_SZ),
+              NumAlias#(TLog#(`N_SCRATCH), t_SCRATCH_IDX_SZ),
               Alias#(Bit#(t_SCRATCH_IDX_SZ), t_SCRATCH_IDX),
               NumAlias#(TAdd#(t_SCRATCH_IDX_SZ, t_MEM_ADDR_SZ), t_COH_SCRATCH_ADDR_SZ),
               Alias#(Bit#(t_COH_SCRATCH_ADDR_SZ), t_COH_SCRATCH_ADDR));
@@ -60,7 +60,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
 
-    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(valueOf(N_SCRATCH))+".out");
-    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, valueOf(N_SCRATCH), conf, debugLogsCohScratch);
+    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(valueOf(`N_SCRATCH))+".out");
+    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, valueOf(`N_SCRATCH), conf, debugLogsCohScratch);
   
 endmodule

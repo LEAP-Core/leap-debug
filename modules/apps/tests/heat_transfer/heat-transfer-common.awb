@@ -1,0 +1,14 @@
+%name Heat Transfer Test Common
+%desc Heat Transfer Test Common
+
+%attributes heat_transfer test
+
+%provides heat_transfer_common
+
+%public heat-transfer-common.bsv
+%public heat-engine.bsv
+
+%param --global HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE    1  "0: disable, 1: enable private caches"
+
+%param --dynamic HEAT_TRANSFER_TEST_ITER             128  "number of iterations"
+

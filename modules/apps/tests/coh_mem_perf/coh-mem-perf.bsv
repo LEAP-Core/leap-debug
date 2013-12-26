@@ -40,7 +40,7 @@ import DefaultValue::*;
 `include "awb/provides/coherent_scratchpad_memory_service.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST.bsh"
+`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
 // scratchpads.  mem-test includes it only to get the value of

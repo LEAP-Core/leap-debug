@@ -2,9 +2,9 @@
 [Global]
 SaveParameters=0
 Description=has strange module alingments
-File=coh_mem_perf_hybrid_dual_exe
+File=heat_transfer_test_hybrid_dual_exe
 Version=2.2
-Name=Multifpga synthesis test 
+Name=Heat Transfer Multifpga Simulation Test
 DefaultBenchmark=
 Type=Leap
 Class=Asim::Model
@@ -20,7 +20,7 @@ model=HW/SW Hybrid Multifpga Project Foundation
 connected_application=Default Software Connected Application
 environment_description=Simulation Dual FPGA Environment with Dual Cache
 build_pipeline=multiFPGA Build Pipeline
-fpga_mapping=Coherent Mem Perf Mapping
+fpga_mapping=Heat Transfer Test Mapping
 
 [HW/SW Hybrid Multifpga Project Foundation]
 File=modules/leap/build-support/project/project-multifpga.awb
@@ -79,34 +79,33 @@ Packagehint=multifpga
 File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
 Packagehint=leap
 
-[Coherent Scratchpad Memory Performance Test System]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf.awb
-Packagehint=leap-debug
-
 [Default Software Connected Application/Requires]
-hardware_system=Coherent Scratchpad Memory Performance Test System
-
-[Coherent Scratchpad Memory Performance Common]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-common.awb
-Packagehint=leap-debug
-
-[Coherent Scratchpad Tester]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-test.awb
-Packagehint=leap-debug
-
-[Coherent Scratchpad Memory Performance Test System/Requires]
-coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module
-coherent_scratchpad_performance_test=Coherent Scratchpad Tester
-coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
-
-[Coherent Mem Perf Mapping]
-File=modules/apps/tests/coh_mem_perf/sim_mapping.awb
-Packagehint=leap-debug
+hardware_system=Heat Transfer System
 
 [MultiFPGA Communication Complex Generator/Params]
 MAX_NUMBER_OF_VIAS=1
 
+[Heat Transfer Test Mapping]
+File=modules/apps/tests/heat_transfer/sim_mapping.awb
+Packagehint=leap-debug
 
-[Coherent Scratchpad Tester Remote Module]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
+[Heat Transfer System/Requires]
+heat_transfer_remote=Heat Transfer Test Remote Module
+heat_transfer_local=Heat Transfer Test Local Module
+heat_transfer_common=Heat Transfer Test Common
+
+[Heat Transfer Test Remote Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
+Packagehint=leap-debug
+
+[Heat Transfer System]
+File=modules/apps/tests/heat_transfer/heat-transfer.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Local Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-local.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Common]
+File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
 Packagehint=leap-debug

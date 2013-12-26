@@ -1627,3 +1627,38 @@ Directory modules/apps/tests/coh_mem_perf
 
 
 Added some more test cases for coherent scratchpads.
+
+----------
+hjyang      Date: Wed Dec 25 22:18:41 EST 2013  CSN: CSN-leap-debug-65
+                  Thu Dec 26 03:18:41 UTC 2013
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_dual_exe.apm Locally Modified           64 
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_exe.apm Locally Modified           64 
+ heat_transfer_test_hybrid_ml605.apm Locally Modified           64 
+ heat_transfer_test_hybrid_dual_exe.apm Locally Added               0 
+ heat_transfer_test_hybrid_dual_vc707.apm Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf-test.bsv     Locally Modified           64 
+ coh-mem-perf-remote.bsv   Locally Modified           64 
+ coh-mem-perf.bsv          Locally Modified           64 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-local.bsv   Locally Added               0 
+ heat-transfer-remote.awb  Locally Added               0 
+ heat-transfer-remote.bsv  Locally Added               0 
+ heat-transfer.awb         Locally Modified           64 
+ sim_mapping.awb           Locally Added               0 
+ heat-transfer.bsv         Locally Modified           64 
+ heat-engine.bsv           Locally Modified           64 
+ sim-mapping.map           Locally Added               0 
+ heat-transfer-common.awb  Locally Added               0 
+ heat-transfer-common.bsv  Locally Added               0 
+ heat-transfer-local.awb   Locally Added               0 
+
+(1) Fix some parameter settings in coh_mem_perf to make multi-fgpa simulation work.
+(2) Split the heat trnasfer function on two FPGAs. 

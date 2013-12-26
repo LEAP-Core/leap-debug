@@ -39,7 +39,7 @@ import DefaultValue::*;
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 //`include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
-`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST.bsh"
+`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
 // scratchpads.  mem-test includes it only to get the value of
@@ -121,10 +121,10 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     // Verbose mode
     //  0 -- quiet
     //  1 -- verbose
-    Param#(1) verboseMode <- mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST_COH_MEM_PERF_VERBOSE, paramNode);
+    Param#(1) verboseMode <- mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON_COH_MEM_PERF_VERBOSE, paramNode);
     let verbose = verboseMode == 1;
-    Param#(16) testNumParam <-mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST_COH_MEM_PERF_TEST_NUM, paramNode);
-    Param#(1) testFwdMode <- mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_TEST_COH_MEM_PERF_FWD_TEST, paramNode);
+    Param#(16) testNumParam <-mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON_COH_MEM_PERF_TEST_NUM, paramNode);
+    Param#(1) testFwdMode <- mkDynamicParameter(`PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON_COH_MEM_PERF_FWD_TEST, paramNode);
 
     // Output
     STDIO#(Bit#(64)) stdio <- mkStdIO();

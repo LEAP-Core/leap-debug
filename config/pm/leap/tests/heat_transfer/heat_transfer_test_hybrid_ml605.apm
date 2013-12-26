@@ -47,7 +47,23 @@ Packagehint=leap
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie.apm
 Packagehint=leap
 
-
 [Heat Transfer System]
 File=modules/apps/tests/heat_transfer/heat-transfer.awb
+Packagehint=leap-debug
+
+[Heat Transfer System/Requires]
+heat_transfer_remote=Heat Transfer Test Remote Module
+heat_transfer_local=Heat Transfer Test Local Module
+heat_transfer_common=Heat Transfer Test Common
+
+[Heat Transfer Test Remote Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Common]
+File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Local Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-local.awb
 Packagehint=leap-debug
