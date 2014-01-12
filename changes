@@ -1662,3 +1662,40 @@ Directory modules/apps/tests/heat_transfer
 
 (1) Fix some parameter settings in coh_mem_perf to make multi-fgpa simulation work.
 (2) Split the heat trnasfer function on two FPGAs. 
+
+----------
+keflemin    Date: Sun Jan 12 18:23:08 EST 2014  CSN: CSN-leap-debug-66
+                  Sun Jan 12 23:23:08 UTC 2014
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_coh_hybrid_exe.apm Locally Added               0 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           65 
+ mem-perf.awb              Locally Modified           65 
+ mem-perf-alt.dic          Locally Modified           65 
+ mem-perf-wrapper-coherent.bsv Locally Added               0 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           65 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-wrapper-multi.awb Locally Modified           65 
+ mem-perf-common.bsv       Locally Modified           65 
+ mem-perf-driver.bsv       Locally Modified           65 
+ mem-perf-common-coherent.bsv Locally Added               0 
+ mem-perf-alt.awb          Locally Modified           65 
+ mem-perf.bsv              Locally Modified           65 
+ mem-perf-wrapper-coh.awb  Locally Added               0 
+ mem-perf-common.awb       Locally Modified           65 
+ mem-perf.dic              Locally Modified           65 
+ mem-perf-common-coherent.awb Locally Added               0 
+
+
+1) Added parameters to control number of instantiated scratchpads and
+their bit-widths.
+
+2) Added coherent version of memory perf.  There is substantial code
+replication in the common.bsv file.  We should try to refactor this at
+some point.

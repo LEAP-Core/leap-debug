@@ -1,14 +1,15 @@
-%name Mem perf common types
-%desc Mem perf common types
+%name Mem perf common types (coherent)
+%desc Mem perf common types (coherent)
 
 %attributes scratchpad_test test
 
 %provides mem_perf_common
 
-%public mem-perf-common.bsv
+%public mem-perf-common-coherent.bsv
 
 %param MEM_TEST_ALT 1  "Should we test the second scratchpad"
 %param MEM_WIDTH 64  "Should we test the second scratchpad"
+
 
 
 

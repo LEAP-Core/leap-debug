@@ -1,3 +1,10 @@
 // Scratchpads
-def VDEV.SCRATCH.MEMTEST     "scratch_memtest";
+def VDEV.SCRATCH.COH_MEMPERF_DATA     "coh_scratch_memperf_data";
+def VDEV.SCRATCH.COH_MEMPERF_BITS     "coh_scratch_memperf_bits";
+
+def VDEV.SCRATCH.MEMTEST0     "scratch_memtest0";
+def VDEV.SCRATCH.MEMTEST1     "scratch_memtest1";
+def VDEV.SCRATCH.MEMTEST2     "scratch_memtest2";
+def VDEV.SCRATCH.MEMTEST3     "scratch_memtest3";
+def VDEV.SCRATCH.MEMTEST4     "scratch_memtest4";
 

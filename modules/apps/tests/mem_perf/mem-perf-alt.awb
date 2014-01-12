@@ -9,6 +9,7 @@
 %public mem-perf-alt.dic
 
 %param MEM_TEST_PRIVATE_CACHES_ALT 1  "Enable (1) / disable (0) private scratchpad caches"
+%param MEM_TEST_NUM_CACHES_ALT 1  "Number of caches"
 
 %param SYNTH_BOUNDARY mkMemTesterAlt "name of synthesis boundary"
 

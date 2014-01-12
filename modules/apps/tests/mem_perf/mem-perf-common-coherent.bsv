@@ -32,6 +32,7 @@ import DefaultValue::*;
 `include "awb/provides/mem_perf_common.bsh"
 `include "awb/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
 
 `include "awb/dict/VDEV_SCRATCH.bsh"
 
@@ -50,10 +51,10 @@ STATE
     deriving (Bits, Eq);
 
 
-typedef UInt#(32) CYCLE_COUNTER;
+typedef Bit#(32) CYCLE_COUNTER;
 
-typedef UInt#(28) MEM_ADDRESS;
-typedef UInt#(`MEM_WIDTH) MEM_DATA;
+typedef Bit#(28) MEM_ADDRESS;
+typedef Bit#(`MEM_WIDTH) MEM_DATA;
 typedef 26 MAX_WORKING_SET;
 typedef 9 MIN_WORKING_SET;
 typedef 12 STRIDE_INDEXES;
@@ -61,28 +62,26 @@ typedef 12 STRIDE_INDEXES;
 MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
 
 typedef struct {
-    UInt#(32) workingSet;
-    UInt#(32) stride;
-    UInt#(32) iterations;
-    UInt#(8)  command;
+    Bit#(32) workingSet;
+    Bit#(32) stride;
+    Bit#(32) iterations;
+    Bit#(8)  command;
 } CommandType deriving (Bits,Eq);
 
 
 module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches) (Empty)
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
-
     //
     // Allocate scratchpads
     //
-
-    SCRATCHPAD_CONFIG sconf = defaultValue;
-    sconf.cacheMode = (addCaches ? SCRATCHPAD_CACHED :
-                                   SCRATCHPAD_NO_PVT_CACHE);
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = COH_SCRATCH_CACHED;//(addCaches) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkScratchpad(scratchpadID, sconf);
-
+    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(scratchpadID)+".out");
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, scratchpadID, conf, debugLogsCohScratch);
+    
     // Output
     STDIO#(Bit#(64))     stdio <- mkStdIO();
 
@@ -90,7 +89,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     Reg#(CYCLE_COUNTER)  cycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
-    Reg#(UInt#(64))       totalLatency <- mkReg(0);
+    Reg#(Bit#(64))       totalLatency <- mkReg(0);
 
     CONNECTION_CHAIN#(CommandType) commandChain <- mkConnectionChain("command");
     CONNECTION_ADDR_RING#(Bit#(8), Bit#(1))     finishChain  <- mkConnectionAddrRingDynNode("finish");
@@ -103,9 +102,9 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
 
-    Reg#(UInt#(32)) count <- mkRegU();
-    Reg#(UInt#(32)) iterations <- mkRegU();
-    Reg#(UInt#(32)) errors <- mkRegU();
+    Reg#(Bit#(32)) count <- mkRegU();
+    Reg#(Bit#(32)) iterations <- mkRegU();
+    Reg#(Bit#(32)) errors <- mkRegU();
 
     FIFO#(MEM_DATA) expected <- mkSizedBRAMFIFO(256);
     Reg#(MEM_ADDRESS) stride <- mkRegU();
@@ -178,6 +177,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
 
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
+
         if(addr + stride < bound * stride)
         begin
             addr <= (addr + stride);

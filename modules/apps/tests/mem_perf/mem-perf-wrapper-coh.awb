@@ -1,5 +1,5 @@
-%name Scratchpad Memory Performance Test System (MultiFPGA)
-%desc Scratchpad Memory Performance Test System (MultiFPGA)
+%name Scratchpad Memory Performance Test System (Coherent)
+%desc Scratchpad Memory Performance Test System (Coherent)
 
 %attributes scratchpad_test test
 
@@ -8,7 +8,7 @@
 %requires mem_perf_common
 %requires mem_perf_tester_alt
 
-%public mem-perf-wrapper-multi.bsv
+%public mem-perf-wrapper-coherent.bsv
 %public mem-perf-driver.bsv
 %public mem-perf.rrr
 

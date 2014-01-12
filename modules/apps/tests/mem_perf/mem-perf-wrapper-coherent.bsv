@@ -15,26 +15,41 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
+import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
+
 `include "awb/provides/soft_connections.bsh"
-`include "awb/provides/soft_services.bsh"
+`include "awb/provides/soft_services.bsh" 
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
-`include "awb/provides/mem_perf_tester.bsh"
-`include "awb/provides/mem_perf_common.bsh"
+
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/scratchpad_memory_common.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
+`include "awb/provides/mem_perf_tester.bsh"
+`include "awb/provides/mem_perf_tester_alt.bsh"
 
-module [CONNECTED_MODULE] mkMemTester ()
+module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
 
+    //
+    // Allocate scratchpads
+    //
+    COH_SCRATCH_CONFIG conf = defaultValue;
+    conf.cacheMode = COH_SCRATCH_CACHED;
 
-    for(Integer i = 0; i < `MEM_TEST_NUM_CACHES; i = i+1)
-    begin
-        mkMemTesterRing(`VDEV_SCRATCH_MEMTEST0 + i,`MEM_TEST_PRIVATE_CACHES != 0);
-    end
+    // Coherent scratchpads
+    NumTypeParam#(SizeOf#(MEM_ADDRESS)) addr_size = ~0;
+    NumTypeParam#(SizeOf#(MEM_DATA)) data_size = ~0;
 
+    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size, conf);
+
+    let mem_tester <- mkMemTester();
+    let mem_tester_alt <- mkMemTesterAlt();
+    let mem_perf_driver <- mkMemPerfDriver();
+  
 endmodule

@@ -32,6 +32,9 @@
 
 module [CONNECTED_MODULE] mkMemTesterAlt ();
 
-    mkMemTesterRing(`VDEV_SCRATCH_MEMTESTALT,`MEM_TEST_PRIVATE_CACHES != 0);
+    for(Integer i = 0; i < `MEM_TEST_NUM_CACHES_ALT; i = i+1)
+    begin
+        mkMemTesterRing(`VDEV_SCRATCH_MEMTESTALT0 + i,`MEM_TEST_PRIVATE_CACHES != 0);
+    end
 
 endmodule
