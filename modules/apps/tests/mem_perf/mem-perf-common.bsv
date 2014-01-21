@@ -50,10 +50,9 @@ STATE
     deriving (Bits, Eq);
 
 
-typedef UInt#(32) CYCLE_COUNTER;
-
-typedef UInt#(28) MEM_ADDRESS;
-typedef UInt#(`MEM_WIDTH) MEM_DATA;
+typedef Bit#(32) CYCLE_COUNTER;
+typedef Bit#(`MEM_ADDR) MEM_ADDRESS;
+typedef Bit#(`MEM_WIDTH) MEM_DATA;
 typedef 26 MAX_WORKING_SET;
 typedef 9 MIN_WORKING_SET;
 typedef 12 STRIDE_INDEXES;
@@ -61,10 +60,10 @@ typedef 12 STRIDE_INDEXES;
 MEM_ADDRESS boundMin      =  1 << fromInteger(valueof(MIN_WORKING_SET));
 
 typedef struct {
-    UInt#(32) workingSet;
-    UInt#(32) stride;
-    UInt#(32) iterations;
-    UInt#(8)  command;
+    Bit#(32) workingSet;
+    Bit#(32) stride;
+    Bit#(32) iterations;
+    Bit#(8)  command;
 } CommandType deriving (Bits,Eq);
 
 
@@ -76,12 +75,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     // Allocate scratchpads
     //
 
-    SCRATCHPAD_CONFIG sconf = defaultValue;
-    sconf.cacheMode = (addCaches ? SCRATCHPAD_CACHED :
-                                   SCRATCHPAD_NO_PVT_CACHE);
-
-    // Large data (multiple containers for single datum)
-    MEMORY_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkScratchpad(scratchpadID, sconf);
+    MEMORY_IFC#(MEM_ADDRESS, MEM_DATA) memory <- mkTestMemory(scratchpadID, addCaches);
 
     // Output
     STDIO#(Bit#(64))     stdio <- mkStdIO();
@@ -90,7 +84,11 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     Reg#(CYCLE_COUNTER)  cycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  startCycle <- mkReg(0);
     Reg#(CYCLE_COUNTER)  endCycle <- mkReg(0);
-    Reg#(UInt#(64))       totalLatency <- mkReg(0);
+    Reg#(Bit#(64))       totalLatency <- mkReg(0);
+
+    // Used to skew access addresses.  Useful for create the illusion of private
+    // address spaces in coherent memory tests. 
+    MEM_ADDRESS privSpace = fromInteger(scratchpadID) << `MEM_TEST_SHIFT;
 
     CONNECTION_CHAIN#(CommandType) commandChain <- mkConnectionChain("command");
     CONNECTION_ADDR_RING#(Bit#(8), Bit#(1))     finishChain  <- mkConnectionAddrRingDynNode("finish");
@@ -103,9 +101,9 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     // Address Calculation State
     Reg#(MEM_ADDRESS) addr   <- mkReg(0);
 
-    Reg#(UInt#(32)) count <- mkRegU();
-    Reg#(UInt#(32)) iterations <- mkRegU();
-    Reg#(UInt#(32)) errors <- mkRegU();
+    Reg#(Bit#(32)) count <- mkRegU();
+    Reg#(Bit#(32)) iterations <- mkRegU();
+    Reg#(Bit#(32)) errors <- mkRegU();
 
     FIFO#(MEM_DATA) expected <- mkSizedBRAMFIFO(256);
     Reg#(MEM_ADDRESS) stride <- mkRegU();
@@ -126,8 +124,8 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     rule doGetCommand (state == STATE_get_command);
         let cmd <- commandChain.recvFromPrev();
         commandChain.sendToNext(cmd);
-
-        addr <= 0;
+	
+        addr <= privSpace;
         bound <= truncate(cmd.workingSet);
         stride <= truncate(cmd.stride);
         iterations <= cmd.iterations;
@@ -201,7 +199,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     rule readResp (state == STATE_reading);
         let resp <- memory.readRsp();
 
-        if (resp != expected.first)
+        if (resp != expected.first && `MEM_TEST_VERBOSE != 0)
         begin
             stdio.printf(errMsg, list3(fromInteger(scratchpadID),
                                        zeroExtend(pack(resp)), 

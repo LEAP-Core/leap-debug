@@ -12,5 +12,9 @@
 %public mem-perf-driver.bsv
 %public mem-perf.rrr
 
+%sources -t STAT -v PUBLIC mem-perf-coh.stats
+
+
+
 %param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
 

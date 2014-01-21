@@ -1699,3 +1699,37 @@ their bit-widths.
 2) Added coherent version of memory perf.  There is substantial code
 replication in the common.bsv file.  We should try to refactor this at
 some point.
+
+----------
+keflemin    Date: Tue Jan 21 03:31:14 EST 2014  CSN: CSN-leap-debug-67
+                  Tue Jan 21 08:31:14 UTC 2014
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_vc707.apm Locally Modified           66 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           66 
+ mem-perf-wrapper-coherent.bsv Locally Modified           66 
+ mem-perf-alt.dic          Locally Modified           66 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.cpp Locally Modified           66 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           66 
+ mem-perf-common-coherent.bsv Locally Modified           66 
+ mem-perf-common-private.bsv Locally Added               0 
+ mem-perf-wrapper-coh.awb  Locally Modified           66 
+ mem-perf.dic              Locally Modified           66 
+ mem-perf-common.awb       Locally Modified           66 
+ mem-perf-common-coherent.awb Locally Modified           66 
+ mem-perf-coh.stats        Locally Added               0 
+
+
+Some cleanup of memory benchmarks post-paper run.  Refactored memory
+tests to have a single common test harness.  Different memory types
+are now instantiated behind a layer of indirection.
+
+
+

@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-
 import FIFO::*;
 import Vector::*;
 import GetPut::*;
@@ -29,24 +28,24 @@ import DefaultValue::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
-`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+
 
 module [CONNECTED_MODULE] mkTestMemory#(Integer scratchpadID, Bool addCaches) (MEMORY_IFC#(t_ADDR, t_DATA))
    provisos (Bits#(t_ADDR, t_ADDR_SZ),
              Bits#(t_DATA, t_DATA_SZ));
 
-
     //
     // Allocate scratchpads
     //
 
-    COH_SCRATCH_CONFIG conf = defaultValue;
-    conf.cacheMode = (addCaches) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    SCRATCHPAD_CONFIG sconf = defaultValue;
+    sconf.cacheMode = (addCaches ? SCRATCHPAD_CACHED :
+                                   SCRATCHPAD_NO_PVT_CACHE);
 
-    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(scratchpadID)+".out");
-    MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) memory <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, scratchpadID, conf, debugLogsCohScratch);
+    // Large data (multiple containers for single datum)
+    MEMORY_IFC#(t_ADDR, t_DATA) memory <- mkScratchpad(scratchpadID, sconf);
 
-    return memoryFenceIfcToMemoryIfc(memory);
+    return memory;
 
 endmodule
 

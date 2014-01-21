@@ -39,13 +39,14 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate scratchpads
     //
+
     COH_SCRATCH_CONFIG conf = defaultValue;
     conf.cacheMode = COH_SCRATCH_CACHED;
 
     // Coherent scratchpads
     NumTypeParam#(SizeOf#(MEM_ADDRESS)) addr_size = ~0;
     NumTypeParam#(SizeOf#(MEM_DATA)) data_size = ~0;
-
+    
     mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMPERF_DATA, `VDEV_SCRATCH_COH_MEMPERF_BITS, addr_size, data_size, conf);
 
     let mem_tester <- mkMemTester();

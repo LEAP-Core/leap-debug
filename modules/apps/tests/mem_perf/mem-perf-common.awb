@@ -6,9 +6,13 @@
 %provides mem_perf_common
 
 %public mem-perf-common.bsv
+%public mem-perf-common-private.bsv
 
 %param MEM_TEST_ALT 1  "Should we test the second scratchpad"
-%param MEM_WIDTH 64  "Should we test the second scratchpad"
+%param MEM_WIDTH 64  "Width of scratchpads"
+%param MEM_ADDR 24 "Size of scratchpad address space"
+%param MEM_TEST_VERBOSE 0  "Should we test the second scratchpad"
+%param MEM_TEST_SHIFT 30  "How large should the private region address offset be?"
 
 
 

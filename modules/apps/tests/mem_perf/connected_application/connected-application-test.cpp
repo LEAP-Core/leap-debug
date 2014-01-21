@@ -6,6 +6,7 @@
 
 
 static UINT32 stride[] = {1,2,3,4,5,6,7,8,16,32,64,128};
+static UINT32 rw[] = {0,1,0,1};
 
 using namespace std;
 
@@ -39,14 +40,17 @@ CONNECTED_APPLICATION_CLASS::Main()
     // for read value error detection.
     //
 
-    for (int rw = 0; rw < 2; rw++) {
-        for (int ws = 9; ws < 10; ws++) {
+    for (int ws = 9; ws < 13; ws++) {
+	for (int rw_idx = 0; rw_idx < 3; rw_idx++) {
+
             for (int stride_idx = 0; stride_idx < 2; stride_idx++) {
                 stringstream filename;
+                cout << "Test RW: " << ((rw[rw_idx])?"Read":"Write") << " Working Set: " << (1 << ws) << " stride " << stride[stride_idx] << endl;
+
                 OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
                                                               stride[stride_idx],
-                                                              1<<10,
-                                                              rw);
+                                                              1<<16,
+                                                              rw[rw_idx]);
 
                 filename << "cache_" << rw << "_" << stride_idx << "_" << ws << ".stats";
                 STATS_SERVER_CLASS::GetInstance()->DumpStats();

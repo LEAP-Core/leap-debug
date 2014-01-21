@@ -7,4 +7,7 @@ def VDEV.SCRATCH.MEMTEST1     "scratch_memtest1";
 def VDEV.SCRATCH.MEMTEST2     "scratch_memtest2";
 def VDEV.SCRATCH.MEMTEST3     "scratch_memtest3";
 def VDEV.SCRATCH.MEMTEST4     "scratch_memtest4";
+def VDEV.SCRATCH.MEMTEST5     "scratch_memtest4";
+def VDEV.SCRATCH.MEMTEST6     "scratch_memtest4";
+def VDEV.SCRATCH.MEMTEST7     "scratch_memtest4";
 

@@ -33,7 +33,7 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid ML605 PCIE FPGA Environment
+fpgaenv=Hybrid VC707 PCIE FPGA Environment
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment/Requires]
@@ -41,10 +41,6 @@ connected_application=Default Software Connected Application
 
 [HW/SW Hybrid Pipeline Build]
 File=modules/leap/build-support/project/project-pipeline.awb
-Packagehint=leap
-
-[Hybrid ML605 PCIE FPGA Environment]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie.apm
 Packagehint=leap
 
 [Coherent Scratchpad Memory Performance Test System]
@@ -60,10 +56,15 @@ File=modules/apps/tests/coh_mem_perf/coh-mem-perf-test.awb
 Packagehint=leap-debug
 
 [Coherent Scratchpad Memory Performance Test System/Requires]
-coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module Synth
+coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module
 coherent_scratchpad_performance_test=Coherent Scratchpad Tester
 coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
 
-[Coherent Scratchpad Tester Remote Module Synth]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote-synth.awb
+
+[Hybrid VC707 PCIE FPGA Environment]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie.apm
+Packagehint=leap
+
+[Coherent Scratchpad Tester Remote Module]
+File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
 Packagehint=leap-debug

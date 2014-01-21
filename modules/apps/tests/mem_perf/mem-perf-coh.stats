@@ -1,0 +1,444 @@
+LEAP_SCRATCHPAD_REMOTE_RESPONSES,"Responses from the remote scratchpads",0
+LEAP_SCRATCHPAD_REMOTE_REQUESTS,"Requests from the remote scratchpads",0
+LEAP_SCRATCHPAD_LOCAL_RESPONSES,"Responses from the local scratchpads",0
+LEAP_SCRATCHPAD_LOCAL_REQUESTS,"Requests from the local scratchpads",0
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_MERGED,"egressMultiplexor_FPGA0_to_FPGA1 cycles enqueued",192039
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_3_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",103
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_2_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",60661
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_1_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",131275
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_0_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",1298601464
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_2_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles enqueued",62275
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_1_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_1_write cycles enqueued",1488
+ROUTER_egressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_0_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_0_write cycles enqueued",189143
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_GETX_RETRY,"Coherent scratchpad resend GETX forced by other caches",12
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_MSHR_RETRY,"Coherent scratchpad cache retry due to unavailable mshr entry",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_COH_FLUSH,"Coherent scratchpad flush due to coherence",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_COH_INVAL,"Coherent scratchpad invalidate due to coherence",19397
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_SELF_CLEAN_FLUSH,"Coherent scratchpad self clean flush due to capacity",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_SELF_DIRTY_FLUSH,"Coherent scratchpad self dirty flush due to capacity",2920
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_SELF_INVAL,"Coherent scratchpad self invalidate",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_STORE_PERMISSION_MISS_O,"Coherent scratchpad store permission misses from O state",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_STORE_PERMISSION_MISS_S,"Coherent scratchpad store permission misses from S state",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_STORE_CACHELINE_MISS,"Coherent scratchpad store cache-line misses",21555
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_STORE_HIT,"Coherent scratchpad store hits",17495
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_LOAD_MISS,"Coherent scratchpad load misses",0
+LEAP_Coherent_scratchpad_33_client_35_COH_SCRATCH_LOAD_HIT,"Coherent scratchpad load hits",0
+ROUTER_ingressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_2_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_read cycles dequeued",62511
+ROUTER_ingressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_1_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_1_read cycles dequeued",48505
+ROUTER_ingressMultiplexor_FPGA0_to_FPGA1_vplat_llpint_physicalDrivers_auroraDriver_1_0_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_0_read cycles dequeued",189020
+LEAP_CENTRAL_CACHE_LOAD_NEW_MRU_FPGA1,"Central Cache: Reference changed MRU way for valid entry (hit)",0
+LEAP_CENTRAL_CACHE_LOAD_RECENT_LINE_HIT_FPGA1,"Central Cache: Load recent line cache hits",0
+LEAP_CENTRAL_CACHE_FORCE_INVAL_LINE_FPGA1,"Central Cache: Lines forcibly invalidated (not due to capacity)",0
+LEAP_CENTRAL_CACHE_DIRTY_LINE_FLUSH_FPGA1,"Central Cache: Dirty lines flushed to memory",0
+LEAP_CENTRAL_CACHE_INVAL_LINE_FPGA1,"Central Cache: Lines invalidated due to capacity",0
+LEAP_CENTRAL_CACHE_STORE_MISS_FPGA1,"Central Cache: Store misses",0
+LEAP_CENTRAL_CACHE_STORE_HIT_FPGA1,"Central Cache: Store hits",0
+LEAP_CENTRAL_CACHE_LOAD_MISS_FPGA1,"Central Cache: Load misses",0
+LEAP_CENTRAL_CACHE_LOAD_HIT_FPGA1,"Central Cache: Load hits",0
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Req_SENT,"Coherent_Scratchpad_33_Req on egress1 link 3 cycles sent",0
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Req_BLOCKED,"Coherent_Scratchpad_33_Req on egress1 link 3 cycles blocked",0
+ROUTER_FPGA0_FPGA1_stdio_req_ring_SENT,"stdio_req_ring on egress0 link 3 cycles sent",0
+ROUTER_FPGA0_FPGA1_stdio_req_ring_BLOCKED,"stdio_req_ring on egress0 link 3 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_2_SENT,"ScratchpadGlobalResp_chunk_2 on egress0 link 9 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_2_BLOCKED,"ScratchpadGlobalResp_chunk_2 on egress0 link 9 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_3_SENT,"ScratchpadGlobalResp_chunk_3 on egress2 link 8 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_3_BLOCKED,"ScratchpadGlobalResp_chunk_3 on egress2 link 8 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_0_SENT,"ScratchpadGlobalResp_chunk_0 on egress1 link 8 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_0_BLOCKED,"ScratchpadGlobalResp_chunk_0 on egress1 link 8 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_1_SENT,"ScratchpadGlobalResp_chunk_1 on egress0 link 8 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_1_BLOCKED,"ScratchpadGlobalResp_chunk_1 on egress0 link 8 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_3_SENT,"ScratchpadGlobalReq_chunk_3 on egress2 link 7 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_3_BLOCKED,"ScratchpadGlobalReq_chunk_3 on egress2 link 7 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_4_SENT,"ScratchpadGlobalResp_chunk_4 on egress1 link 7 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalResp_chunk_4_BLOCKED,"ScratchpadGlobalResp_chunk_4 on egress1 link 7 cycles blocked",0
+ROUTER_FPGA0_FPGA1_command_chunk_0_SENT,"command_chunk_0 on egress0 link 7 cycles sent",1
+ROUTER_FPGA0_FPGA1_command_chunk_0_BLOCKED,"command_chunk_0 on egress0 link 7 cycles blocked",0
+ROUTER_FPGA0_FPGA1_command_chunk_1_SENT,"command_chunk_1 on egress2 link 6 cycles sent",1
+ROUTER_FPGA0_FPGA1_command_chunk_1_BLOCKED,"command_chunk_1 on egress2 link 6 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_2_SENT,"ScratchpadGlobalReq_chunk_2 on egress1 link 6 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_2_BLOCKED,"ScratchpadGlobalReq_chunk_2 on egress1 link 6 cycles blocked",0
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Resp_chunk_1_SENT,"Coherent_Scratchpad_33_Resp_chunk_1 on egress0 link 6 cycles sent",60357
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Resp_chunk_1_BLOCKED,"Coherent_Scratchpad_33_Resp_chunk_1 on egress0 link 6 cycles blocked",7007
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Resp_chunk_0_SENT,"Coherent_Scratchpad_33_Resp_chunk_0 on egress2 link 5 cycles sent",60357
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_Resp_chunk_0_BLOCKED,"Coherent_Scratchpad_33_Resp_chunk_0 on egress2 link 5 cycles blocked",298
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_1_SENT,"ScratchpadGlobalReq_chunk_1 on egress1 link 5 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_1_BLOCKED,"ScratchpadGlobalReq_chunk_1 on egress1 link 5 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_0_SENT,"ScratchpadGlobalReq_chunk_0 on egress0 link 5 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_0_BLOCKED,"ScratchpadGlobalReq_chunk_0 on egress0 link 5 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_6_SENT,"ScratchpadGlobalReq_chunk_6 on egress2 link 4 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_6_BLOCKED,"ScratchpadGlobalReq_chunk_6 on egress2 link 4 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_5_SENT,"ScratchpadGlobalReq_chunk_5 on egress1 link 4 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_5_BLOCKED,"ScratchpadGlobalReq_chunk_5 on egress1 link 4 cycles blocked",0
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_ActivatedReq_SENT,"Coherent_Scratchpad_33_ActivatedReq on egress0 link 2 cycles sent",123017
+ROUTER_FPGA0_FPGA1_Coherent_Scratchpad_33_ActivatedReq_BLOCKED,"Coherent_Scratchpad_33_ActivatedReq on egress0 link 2 cycles blocked",6060
+ROUTER_FPGA0_FPGA1_OldSchoolChain0_SENT,"OldSchoolChain0 on egress2 link 2 cycles sent",0
+ROUTER_FPGA0_FPGA1_OldSchoolChain0_BLOCKED,"OldSchoolChain0 on egress2 link 2 cycles blocked",0
+ROUTER_FPGA0_FPGA1_OldSchoolChain1_SENT,"OldSchoolChain1 on egress1 link 2 cycles sent",0
+ROUTER_FPGA0_FPGA1_OldSchoolChain1_BLOCKED,"OldSchoolChain1 on egress1 link 2 cycles blocked",0
+ROUTER_FPGA0_FPGA1_finish_SENT,"finish on egress0 link 1 cycles sent",0
+ROUTER_FPGA0_FPGA1_finish_BLOCKED,"finish on egress0 link 1 cycles blocked",0
+ROUTER_FPGA0_FPGA1_stdio_rsp_ring_SENT,"stdio_rsp_ring on egress2 link 3 cycles sent",0
+ROUTER_FPGA0_FPGA1_stdio_rsp_ring_BLOCKED,"stdio_rsp_ring on egress2 link 3 cycles blocked",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_4_SENT,"ScratchpadGlobalReq_chunk_4 on egress0 link 4 cycles sent",0
+ROUTER_FPGA0_FPGA1_ScratchpadGlobalReq_chunk_4_BLOCKED,"ScratchpadGlobalReq_chunk_4 on egress0 link 4 cycles blocked",0
+ROUTER_FPGA0_FPGA1_DebugScanRing_G_SENT,"DebugScanRing_G on egress1 link 1 cycles sent",0
+ROUTER_FPGA0_FPGA1_DebugScanRing_G_BLOCKED,"DebugScanRing_G on egress1 link 1 cycles blocked",0
+ROUTER_FPGA0_FPGA1_StatsRing_SENT,"StatsRing on egress2 link 1 cycles sent",5
+ROUTER_FPGA0_FPGA1_StatsRing_BLOCKED,"StatsRing on egress2 link 1 cycles blocked",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_GETX_RETRY,"Coherent scratchpad resend GETX forced by other caches",36
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_MSHR_RETRY,"Coherent scratchpad cache retry due to unavailable mshr entry",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_COH_FLUSH,"Coherent scratchpad flush due to coherence",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_COH_INVAL,"Coherent scratchpad invalidate due to coherence",22488
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_SELF_CLEAN_FLUSH,"Coherent scratchpad self clean flush due to capacity",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_SELF_DIRTY_FLUSH,"Coherent scratchpad self dirty flush due to capacity",306
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_SELF_INVAL,"Coherent scratchpad self invalidate",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_STORE_PERMISSION_MISS_O,"Coherent scratchpad store permission misses from O state",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_STORE_PERMISSION_MISS_S,"Coherent scratchpad store permission misses from S state",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_STORE_CACHELINE_MISS,"Coherent scratchpad store cache-line misses",23630
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_STORE_HIT,"Coherent scratchpad store hits",17206
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_LOAD_MISS,"Coherent scratchpad load misses",0
+LEAP_Coherent_scratchpad_33_client_34_COH_SCRATCH_LOAD_HIT,"Coherent scratchpad load hits",0
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_MERGED,"egressMultiplexor_FPGA1_to_FPGA0 cycles enqueued",229666
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_3_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",3687
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_2_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",62905
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_1_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",163074
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_0_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles that lanes enqueued",1298562641
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_2_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_write cycles enqueued",62420
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_1_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_1_write cycles enqueued",48505
+ROUTER_egressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_0_write_ENQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_0_write cycles enqueued",189020
+ROUTER_ingressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_2_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_2_read cycles dequeued",62273
+ROUTER_ingressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_1_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_1_read cycles dequeued",1488
+ROUTER_ingressMultiplexor_FPGA1_to_FPGA0_vplat_llpint_physicalDrivers_auroraDriver_1_0_read_DEQUEUED,"vplat_llpint_physicalDrivers_auroraDriver_1_0_read cycles dequeued",189143
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_GETX_RETRY,"Coherent scratchpad resend GETX forced by other caches",71
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_MSHR_RETRY,"Coherent scratchpad cache retry due to unavailable mshr entry",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_COH_FLUSH,"Coherent scratchpad flush due to coherence",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_COH_INVAL,"Coherent scratchpad invalidate due to coherence",19261
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_SELF_CLEAN_FLUSH,"Coherent scratchpad self clean flush due to capacity",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_SELF_DIRTY_FLUSH,"Coherent scratchpad self dirty flush due to capacity",12258
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_SELF_INVAL,"Coherent scratchpad self invalidate",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_STORE_PERMISSION_MISS_O,"Coherent scratchpad store permission misses from O state",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_STORE_PERMISSION_MISS_S,"Coherent scratchpad store permission misses from S state",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_STORE_CACHELINE_MISS,"Coherent scratchpad store cache-line misses",31585
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_STORE_HIT,"Coherent scratchpad store hits",29737
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_LOAD_MISS,"Coherent scratchpad load misses",0
+LEAP_Coherent_scratchpad_33_client_39_COH_SCRATCH_LOAD_HIT,"Coherent scratchpad load hits",0
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Req_SENT,"Coherent_Scratchpad_33_Req on egress1 link 3 cycles sent",48459
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Req_BLOCKED,"Coherent_Scratchpad_33_Req on egress1 link 3 cycles blocked",57
+ROUTER_FPGA1_FPGA0_stdio_req_ring_SENT,"stdio_req_ring on egress0 link 3 cycles sent",0
+ROUTER_FPGA1_FPGA0_stdio_req_ring_BLOCKED,"stdio_req_ring on egress0 link 3 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_2_SENT,"ScratchpadGlobalResp_chunk_2 on egress0 link 9 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_2_BLOCKED,"ScratchpadGlobalResp_chunk_2 on egress0 link 9 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_3_SENT,"ScratchpadGlobalResp_chunk_3 on egress2 link 8 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_3_BLOCKED,"ScratchpadGlobalResp_chunk_3 on egress2 link 8 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_0_SENT,"ScratchpadGlobalResp_chunk_0 on egress1 link 8 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_0_BLOCKED,"ScratchpadGlobalResp_chunk_0 on egress1 link 8 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_1_SENT,"ScratchpadGlobalResp_chunk_1 on egress0 link 8 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_1_BLOCKED,"ScratchpadGlobalResp_chunk_1 on egress0 link 8 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_3_SENT,"ScratchpadGlobalReq_chunk_3 on egress2 link 7 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_3_BLOCKED,"ScratchpadGlobalReq_chunk_3 on egress2 link 7 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_4_SENT,"ScratchpadGlobalResp_chunk_4 on egress1 link 7 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalResp_chunk_4_BLOCKED,"ScratchpadGlobalResp_chunk_4 on egress1 link 7 cycles blocked",0
+ROUTER_FPGA1_FPGA0_command_chunk_0_SENT,"command_chunk_0 on egress0 link 7 cycles sent",1
+ROUTER_FPGA1_FPGA0_command_chunk_0_BLOCKED,"command_chunk_0 on egress0 link 7 cycles blocked",0
+ROUTER_FPGA1_FPGA0_command_chunk_1_SENT,"command_chunk_1 on egress2 link 6 cycles sent",1
+ROUTER_FPGA1_FPGA0_command_chunk_1_BLOCKED,"command_chunk_1 on egress2 link 6 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_2_SENT,"ScratchpadGlobalReq_chunk_2 on egress1 link 6 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_2_BLOCKED,"ScratchpadGlobalReq_chunk_2 on egress1 link 6 cycles blocked",0
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Resp_chunk_1_SENT,"Coherent_Scratchpad_33_Resp_chunk_1 on egress0 link 6 cycles sent",60254
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Resp_chunk_1_BLOCKED,"Coherent_Scratchpad_33_Resp_chunk_1 on egress0 link 6 cycles blocked",2977
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Resp_chunk_0_SENT,"Coherent_Scratchpad_33_Resp_chunk_0 on egress2 link 5 cycles sent",60254
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_Resp_chunk_0_BLOCKED,"Coherent_Scratchpad_33_Resp_chunk_0 on egress2 link 5 cycles blocked",413
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_1_SENT,"ScratchpadGlobalReq_chunk_1 on egress1 link 5 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_1_BLOCKED,"ScratchpadGlobalReq_chunk_1 on egress1 link 5 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_0_SENT,"ScratchpadGlobalReq_chunk_0 on egress0 link 5 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_0_BLOCKED,"ScratchpadGlobalReq_chunk_0 on egress0 link 5 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_6_SENT,"ScratchpadGlobalReq_chunk_6 on egress2 link 4 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_6_BLOCKED,"ScratchpadGlobalReq_chunk_6 on egress2 link 4 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_5_SENT,"ScratchpadGlobalReq_chunk_5 on egress1 link 4 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_5_BLOCKED,"ScratchpadGlobalReq_chunk_5 on egress1 link 4 cycles blocked",0
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_ActivatedReq_SENT,"Coherent_Scratchpad_33_ActivatedReq on egress0 link 2 cycles sent",123001
+ROUTER_FPGA1_FPGA0_Coherent_Scratchpad_33_ActivatedReq_BLOCKED,"Coherent_Scratchpad_33_ActivatedReq on egress0 link 2 cycles blocked",3467
+ROUTER_FPGA1_FPGA0_OldSchoolChain0_SENT,"OldSchoolChain0 on egress2 link 2 cycles sent",0
+ROUTER_FPGA1_FPGA0_OldSchoolChain0_BLOCKED,"OldSchoolChain0 on egress2 link 2 cycles blocked",0
+ROUTER_FPGA1_FPGA0_OldSchoolChain1_SENT,"OldSchoolChain1 on egress1 link 2 cycles sent",0
+ROUTER_FPGA1_FPGA0_OldSchoolChain1_BLOCKED,"OldSchoolChain1 on egress1 link 2 cycles blocked",0
+ROUTER_FPGA1_FPGA0_finish_SENT,"finish on egress0 link 1 cycles sent",0
+ROUTER_FPGA1_FPGA0_finish_BLOCKED,"finish on egress0 link 1 cycles blocked",0
+ROUTER_FPGA1_FPGA0_stdio_rsp_ring_SENT,"stdio_rsp_ring on egress2 link 3 cycles sent",0
+ROUTER_FPGA1_FPGA0_stdio_rsp_ring_BLOCKED,"stdio_rsp_ring on egress2 link 3 cycles blocked",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_4_SENT,"ScratchpadGlobalReq_chunk_4 on egress0 link 4 cycles sent",0
+ROUTER_FPGA1_FPGA0_ScratchpadGlobalReq_chunk_4_BLOCKED,"ScratchpadGlobalReq_chunk_4 on egress0 link 4 cycles blocked",0
+ROUTER_FPGA1_FPGA0_DebugScanRing_G_SENT,"DebugScanRing_G on egress1 link 1 cycles sent",0
+ROUTER_FPGA1_FPGA0_DebugScanRing_G_BLOCKED,"DebugScanRing_G on egress1 link 1 cycles blocked",0
+ROUTER_FPGA1_FPGA0_StatsRing_SENT,"StatsRing on egress2 link 1 cycles sent",230
+ROUTER_FPGA1_FPGA0_StatsRing_BLOCKED,"StatsRing on egress2 link 1 cycles blocked",34
+LEAP_CENTRAL_CACHE_LOAD_NEW_MRU_FPGA0,"Central Cache: Reference changed MRU way for valid entry (hit)",0
+LEAP_CENTRAL_CACHE_LOAD_RECENT_LINE_HIT_FPGA0,"Central Cache: Load recent line cache hits",13017
+LEAP_CENTRAL_CACHE_FORCE_INVAL_LINE_FPGA0,"Central Cache: Lines forcibly invalidated (not due to capacity)",0
+LEAP_CENTRAL_CACHE_DIRTY_LINE_FLUSH_FPGA0,"Central Cache: Dirty lines flushed to memory",0
+LEAP_CENTRAL_CACHE_INVAL_LINE_FPGA0,"Central Cache: Lines invalidated due to capacity",0
+LEAP_CENTRAL_CACHE_STORE_MISS_FPGA0,"Central Cache: Store misses",0
+LEAP_CENTRAL_CACHE_STORE_HIT_FPGA0,"Central Cache: Store hits",16537
+LEAP_CENTRAL_CACHE_LOAD_MISS_FPGA0,"Central Cache: Load misses",0
+LEAP_CENTRAL_CACHE_LOAD_HIT_FPGA0,"Central Cache: Load hits",4544
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_GETX_RETRY,"Coherent scratchpad resend GETX forced by other caches",84
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_MSHR_RETRY,"Coherent scratchpad cache retry due to unavailable mshr entry",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_COH_FLUSH,"Coherent scratchpad flush due to coherence",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_COH_INVAL,"Coherent scratchpad invalidate due to coherence",26288
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_SELF_CLEAN_FLUSH,"Coherent scratchpad self clean flush due to capacity",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_SELF_DIRTY_FLUSH,"Coherent scratchpad self dirty flush due to capacity",1688
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_SELF_INVAL,"Coherent scratchpad self invalidate",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_STORE_PERMISSION_MISS_O,"Coherent scratchpad store permission misses from O state",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_STORE_PERMISSION_MISS_S,"Coherent scratchpad store permission misses from S state",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_STORE_CACHELINE_MISS,"Coherent scratchpad store cache-line misses",28872
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_STORE_HIT,"Coherent scratchpad store hits",26046
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_LOAD_MISS,"Coherent scratchpad load misses",0
+LEAP_Coherent_scratchpad_33_client_40_COH_SCRATCH_LOAD_HIT,"Coherent scratchpad load hits",0
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_RETRY_GET,"Coherence controller retry get request",267
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_RETRY_PUT,"Coherence controller retry put request",103
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_RESP_SENT,"Coherence controller response sent",18194
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_MEM_DATA,"Coherence controller data received from memory",17561
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_OWNERBIT,"Coherence controller ownerbit checkout",17561
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_WRITEBACK,"Coherence controller write-back data received",17170
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_GETX,"Coherence controller getX received",105845
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_GETS,"Coherence controller getS received",0
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_DIRTY_PUTX,"Coherence controller dirty putX received",17172
+LEAP_Coherent_scratchpad_33_controller_COH_SCRATCH_CTRLR_CLEAN_PUTX,"Coherence controller clean putX received",0
+Module_model,"provides model (MultiFPGA Platform)",1
+Param_LEAP_DEBUG_PATH,"Debugging output directory",leap_debug
+Param_LEAP_LIVE_DEBUG_PATH,"Live files (e.g. FIFOs) debugging output directory",leap_debug/live
+Param_SMART_SYNTH_BOUNDARY,"use smart synthesis boundaries",0
+Module_application_env,"provides application_env (Soft Services Hybrid Application Environment)",1
+Param_PLATFORM_SERVICES_AVAILABLE,"1 = Platform services are available.",1
+Module_connected_application,"provides connected_application (Scratchpad Perf Test Connected Application)",1
+Module_mem_perf_wrapper,"provides mem_perf_wrapper (Scratchpad Memory Performance Test System (Coherent))",1
+Module_mem_perf_tester,"provides mem_perf_tester (Scratchpad Memory Performance Test System)",1
+Param_MEM_TEST_PRIVATE_CACHES,"Enable (1) / disable (0) private scratchpad caches",1
+Param_MEM_TEST_NUM_CACHES,"Number of caches",2
+Module_mem_perf_common,"provides mem_perf_common (Mem perf common types (coherent))",1
+Param_MEM_TEST_ALT,"Should we test the second scratchpad",1
+Param_MEM_WIDTH,"Should we test the second scratchpad",32
+Module_mem_perf_tester_alt,"provides mem_perf_tester_alt (Scratchpad Memory Performance Test System (FPGA1))",1
+Param_MEM_TEST_PRIVATE_CACHES_ALT,"Enable (1) / disable (0) private scratchpad caches",1
+Param_MEM_TEST_NUM_CACHES_ALT,"Number of caches",2
+Module_fpgaenv,"provides fpgaenv (FPGA Environment)",1
+Module_virtual_platform,"provides virtual_platform (Standard Virtual Platform)",1
+Module_platform_services,"provides platform_services (Translates Virtual Devices into Soft Connections)",1
+Module_starter_service,"provides starter_service (Wrap Starter Device in Soft Connections)",1
+Module_front_panel_service,"provides front_panel_service (Wrap the Front Panel Device in Soft Connections)",1
+Module_mem_services,"provides mem_services (A Set of Standard Mem Services)",1
+Module_central_cache_service,"provides central_cache_service (Central Cache Service)",1
+Module_central_cache_common,"provides central_cache_common (Central Cache Common Definitions)",1
+Param_CENTRAL_CACHE_LINE_ADDR_BITS,"Address size of entries in the central cache.  Must be at least as large as the largest client.",64
+Param_CENTRAL_CACHE_READ_META_BITS,"Metadata size for tagging read requests.  Must be large enough for the largest client's metadata.",18
+Param_CENTRAL_CACHE_LINE_RESP_CACHE_IDX_BITS,"Index bits for a BRAM-based cache of recently accessed lines",10
+Param_CENTRAL_CACHE_DEBUG_ENABLE,"Enables the central cache debug",1
+Module_central_cache,"provides central_cache (Local Memory Central Cache)",1
+Param_CENTRAL_CACHE_MODE,"Bits 0-1: 0 write-back, 1 write-through, 3 disabled / Bit 2 disables recent line cache (dynamic)",0
+Module_scratchpad_memory_service,"provides scratchpad_memory_service (Wrap the Scratchpad Memory in Soft Connections)",1
+Param_SCRATCHPAD_STD_PVT_CACHE_ENTRIES,"Scratchpad private cache entries (must be a power of 2)",4096
+Param_SCRATCHPAD_STD_PVT_CACHE_PREFETCH_LEARNER_NUM,"Number of prefetch learners in scratchpad private cache (must be a power of 2)",32
+Param_SCRATCHPAD_STD_PVT_CACHE_PREFETCH_ENABLE,"Enable scratchpad private cache prefetcher",0
+Param_SCRATCHPAD_STD_PVT_SKEW,"Skew cache indices",0
+Param_SCRATCHPAD_PLATFORM,"Where should my scratchpad requests go?",Unknown
+Param_PLATFORM_SCRATCHPAD_DEBUG_ENABLE,"Enable Platform Scratchpad Debug Log",1
+Param_SCRATCHPAD_PVT_CACHE_MODE,"Bit 2: 0 disabled, 1 enabled prefetcher / Bits 1-0: 0 write-back, 1 write-through, 2 write-no-allocate, 3 disabled (dynamic)",0
+Param_SCRATCHPAD_PREFETCHER_MECHANISM,"Bits 5-4: 0 basic-tagged, 1 stride-learn-on-miss, 2 stride-learn-on-original-miss, 3 stride-hybrid / Bits 3: 0 look ahead prefetch distance (laDist) learn automatically / Bit 2-0: laDist upper bound in log (dynamic)",36
+Param_SCRATCHPAD_PREFETCHER_LEARNER_SIZE_LOG,"0-6: # prefetch learners (in log) (dynamic)",5
+Module_scratchpad_memory_common,"provides scratchpad_memory_common (Scratchpad Memory Common Definitions)",1
+Param_SCRATCHPAD_MEMORY_DEBUG_ENABLE,"Enables the scratchpad memory debug",1
+Param_SCRATCHPAD_CLIENT_READ_UID_BITS,"Bits available to clients to tag and reorder read responses.",10
+Module_scratchpad_memory,"provides scratchpad_memory (Hybrid Scratchpad Memory Device)",1
+Param_SCRATCHPAD_SUPPORTS_INIT,"0 or 1: Does scratchpad memory directly supports initialization from a file?",1
+Param_SCRATCHPAD_MEMORY_ADDR_BITS,"Word-level address bits per private scratchpad region",36
+Module_coherent_scratchpad_memory_service,"provides coherent_scratchpad_memory_service (Coherent Scratchpad Memory Service)",1
+Param_COHERENT_SCRATCHPAD_DEBUG_ENABLE,"Enables the coherent scratchpad debug",1
+Param_COHERENT_SCRATCHPAD_REQ_RESP_LINK_TYPE,"0 Use non-token ring, 1 use token ring",0
+Param_COHERENT_SCRATCHPAD_PVT_CACHE_ENTRIES,"Coherent scratchpad client private cache entries (must be a power of 2)",1024
+Param_COHERENT_SCRATCHPAD_PVT_CACHE_PREFETCH_LEARNER_NUM,"Number of prefetch learners in scratchpad private cache (must be a power of 2)",32
+Param_COHERENT_SCRATCHPAD_PVT_CACHE_PREFETCH_ENABLE,"Enable scratchpad private cache prefetcher",0
+Param_COHERENT_SCRATCHPAD_CLIENT_META_BITS,"Bits available to coherent scratchpad clients to tag out-of-order responses",6
+Param_COHERENT_SCRATCHPAD_CONTROLLER_META_BITS,"Bits available to coherent scratchpad controller to tag write back data",8
+Param_COHERENT_SCRATCHPAD_PVT_CACHE_MODE,"Bit 1: 0 disabled, 1 enabled prefetcher / Bit 0: 0 disabled, 1 enabled cache clean write-back (dynamic)",1
+Module_shared_memory_service,"provides shared_memory_service (Null Shared Memory Services)",1
+Module_common_services,"provides common_services (Wrap Base Devices in Soft Connections)",1
+Module_assertions_service,"provides assertions_service (Wrap assertions device in Soft Connections)",1
+Param_ASSERTIONS_PER_NODE,"Max number of assertions connected to an assertion node (ring stop).",16
+Module_debug_scan_service,"provides debug_scan_service (Wrap debug scan device in Soft Connections)",1
+Param_DEBUG_SCAN_ENABLED,"Enable debug scan?",1
+Param_DEBUG_SCAN_DEADLINK_TIMEOUT,"Cycles between forced dumps (for debugging when host->FPGA channel blocks) (dynamic)",0
+Module_dynamic_parameters_service,"provides dynamic_parameters_service (Wrap dynamic parameter device in Soft Connections)",1
+Module_stats_service,"provides stats_service (Wrap Stats Device cin Soft Connections)",1
+Param_STATS_SIZE,"Number of bits per Stat counter.",28
+Param_STATS_MAX_VECTOR_LEN,"Maximum number of counters on a single statistics node.",4096
+Module_stdio_service,"provides stdio_service (Standard I/O Services)",1
+Param_STDIO_ENABLE_DEBUG,"Enable debugging nodes",1
+Module_multifpga_router_service,"provides multifpga_router_service (A stub file for the build-time generated router)",1
+Param_USE_ROUTING_KNOWN,"True if we can expect that the router has been generated",1
+Param_MARSHALLING_DEBUG,"Should we enable router debug?",0
+Module_multifpga_switch,"provides multifpga_switch (MultiFPGA Switch with Flowcontrol)",1
+Param_MULTIFPGA_FIFO_SIZES,"True if we can expect that the router has been generated",128
+Param_SWITCH_DEBUG,"Enables copious switch debug printing",0
+Param_TIME_SWITCH,"Enables performance timing of switch",0
+Param_PACK_FLOWCONTROL,"Try to pack flowcontrol messages with header",0
+Module_virtual_devices,"provides virtual_devices (Standard Virtual Devices)",1
+Module_front_panel,"provides front_panel (Hybrid Front Panel)",1
+Module_local_memory_device,"provides local_memory_device (Soft Connection Local Memory Device)",1
+Module_starter_device,"provides starter_device (Starter Virtual Device)",1
+Module_common_utility_devices,"provides common_utility_devices (A collection of useful utilities, mostly dealing with I/O)",1
+Module_low_level_platform_interface,"provides low_level_platform_interface (Low Level Platform Interface for Hybrid Models)",1
+Module_rrr,"provides rrr (RRR Clients and Servers)",1
+Module_rrr_common,"provides rrr_common (RRR Common Module)",1
+Module_channelio,"provides channelio (Basic Virtual Channel Multiplexer)",1
+Param_CIO_NUM_CHANNELS,"Number of virtual duplex channels",2
+Module_physical_channel,"provides physical_channel (BlueNoC PCIe Tunnel)",1
+Param_SOFT_RESET,"Does this channel support soft reset?",1
+Param_BLUENOC_HISTORY_INDEX_BITS,"For debugging: maintain log of transmitted beats.",0
+Param_BLUENOC_CHIPSCOPE_DEBUG,"For debugging: insert chipscope into hardware.",0
+Param_BLUENOC_TIMEOUT_CYCLES,"Cycles to wait before flushing FPGA->host buffer (max 2K). (dynamic)",20
+Module_local_mem,"provides local_mem (Local Memory using DDR DRAM (burst holds at least one line))",1
+Param_LOCAL_MEM_WORD_BITS,"Local memory word size",64
+Param_LOCAL_MEM_WORDS_PER_LINE,"Local memory words per line (must be power of 2)",4
+Module_remote_memory,"provides remote_memory (Null Remote Memory)",1
+Module_physical_platform,"provides physical_platform (PCIe Board with DDR)",1
+Param_N_TOP_LEVEL_CLOCKS,"Number of clocks exposed in the top level interface",2
+Module_physical_platform_config,"provides physical_platform_config (VC707 Virtex-7 Platform with PCIe)",1
+Param_MAKE_ALL_TARGET,"Target of 'make all'.  Most likely bit, exe or vexe.",bit
+Param_FPGA_PLATFORM,"FPGA Platform",VC707
+Param_FPGA_PART_XILINX,"FPGA Part ID",xc7vx485t-ffg1761-2
+Param_FPGA_POSITION,"FPGA Position (in Xilinx iMPACT)",1
+Param_MAP_OPTIONS,"Extra Xilinx Map Options",
+Param_FPGA_TECHNOLOGY,"FPGA Technology (Synplify)",Virtex7
+Param_FPGA_PART_SYNPLIFY,"FPGA Part (Synplify)",XC7VX485T
+Param_FPGA_SPEED,"FPGA Speed Grade (Synplify)",-2
+Param_FPGA_PACKAGE,"FPGA Package (Synplify)",FFG1761
+Param_SYNTHESIS_TOOL,"Synthesis tool, xst or synplify_pro supported",xst
+Module_clocks_device,"provides clocks_device (Differential Crystal Clocks Device from Clocks)",1
+Param_MODEL_CLOCK_FREQ,"Desired model clock frequency (integer).",50
+Param_CRYSTAL_CLOCK_FREQ,"Input (Crystal) Clock Frequency",200
+Param_RESET_ACTIVE_HIGH,"Reset active level polarity: 0 - negative, 1 - positive.",1
+Module_pcie_device,"provides pcie_device (BlueNoC PCIe Bridge)",1
+Param_DO_SOFT_RESET,"Do Bluenoc soft reset on start",0
+Module_pcie_bluenoc_ifc,"provides pcie_bluenoc_ifc (BlueNoC PCIe Bridge Interfaces)",1
+Param_PCIE_BYTES_PER_BEAT,"BlueNoC bytes per beat",16
+Param_PCIE_LANES,"PCIe lanes",8
+Module_pcie_bluenoc_device,"provides pcie_bluenoc_device (Virtex-7 PCIE Device (BlueNoC))",1
+Module_ddr_sdram_device,"provides ddr_sdram_device (Xilinx DDR SDRAM Physical Device)",1
+Param_DRAM_MAX_OUTSTANDING_READS,"Maximum in-flight read requests",64
+Param_DRAM_DEBUG,"Non-zero enables debugging methods",0
+Param_DEBUG_DDR3,"Enable DDR3 Debugging",0
+Module_ddr_sdram_xilinx_driver,"provides ddr_sdram_xilinx_driver (VC707 DDR3 SDRAM)",1
+Param_DRAM_MIN_BURST,"Minimum burst size",2
+Param_DRAM_BEAT_WIDTH,"Bit width of one beat in a burst",256
+Param_DRAM_WORD_WIDTH,"Addressable object size",64
+Param_DRAM_ADDR_BITS,"Address bits per bank",27
+Param_DRAM_NUM_BANKS,"DDR banks",1
+Module_aurora_device,"provides aurora_device (Taps out the various Aurora channels on the VC707.)",1
+Param_NUM_AURORA_IFCS,"Number of Aurora Interfaces",2
+Param_AURORA_IFC_WORDS,"Width of the model-side Aurora interface (0 for automatic based on relative frequencies.)",3
+Module_aurora_common,"provides aurora_common (Some types used to configure aurora devices)",1
+Module_aurora_driver,"provides aurora_driver (VC707 Aurora Device, Single Lane, 64b/65b, 64-bit, 10 gbps)",1
+Param_AURORA_INTERFACE_WIDTH,"Aurora Interface Width",128
+Param_AURORA_INTERFACE_TIMING_PARAMETER,"Timing parameter used to size various counters",16
+Param_AURORA_INTERFACE_FREQ,"Aurora Interface Frequency",156
+Module_aurora_flowcontrol,"provides aurora_flowcontrol (Aurora Device Reliable Flowcontrol)",1
+Param_AURORA_RELIABLE_DEBUG,"Enable Aurora Debug",0
+Module_aurora_flowcontrol_debugger,"provides aurora_flowcontrol_debugger (Aurora Device Reliable Flowcontrol Debugger)",1
+Module_physical_platform_utils,"provides physical_platform_utils (Common Utilities shared by multiple Platforms)",1
+Param_FPGA_PLATFORM_ID,"ID of multi-FPGA target",0
+Param_FPGA_PLATFORM_NAME,"Name of multi-FPGA target",FPGA0
+Param_FPGA_NUM_PLATFORMS,"Number of FPGA targets",2
+Param_FPGA_DEV_PATH,"FPGA device(s) allocated (comma separated) (dynamic)",/dev/bluenoc_0000:04:00.0
+Module_physical_platform_debugger,"provides physical_platform_debugger (Null Physical Platform Debugger)",1
+Module_umf,"provides umf (Little-Endian Unified Message Format)",1
+Param_UMF_CHUNK_BYTES,"Bytes in UMF Chunk",16
+Param_UMF_MAX_MSG_BYTES,"Maximum message length",1024
+Param_UMF_DEBUG,"Enable UMF Debug",0
+Param_UMF_PHY_CHANNEL_RESERVED_BITS,"Bits reserved for use by the physical channel",6
+Param_UMF_CHANNEL_ID_BITS,"Bits in UMF ChannelID",4
+Param_UMF_SERVICE_ID_BITS,"Bits in UMF ServiceID",8
+Param_UMF_METHOD_ID_BITS,"Bits in UMF MethodID",4
+Param_UMF_MSG_LENGTH_BITS,"Bits in UMF MsgLength",10
+Module_fpga_components,"provides fpga_components (Hardware FPGA Components for Virtex 7)",1
+Param_XILINX_GENERATION,"Which NGCs should we pick",7
+Param_SYNTH,"Synthesize it to FPGAs",1
+Param_BROKEN_REGFILE,"0 if RegFile synthesizes correctly.  Nonzero for Xilinx Xst < version 11.",1
+Param_XILINX_FAMILY,"Xilinx parameter describing the fpga architecture",virtex7
+Module_soft_services,"provides soft_services (Everything needed for the various soft services)",1
+Module_soft_services_lib,"provides soft_services_lib (Toplevel for connected module alone)",1
+Module_smart_synth_boundaries,"provides smart_synth_boundaries (Some BSH magic to maintain backwards compatibility.  There are massive hacks here.)",1
+Module_soft_connections,"provides soft_connections (SoftService Soft Connections for MultiFPGA)",1
+Param_IGNORE_PLATFORM_MISMATCH,"Specifies name of multi-fpga target",0
+Param_CLOSE_CHAINS,"should we close chains at the top level",1
+Param_LATENCY_DELTA_ID,"Which soft connection should get extra latency? (dynamic)",0
+Param_LATENCY_DELTA_DELAY,"Which soft connection should get extra latency? (dynamic)",0
+Param_LATENCY_DELTA_DEPTH,"Which soft connection should get extra latency? (dynamic)",0
+Param_LATENCY_DELTA_INVERSE_TEST,"Should we modify all fifos, except this one? (dynamic)",0
+Module_soft_connections_alg,"provides soft_connections_alg (SoftService Soft Connections Algorithm MultiFPGA)",1
+Module_physical_interconnect,"provides physical_interconnect (NULL Physical Interconnect)",1
+Module_soft_connections_common,"provides soft_connections_common (Soft Service Soft Connections Common)",1
+Param_CON_CWIDTH,"Phyisical Connection Bit Width after splitting.",56
+Param_CON_CHAIN_CWIDTH,"Phyisical Chain Connection Bit Width, which is not split.",56
+Param_CON_BUFFERING,"Amount of Buffering Slots per Connection.",2
+Param_CON_NUMCHAINS,"Number of Connection Chains.",9
+Param_CONNECTION_IDX_SIZE,"Number of bits to index multicast connections (8=256 connections).",8
+Param_ADDR_RING_MSG_MODE,"Addressable ring message priority: 0 always choose local message, 1 always forward, 2 use arbiter",0
+Param_ADDR_RING_DEBUG_ENABLE,"Enable addressable ring debug",0
+Param_CON_LATENCY_ENABLE,"Add soft-connection latency test fixture",0
+Module_soft_connections_debug,"provides soft_connections_debug (Soft Connections Debugging)",1
+Param_CON_DEBUG_ENABLE,"Add soft-connection state to the debug scan chain (0/1)",1
+Module_soft_connections_latency,"provides soft_connections_latency (Soft Connections Latency Test Fixture)",1
+Module_soft_strings,"provides soft_strings (Integer UID-based global string database)",1
+Param_GLOBAL_STRING_PLATFORM_UID_SZ,"Number of bits for storing the platform UID",6
+Param_GLOBAL_STRING_SYNTH_UID_SZ,"Number of bits for storing the synthesis boundary UID",10
+Param_GLOBAL_STRING_LOCAL_UID_SZ,"Number of bits for storing the local UID",16
+Module_soft_clocks,"provides soft_clocks (Simply stamps out a new clock for each requested clock)",1
+Module_soft_clocks_lib,"provides soft_clocks_lib (Simply stamps out a new clock for each requested clock)",1
+Module_soft_services_deps,"provides soft_services_deps (A means for dependent modules to include all soft service implementation files)",1
+Module_lock_sync_service,"provides lock_sync_service (Lock Synchronization Service)",1
+Module_librl_bsv,"provides librl_bsv (Reconfigurable Logic Bluespec Library)",1
+Module_librl_bsv_base,"provides librl_bsv_base (Reconfigurable Logic Bluespec Base Library)",1
+Module_librl_bsv_storage,"provides librl_bsv_storage (Reconfigurable logic Bluespec modules that manage storage)",1
+Param_DEBUG_STREAM_CAPTURE_FIFO,"Turn on debugging for stream capture fifos",0
+Param_DEBUG_REVBUF,"Turn on debugging for reversal buffer",0
+Param_DEBUG_REWIND_FIFO,"Turn on debugging for rewind fifo",0
+Param_FIFO_MEM_MIN_ENTRIES_FOR_BRAM,"Heuristic for BRAM/LUT-based FIFOs: Min. FIFO depth for choosing BRAM.",256
+Param_FIFO_MEM_MIN_TOTAL_BITS_FOR_BRAM,"Heuristic for BRAM/LUT-based FIFOs: Min. total storage bits for choosing BRAM.",14000
+Module_librl_bsv_cache,"provides librl_bsv_cache (Manage an RL-side cache of arbitrary objects)",1
+Module_build_pipeline,"provides build_pipeline (FPGA Platform Build Pipeline (Legacy))",1
+Param_BUILD_PIPELINE_DEBUG,"Enable build pipeline debug",0
+Module_wrapper_gen_tool,"provides wrapper_gen_tool (Build wrappper files for multifpga synthesis)",1
+Param_USE_BUILD_TREE,"Should we use a flat or hierarchical representation of the program latency-insensitive module graph",1
+Module_fpgamap_parser,"provides fpgamap_parser (A data type for describing FPGA environments)",1
+Module_fpga_environment_parser,"provides fpga_environment_parser (Datatype for describing FPGA environment)",1
+Module_bsv_tool,"provides bsv_tool (This tool builds Bluespec modules in sub directories)",1
+Param_BSC_FLAGS,"Bluespec compiler options",-steps 10000000 +RTS -K1000M -RTS -suppress-warnings G0043 -keep-fires -aggressive-conditions -wait-for-license -no-show-method-conf -licenseWarning 7 -elab -show-schedule -show-range-conflict -verilog -remove-dollar
+Param_BUILD_VERILOG,"Direct BSC to build verilog",1
+Param_BUILD_LOGS_ONLY,"True if we should build only logfiles",0
+Module_iface_tool,"provides iface_tool (Build tool for LEAP interfaces)",1
+Param_EXTRA_DICTS,"A set of extra dictionary files",
+Param_EXTRA_RRRS,"A set of extra rrr files",
+Param_GENERATE_VICO,"True if we are building a vico target",0
+Module_software_tool,"provides software_tool (Build for software side of hybrid system)",1
+Module_synthesis_tool,"provides synthesis_tool (XST Synthesis Tool)",1
+Param_XST_BLUESPEC_BASICINOUT,"Enable running Bluespec basicinout on top level Verilog",0
+Param_XST_PARALLEL_CASE,"Enable Xilinx XST global parallel case directive",1
+Param_XST_INSERT_IOBUF,"Have XST insert IOBUFs",1
+Module_synthesis_library,"provides synthesis_library (some functions for manipulating .prj files)",1
+Module_post_synthesis_tool,"provides post_synthesis_tool (Xilinx Post-synthesis Toolchain)",1
+Module_xilinx_ngd,"provides xilinx_ngd (Xilinx NGD)",1
+Module_xilinx_map,"provides xilinx_map (Xilinx MAP)",1
+Param_MAPPER_OPTIONS,"Xilinx mapper options",-global_opt on
+Param_COST_TABLE,"Placement and routing cost table",1
+Module_xilinx_par,"provides xilinx_par (Xilinx PAR)",1
+Module_xilinx_bitgen,"provides xilinx_bitgen (Xilinx BITGEN)",1
+Module_xilinx_loader,"provides xilinx_loader (Xilinx LOADER)",1
+Param_DEPEND_ON_SW,"For legacy reasons, we depended on software.  This is deprecated and will be removed.",0
+Module_mcd_tool,"provides mcd_tool (Tcl generated UCFs for MCD build)",1
+Module_fpga_program_tool,"provides fpga_program_tool (Communicates data about the FPGA environment to the run script)",1
+Module_li_module,"provides li_module (Various routines for constructing and manipulating LI Modules)",1
+Module_parameter_substitution,"provides parameter_substitution (Allows parsing of AWB-style subsitution files by build pipeline)",1
+Module_fpga_mapping,"provides fpga_mapping (Mem Perf Standard Mapping)",1
+Module_environment_description,"provides environment_description (VC707 Dual FPGA Environment (SMA))",1
+Module_project_common,"provides project_common (A set of utilities useful for all hybrid projects.)",1
+Module_command_switches,"provides command_switches (Standard Command Switches)",1

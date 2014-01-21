@@ -1,7 +1,10 @@
 // Scratchpads
-def VDEV.SCRATCH.MEMTESTALT0     "scratch_memtestalt";
-def VDEV.SCRATCH.MEMTESTALT1     "scratch_memtestalt";
-def VDEV.SCRATCH.MEMTESTALT2     "scratch_memtestalt";
-def VDEV.SCRATCH.MEMTESTALT3     "scratch_memtestalt";
-def VDEV.SCRATCH.MEMTESTALT4     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST8     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST9     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST10     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST11    "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST12     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST13     "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST14    "scratch_memtestalt";
+def VDEV.SCRATCH.MEMTEST15     "scratch_memtestalt";
 
