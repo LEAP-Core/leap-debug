@@ -1733,3 +1733,13 @@ are now instantiated behind a layer of indirection.
 
 
 
+
+----------
+hjyang      Date: Mon Jan 27 20:28:28 EST 2014  CSN: CSN-leap-debug-68
+                  Tue Jan 28 01:28:28 UTC 2014
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_coh_hybrid_ml605.apm Locally Added               0 
+
+Add mem_perf_coh apm for ml605
