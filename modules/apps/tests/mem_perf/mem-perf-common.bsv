@@ -115,6 +115,8 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     // Messages
     let perfMsg <- getGlobalStringUID("Tester%d:size:%llu:stride:%llu:latency:%llu:time:%llu:errors:%llu\n");
     let errMsg <-  getGlobalStringUID("Tester%d:expected:%llu:got:%llu:Alt\n");	    
+    
+    DEBUG_FILE debugLog <- mkDebugFile("mem_tester_"+integerToString(scratchpadID)+".out");
 
     (* fire_when_enabled *)
     rule cycleCount (True);
@@ -135,6 +137,15 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
             1: state <= STATE_reading;
             2: state <= STATE_finished;
         endcase
+            
+        debugLog.record($format("goGetCommand: command: %s", 
+                        (pack(cmd.command)[1:0] == 0)? "write": ((pack(cmd.command)[1:0] == 1)? "read" : "finish") ));
+
+        if (pack(cmd.command)[1:0] != 2)
+        begin
+            debugLog.record($format("goGetCommand: workingSet = 0x%x, stride = 0x%x, iterations = 0x%x",
+                            cmd.workingSet, cmd.stride, cmd.iterations)); 
+        end
 
         errors <= 0;
         count <= 0;
@@ -156,6 +167,8 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
 
     rule doWrite(state == STATE_writing);
         memory.write(addr, zeroExtend(addrMix(addr)));
+            
+        debugLog.record($format("doWrite: addr = 0x%x, val = 0x%X", addr, addrMix(addr)));
 
         if(addr + stride < bound * stride)
         begin
@@ -176,6 +189,9 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
 
     rule readReq (state == STATE_reading && !reqsDone);
         memory.readReq(addr);
+        
+        debugLog.record($format("readReq: addr = 0x%x", addr));
+        
         if(addr + stride < bound * stride)
         begin
             addr <= (addr + stride);
@@ -206,6 +222,9 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
                                        zeroExtend(pack(expected.first))));
             errors <= errors + 1;
         end
+            
+        debugLog.record($format("readResp: %s val = 0x%x, expected = 0x%x", 
+                        (resp != expected.first())? "ERROR!" : "", resp, expected.first()));
 
         expected.deq();
         operationIsLast.deq;

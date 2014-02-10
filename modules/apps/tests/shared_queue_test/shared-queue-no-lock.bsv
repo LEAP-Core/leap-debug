@@ -111,7 +111,8 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     let msgDataErr <- getGlobalStringUID("deq: consumer id=%x, producer id=%x, data=0x%x, (expected: p_id=%x, data=0x%x) ERROR! \n");
     let msgInit <- getGlobalStringUID("sharedQueueTest: start\n");
     let msgInitDone <- getGlobalStringUID("sharedQueueTest: initialization done, cycle: %012d\n");
-    let msgDone <- getGlobalStringUID("sharedQueueTest: done (# test: %08d, queue size: %08d), cycle: %012d, test cycle count: %012d, totalLatency: %012d\n");
+    // let msgDone <- getGlobalStringUID("sharedQueueTest: done (# test: %08d, queue size: %08d), cycle: %012d, test cycle count: %012d, totalLatency: %012d\n");
+    let msgDone <- getGlobalStringUID("sharedQueueTest: done (# test: %08d, # producers: %03d, # consumers: %03d, queue size: %08d), cycle: %012d, test cycle count: %012d\n");
     //let msgDone <- getGlobalStringUID("sharedQueueTest: done\n");
     
     (* fire_when_enabled *)
@@ -219,18 +220,23 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     // ====================================================================
 
     Vector#(N_PRODUCERS, FIFOF#(TEST_DATA)) producers <- replicateM(mkFIFOF());
+    Vector#(N_PRODUCERS, Reg#(Bit#(16))) numTestsP    <- replicateM(mkReg(0));
     Reg#(PRODUCER_IDX) producer                       <- mkReg(0); 
     Reg#(Bit#(2)) producerPhase                       <- mkReg(0);
     LOCAL_ARBITER#(N_PRODUCERS) producerArb           <- mkLocalArbiter();
-    
+    Reg#(Bool) producerAllDone                        <- mkReg(False);
+
     for (Integer r = 0; r < valueOf(N_PRODUCERS); r = r + 1)
     begin
-        rule produceItem (state == STATE_test && producers[r].notFull());
+        rule produceItem (state == STATE_test && producers[r].notFull() && numTestsP[r] < maxTests);
             TEST_DATA d = ?;
             d.idx  = fromInteger(r);
             d.data = resize(lfsrs[r].value);
             producers[r].enq(d);
             lfsrs[r].next();
+            numTestsP[r] <= numTestsP[r] + 1;
+            debugLog.record($format("produceItem: producer id=%x, numTests=%08d, maxTests=%08d", 
+                            r, numTestsP[r], maxTests));
         endrule
     end
 
@@ -288,8 +294,18 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
         numTests <= numTests + 1;
         memoriesP[producer].write(`TAIL_ADDR, zeroExtend(pack(tail)));
         debugLog.record($format("updateTail: tail=0x%x, numTests=%8d", tail_val, numTests));
-        done <= (numTests == maxTests);
         producerPhase <= 0;
+        // check producer done
+        Bool done_signal = True;
+        for(Integer p = 0; p < valueOf(N_PRODUCERS); p = p + 1)
+        begin
+            done_signal = done_signal && (!producers[p].notEmpty) && (numTestsP[p] == maxTests);
+        end
+        if (done_signal)
+        begin
+            done <= True;
+            debugLog.record($format("updateTail: producer all complete!"));
+        end
     endrule
 
     // ====================================================================
@@ -324,7 +340,8 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
             end
             else
             begin
-                debugLog.record($format("recvItem: consumer idx=%x, producer idx=%x, data=0x%x, latency=%d", c, d.idx, d.data, (cycleCnt-s_cycle)));
+                debugLog.record($format("recvItem: consumer idx=%x, producer idx=%x, data=0x%x, latency=%d, completeTests=%8d", 
+                                c, d.idx, d.data, (cycleCnt-s_cycle), completeTests));
                 if (verbose)
                 begin
                     stdio.printf(msgData, list3(fromInteger(c), zeroExtend(d.idx), resize(pack(d.data))));
@@ -413,8 +430,9 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     // ====================================================================
 
     rule sendDone (state == STATE_finished);
-        //stdio.printf(msgDone, List::nili);
-        stdio.printf(msgDone, list5(zeroExtend(maxTests), zeroExtend(pack(maxQueueSize)), zeroExtend(cycleCnt), zeroExtend(cycleCnt-initCycleCnt), zeroExtend(totalLatency)));
+        // stdio.printf(msgDone, List::nili);
+        // stdio.printf(msgDone, list6(zeroExtend(maxTests), zeroExtend(pack(maxQueueSize)), zeroExtend(cycleCnt), zeroExtend(cycleCnt-initCycleCnt), zeroExtend(totalLatency)));
+        stdio.printf(msgDone, list6(zeroExtend(maxTests), fromInteger(valueOf(N_PRODUCERS)), fromInteger(valueOf(N_CONSUMERS)), zeroExtend(pack(maxQueueSize)), zeroExtend(cycleCnt), zeroExtend(cycleCnt-initCycleCnt)));
         linkStarterFinishRun.send(0);
         state <= STATE_exit;
     endrule

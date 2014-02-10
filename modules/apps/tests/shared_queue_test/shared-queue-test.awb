@@ -8,12 +8,15 @@
 %public shared-queue-test.bsv
 %public shared-queue-test-common.bsv
 %public shared-queue-no-lock.bsv
-%public shared-queue-with-lock.bsv
+%public shared-queue-with-hard-lock.bsv
+%public shared-queue-with-soft-lock.bsv
 %public producer.bsv
+%public producer-soft-lock.bsv
 %public consumer.bsv
+%public consumer-soft-lock.bsv
 %public shared-queue-test.dic
 
-%param --global SHARED_QUEUE_TEST_LOCK_SERVICE_ENABLE   1  "0: use global arbiter, 1: use lock service"
+%param --global SHARED_QUEUE_TEST_LOCK_MODE             2  "0: use global arbiter, 1: use hardware lock, 2: use software lock"
 %param --global SHARED_QUEUE_TEST_PVT_CACHE_ENABLE      1  "0: disable, 1: enable private caches"
 
 %param --dynamic SHARED_QUEUE_TEST_VERBOSE              0  "0: disable, 1: enable verbose output"

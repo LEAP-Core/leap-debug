@@ -21,8 +21,8 @@
 // scratchpads' functionality and performance
 //
 module [CONNECTED_MODULE] mkSystem ();
-    let tester <- (`SHARED_QUEUE_TEST_LOCK_SERVICE_ENABLE == 1)? 
-                  mkSharedQueueTestWithLock():
-                  mkSharedQueueTestNoLock();
+    let tester <- (`SHARED_QUEUE_TEST_LOCK_MODE == 0)? mkSharedQueueTestNoLock() :
+                  ((`SHARED_QUEUE_TEST_LOCK_MODE == 1)? mkSharedQueueTestWithHardLock() :
+                  mkSharedQueueTestWithSoftLock());
 endmodule
 

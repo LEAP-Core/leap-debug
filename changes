@@ -1743,3 +1743,30 @@ Directory config/pm/leap/tests/mem_perf
  mem_perf_coh_hybrid_ml605.apm Locally Added               0 
 
 Add mem_perf_coh apm for ml605
+
+----------
+hjyang      Date: Mon Feb 10 17:35:44 EST 2014  CSN: CSN-leap-debug-69
+                  Mon Feb 10 22:35:44 UTC 2014
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_coh_hybrid_ml605.apm Locally Modified           68 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           68 
+ mem-perf-common-coherent.bsv Locally Modified           68 
+
+Directory modules/apps/tests/shared_queue_test
+ shared-queue-with-soft-lock.bsv Locally Added               0 
+ producer-soft-lock.bsv    Locally Added               0 
+ producer.bsv              Locally Modified           68 
+ shared-queue-with-hard-lock.bsv Locally Added               0 
+ shared-queue-test.awb     Locally Modified           68 
+ shared-queue-test.bsv     Locally Modified           68 
+ shared-queue-no-lock.bsv  Locally Modified           68 
+ consumer-soft-lock.bsv    Locally Added               0 
+ consumer.bsv              Locally Modified           68 
+ shared-queue-test-common.bsv Locally Modified           68 
+
+(1) Add a shared-queue benchmark that uses software locks through memory. 
+(2) Add more debug messages in mem_perf.

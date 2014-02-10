@@ -73,3 +73,78 @@ mem_perf_common=Mem perf common types (coherent)
 [Scratchpad Memory Performance Test System (Coherent)]
 File=modules/apps/tests/mem_perf/mem-perf-wrapper-coh.awb
 Packagehint=leap-debug
+
+[Global]
+SaveParameters=0
+Description=Hybrid Virtual Memory Test Model with Coherent Caches for ML605
+File=mem_perf_coh_hybrid_ml605
+Version=2.2
+Name=Hybrid Virtual Memory Test Model with Coherent Caches for ML605
+Type=Leap
+Class=Asim::Model
+DefaultBenchmark=
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=coh_scratch_test hasim hybrid
+model=HW/SW Hybrid Pipeline Build
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid ML605 PCIE FPGA Environment
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Scratchpad Perf Test Connected Application
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[Scratchpad Memory Performance Test System]
+File=modules/apps/tests/mem_perf/mem-perf.awb
+Packagehint=leap-debug
+
+
+
+[Scratchpad Perf Test Connected Application]
+File=modules/apps/tests/mem_perf/connected_application/connected-application-test.awb
+Packagehint=leap-debug
+
+[Scratchpad Perf Test Connected Application/Requires]
+mem_perf_wrapper=Scratchpad Memory Performance Test System (Coherent)
+
+
+[Hybrid ML605 PCIE FPGA Environment]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-ml605-pcie.apm
+Packagehint=leap
+
+[Hybrid ML605 PCIE FPGA Environment/Params]
+MODEL_CLOCK_FREQ=75
+
+[Scratchpad Memory Performance Test System (FPGA1)]
+File=modules/apps/tests/mem_perf/mem-perf-alt.awb
+Packagehint=leap-debug
+
+[Mem perf common types (coherent)]
+File=modules/apps/tests/mem_perf/mem-perf-common-coherent.awb
+Packagehint=leap-debug
+
+[Scratchpad Memory Performance Test System (Coherent)/Requires]
+mem_perf_tester=Scratchpad Memory Performance Test System
+mem_perf_tester_alt=Scratchpad Memory Performance Test System (FPGA1)
+mem_perf_common=Mem perf common types (coherent)
+
+[Scratchpad Memory Performance Test System (Coherent)]
+File=modules/apps/tests/mem_perf/mem-perf-wrapper-coh.awb
+Packagehint=leap-debug

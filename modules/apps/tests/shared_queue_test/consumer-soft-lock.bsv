@@ -34,43 +34,19 @@ import Vector::*;
 `include "asim/dict/VDEV_LOCKGROUP.bsh"
 `include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
 
-typedef enum
-{
-    CONSUMER_LOCK = 0
-}
-CONSUMER_LOCK_TYPE
-    deriving (Eq, Bits);
-
-interface CONSUMER_IFC#(type t_QUEUE_IDX);
-    method Action setQueueSize(t_QUEUE_IDX size);
-    method Action setBarrier(Bit#(N_SYNC_NODES) barrier);
-    method Action producerDone();
-    method Bool initialized();
-    method Bool done();
-endinterface
-
 //
 // Consumer implementation
 //
-module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
-                                      MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) cohMem,
-                                      DEBUG_FILE debugLog,
-                                      Bool isMaster)
+module [CONNECTED_MODULE] mkConsumerSoftLock#(Integer consumerID,
+                                              MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) cohMem,
+                                              DEBUG_FILE debugLog,
+                                              Bool isMaster)
     // interface:
     (CONSUMER_IFC#(t_QUEUE_IDX))
     provisos (Bits#(t_ADDR, t_ADDR_SZ),
               Bits#(t_DATA, t_DATA_SZ),
               Bits#(t_QUEUE_IDX, t_QUEUE_IDX_SZ));
 
-    // =======================================================================
-    //
-    // Lock and synchronization services
-    //
-    // =======================================================================
-    
-    DEBUG_FILE lockDebugLog <- mkDebugFile("lock_service_consumer_" + integerToString(consumerID) + ".out");
-    LOCK_IFC#(CONSUMER_LOCK_TYPE) lock <- mkLockNodeDebug(`VDEV_LOCKGROUP_CONSUMER, isMaster, lockDebugLog);
-    SYNC_SERVICE_IFC sync <- mkSyncNode(`VDEV_LOCKGROUP_CONSUMER, isMaster); 
 
     // =======================================================================
     //
@@ -79,26 +55,25 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
     // =======================================================================
 
     Reg#(Bool) initDone                       <- mkReg(False);
-    Reg#(Bool) masterInitDone                 <- mkReg(!isMaster);
+    Reg#(Bool) masterInitDone                 <- mkReg(False);
     Reg#(Tuple2#(Bool, t_QUEUE_IDX)) head     <- mkReg(unpack(0));
     Reg#(Bit#(32)) cycleCnt                   <- mkReg(0);
     Reg#(WORKING_SET) testAddr                <- mkReg(0);
     Reg#(t_QUEUE_IDX) maxQueueSize            <- mkReg(unpack(0));
-    Reg#(Bit#(N_SYNC_NODES)) barrierInitValue <- mkReg(0);
+    Reg#(Bit#(3)) masterInitCnt               <- mkReg(0);
     
     rule countCycle(True);
         cycleCnt <= cycleCnt + 1;
     endrule
     
-    rule doInit (!initDone && masterInitDone && sync.initialized() && pack(maxQueueSize) != 0);
+    rule doInit (!initDone && masterInitDone && pack(maxQueueSize) != 0);
         initDone <= True;
         debugLog.record($format("initialization done, cycle=0x%11d", cycleCnt));
-        lock.acquireLockReq(CONSUMER_LOCK);
+        cohMem.testAndSetReq(unpack(`HEAD_LOCK_ADDR), unpack(1));
     endrule
 
     if (isMaster == True)
     begin
-        Reg#(Bit#(1)) masterInitCnt <- mkReg(0);
         (* mutually_exclusive = "doMasterInit, doInit" *)
         rule doMasterInit (!masterInitDone);
             if (masterInitCnt == 0)
@@ -107,12 +82,48 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
                 masterInitCnt <= masterInitCnt + 1;
                 debugLog.record($format("write initial head value"));
             end
-            else if (masterInitCnt == 1 && !cohMem.writePending())
+            else if (masterInitCnt == 1)
+            begin
+                cohMem.write(unpack(`HEAD_LOCK_ADDR), unpack(0));
+                masterInitCnt <= masterInitCnt + 1;
+                debugLog.record($format("write initial head lock value"));
+            end
+            else if (masterInitCnt == 2)
+            begin
+                cohMem.write(unpack(`CONSUMER_DONE_ADDR), unpack(0));
+                masterInitCnt <= masterInitCnt + 1;
+                debugLog.record($format("write initial done signal value"));
+            end
+            else if (masterInitCnt == 3)
+            begin
+                cohMem.write(unpack(`CONSUMER_DONE_LOCK_ADDR), unpack(0));
+                masterInitCnt <= masterInitCnt + 1;
+                debugLog.record($format("write initial done lock value"));
+            end
+            else if (masterInitCnt == 4 && !cohMem.writePending())
             begin
                 masterInitDone <= True;
                 masterInitCnt  <= 0;
-                sync.setSyncBarrier(barrierInitValue);
+                cohMem.write(unpack(`INIT_CLIENT_DONE_ADDR), unpack(1));
                 debugLog.record($format("master initialization done, cycle=0x%11d", cycleCnt));
+            end
+        endrule
+    end
+    else
+    begin
+        rule checkMasterInit0(!masterInitDone && masterInitCnt == 0);
+            cohMem.readReq(unpack(`INIT_CLIENT_DONE_ADDR));
+            masterInitCnt <= masterInitCnt + 1;
+        endrule
+        rule checkMasterInit1(!masterInitDone && masterInitCnt == 1);
+            let resp <- cohMem.readRsp();
+            if (pack(resp) == 1)
+            begin
+                masterInitDone <= True;
+            end
+            else
+            begin
+                masterInitCnt <= 0;
             end
         endrule
     end
@@ -124,18 +135,12 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
     // =======================================================================
 
     FIFOF#(Bool) consumerReqInfo     <- mkSizedFIFOF(8);
-    Reg#(Bit#(2)) consumerPhase      <- mkReg(0);
+    Reg#(Bit#(3)) consumerPhase      <- mkReg(0);
     PulseWire queueNotEmptyW         <- mkPulseWire();
     Reg#(Bool) queueNotEmpty         <- mkReg(False);
     Reg#(Bool) testDone              <- mkReg(False);
     Reg#(Bool) hasLock               <- mkReg(False);
     Reg#(Bool) producerIsDone        <- mkReg(False);
-
-    rule waitForProducer (!producerIsDone);
-        sync.waitForSync();
-        producerIsDone <= True;
-        debugLog.record($format("waitForProducer: producers are done..."));
-    endrule
 
     rule recvItem (initDone && consumerReqInfo.first());
         let resp <- cohMem.readRsp();
@@ -147,11 +152,21 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
     rule getConsumerLock (initDone && !testDone && consumerPhase == 0);
         if (!hasLock)
         begin
-            let r <- lock.lockResp();
-            hasLock <= True;
-            cohMem.readReq(unpack(`HEAD_ADDR));
-            consumerReqInfo.enq(False);
-            consumerPhase <= consumerPhase + 1;
+            let resp <- cohMem.testAndSetRsp();
+            debugLog.record($format("getConsumerLock: testAndSetRsp=0x%x", resp));
+            if (pack(resp) == 0) // get lock!
+            begin
+                hasLock <= True;
+                cohMem.readReq(unpack(`HEAD_ADDR));
+                consumerPhase <= consumerPhase + 1;
+                consumerReqInfo.enq(False);
+                debugLog.record($format("getConsumerLock: get head lock!"));
+            end
+            else
+            begin
+                cohMem.testAndSetReq(unpack(`HEAD_LOCK_ADDR), unpack(1));
+                debugLog.record($format("getConsumerLock: does not get head lock, retry..."));
+            end
         end
         else
         begin
@@ -161,7 +176,7 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
         end
     endrule
 
-    rule getTailAddr (consumerPhase == 1 && !consumerReqInfo.first());
+    rule getTailAddr (initDone && consumerPhase == 1 && !consumerReqInfo.first());
         let resp <- cohMem.readRsp(); 
         consumerReqInfo.deq();
         head <= unpack(resize(pack(resp)));
@@ -169,20 +184,20 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
         consumerReqInfo.enq(False);
         consumerPhase <= consumerPhase + 1;
     endrule
-
-    rule checkEmpty (consumerPhase == 2 && !consumerReqInfo.first());
+    
+    rule checkEmpty (initDone && consumerPhase == 2 && !consumerReqInfo.first());
         match {.head_looped, .head_val} = head;
         t_DATA tail_resp <- cohMem.readRsp();
-        Tuple2#(Bool, t_QUEUE_IDX) tail_tuple = unpack(resize(tail_resp));
-        match {.tail_looped, .tail_val} = tail_tuple;
+        Tuple3#(Bool, t_QUEUE_IDX, Bool) tail_tuple = unpack(resize(tail_resp));
+        match {.tail_looped, .tail_val, .tail_done} = tail_tuple;
         consumerReqInfo.deq();
         if ((head_looped == tail_looped) && (pack(head_val) == pack(tail_val))) // empty
         begin
             debugLog.record($format("checkEmpty: Empty! head=0x%x, tail=0x%x", head_val, tail_val));
             consumerPhase <= 0;
-            if (producerIsDone)
+            if (tail_done) //producerIsDone
             begin
-                lock.releaseLock(CONSUMER_LOCK);
+                cohMem.write(unpack(`HEAD_LOCK_ADDR), unpack(0));
                 hasLock <= False;
                 testDone <= True;
                 debugLog.record($format("checkEmpty: Empty! test finished"));
@@ -196,7 +211,7 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
         end
     endrule 
 
-    rule popItem (consumerPhase == 2 && (queueNotEmptyW || queueNotEmpty));    
+    rule popItem (initDone && consumerPhase == 2 && (queueNotEmptyW || queueNotEmpty));    
         match {.head_looped, .head_val} = head;
         cohMem.readReq(unpack(`START_ADDR + resize(pack(head_val))));
         cohMem.readFence();
@@ -214,16 +229,26 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
     endrule
 
     (* mutually_exclusive = "doInit, checkEmpty, updateHead" *)
-    rule updateHead (consumerPhase == 3);
+    rule updateHead (initDone && consumerPhase == 3);
         match {.head_looped, .head_val} = head;
         cohMem.write(unpack(`HEAD_ADDR), unpack(resize(pack(head))));
         debugLog.record($format("updateHead: head=0x%x", head_val));
-        consumerPhase <= 0;
+        consumerPhase <= consumerPhase + 1;
         queueNotEmpty <= False;
-        lock.releaseLock(CONSUMER_LOCK);
-        lock.acquireLockReq(CONSUMER_LOCK);
+    endrule
+
+    rule releaseLock (initDone && consumerPhase == 4);    
+        consumerPhase <= consumerPhase + 1;
+        cohMem.write(unpack(`HEAD_LOCK_ADDR), unpack(0));
         hasLock <= False;
     endrule
+
+    rule reAcquireLock (initDone && !testDone && consumerPhase == 5);
+        consumerPhase <= 0;
+        cohMem.testAndSetReq(unpack(`HEAD_LOCK_ADDR), unpack(1));
+        debugLog.record($format("reAcquireLock..."));
+    endrule
+
 
     // =======================================================================
     //
@@ -237,18 +262,11 @@ module [CONNECTED_MODULE] mkConsumer#(Integer consumerID,
     endmethod
     
     method Action setBarrier(Bit#(N_SYNC_NODES) barrier);
-        if (isMaster)
-        begin
-            barrierInitValue <= barrier;
-        end
+        noAction;
     endmethod
     
     method Action producerDone();
-        if (isMaster)
-        begin
-            sync.signalSyncReached();
-            debugLog.record($format("producerDone: notify consumers that producers are done"));
-        end
+        noAction;
     endmethod
 
     method Bool initialized() = initDone;

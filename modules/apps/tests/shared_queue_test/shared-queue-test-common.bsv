@@ -25,7 +25,17 @@
 `define TEST_NUM 1024
 `define HEAD_ADDR   0
 `define TAIL_ADDR   4
-`define START_ADDR  8
+
+`define PRODUCER_DONE_ADDR   8
+`define CONSUMER_DONE_ADDR  12
+`define HEAD_LOCK_ADDR 16
+`define TAIL_LOCK_ADDR 20
+`define PRODUCER_DONE_LOCK_ADDR 24
+`define CONSUMER_DONE_LOCK_ADDR 28
+`define INIT_DONE_ADDR 32
+`define INIT_CLIENT_DONE_ADDR 36
+
+`define START_ADDR  40
 
 typedef Bit#(32) CYCLE_COUNTER;
 typedef Bit#(16) MEM_ADDRESS;
@@ -33,8 +43,8 @@ typedef Bit#(9) WORKING_SET;
 
 typedef Bit#(4) PRODUCER_IDX;
 typedef Bit#(4) CONSUMER_IDX;
-typedef  2 N_PRODUCERS;
-typedef  2 N_CONSUMERS;
+typedef  4 N_PRODUCERS;
+typedef  4 N_CONSUMERS;
 typedef 15 SHARED_QUEUE_SIZE_LOG;
 
 typedef enum
@@ -50,7 +60,7 @@ STATE
 typedef struct
 {
     PRODUCER_IDX idx;
-    Bit#(40)     data;
+    Bit#(25)     data;
 }
 TEST_DATA
     deriving (Bits, Eq);

@@ -44,9 +44,10 @@ module [CONNECTED_MODULE] mkTestMemory#(Integer scratchpadID, Bool addCaches) (M
     conf.cacheMode = (addCaches) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(scratchpadID)+".out");
-    MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) memory <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, scratchpadID, conf, debugLogsCohScratch);
+    MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) memory_with_fence <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, scratchpadID, conf, debugLogsCohScratch);
+    MEMORY_IFC#(t_ADDR, t_DATA) memory <- mkMemFenceIfcToMemIfc(memory_with_fence);
 
-    return memoryFenceIfcToMemoryIfc(memory);
+    return memory;
 
 endmodule
 
