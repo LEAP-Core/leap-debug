@@ -1787,3 +1787,90 @@ Directory modules/apps/tests/mem_perf
 
 - Add debug scan to mem-perf.
 - Add a localmem memory tester.
+
+----------
+mcadler     Date: Thu Feb 13 18:27:14 EST 2014  CSN: CSN-leap-debug-71
+                  Thu Feb 13 23:27:14 UTC 2014
+
+
+Directory modules/apps/tests/alu_test
+ alu-test.bsv              Locally Modified           70 
+
+Directory modules/apps/tests/bram_test
+ bram-test.bsv             Locally Modified           70 
+
+Directory modules/apps/tests/stdio_test
+ stdio-test.bsv            Locally Modified           70 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf-test.bsv     Locally Modified           70 
+ coh-mem-perf-simple.bsv   Locally Modified           70 
+ coh-mem-perf-remote.bsv   Locally Modified           70 
+ coh-mem-perf-remote-synth.bsv Locally Modified           70 
+ coh-mem-perf.bsv          Locally Modified           70 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-local.bsv   Locally Modified           70 
+ heat-transfer-remote.bsv  Locally Modified           70 
+ heat-transfer.bsv         Locally Modified           70 
+ heat-engine.bsv           Locally Modified           70 
+
+Directory modules/apps/tests/clock_test
+ clock_test.cpp            Locally Modified           70 
+
+Directory modules/apps/tests/interconnect_test
+ interconnect-test.bsv     Locally Modified           70 
+
+Directory modules/apps/tests/shared_pipeline_test
+ shared-pipeline-test.bsv  Locally Modified           70 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-alt.bsv          Locally Modified           70 
+ mem-perf-wrapper.bsv      Locally Modified           70 
+ mem-perf-wrapper-coherent.bsv Locally Modified           70 
+
+Directory modules/apps/tests/mem_perf/connected_application
+ connected-application-test.bsv Locally Modified           70 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           70 
+ mem-perf-driver.bsv       Locally Modified           70 
+ mem-perf-common-coherent.bsv Locally Modified           70 
+ mem-perf-common-private.bsv Locally Modified           70 
+ mem-perf.bsv              Locally Modified           70 
+ mem-perf-wrapper-multi.bsv Locally Modified           70 
+
+Directory modules/apps/tests/channel-integrity-test
+ chan-test.bsv             Locally Modified           70 
+ chan-test-server.h        Locally Modified           70 
+ chan-test-16.cpp          Locally Modified           70 
+ chan-test-server-16.cpp   Locally Modified           70 
+ chan-test-16.h            Locally Modified           70 
+ chan-test-16.bsv          Locally Modified           70 
+ chan-test-server-16.h     Locally Modified           70 
+ chan-test.cpp             Locally Modified           70 
+ chan-test-server.cpp      Locally Modified           70 
+ chan-test.h               Locally Modified           70 
+
+Directory modules/apps/tests/fp_test
+ fp-test.bsv               Locally Modified           70 
+
+Directory modules/apps/tests/coh_mem_test
+ coh-mem-test.bsv          Locally Modified           70 
+
+Directory modules/apps/tests/shared_queue_test
+ shared-queue-with-lock.bsv Locally Modified           70 
+ shared-queue-no-lock.bsv  Locally Modified           70 
+ consumer-soft-lock.bsv    Locally Modified           70 
+ consumer.bsv              Locally Modified           70 
+ shared-queue-test-common.bsv Locally Modified           70 
+ shared-queue-with-soft-lock.bsv Locally Modified           70 
+ producer-soft-lock.bsv    Locally Modified           70 
+ producer.bsv              Locally Modified           70 
+ shared-queue-with-hard-lock.bsv Locally Modified           70 
+ shared-queue-test.bsv     Locally Modified           70 
+
+Directory modules/apps/tests/mem_test
+ mem-test.bsv              Locally Modified           70 
+
+Switch to BSD license.
