@@ -1770,3 +1770,20 @@ Directory modules/apps/tests/shared_queue_test
 
 (1) Add a shared-queue benchmark that uses software locks through memory. 
 (2) Add more debug messages in mem_perf.
+
+----------
+mcadler     Date: Thu Feb 13 18:09:20 EST 2014  CSN: CSN-leap-debug-70
+                  Thu Feb 13 23:09:20 UTC 2014
+
+
+Directory config/pm/leap/tests/mem_perf
+ mem_perf_hybrid_vc707.apm Locally Modified           69 
+
+Directory config/pm/leap/tests/mem_test
+ mem_test_localmem_exe.apm Locally Added               0 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-common.bsv       Locally Modified           69 
+
+- Add debug scan to mem-perf.
+- Add a localmem memory tester.

@@ -109,6 +109,19 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     Reg#(MEM_ADDRESS) stride <- mkRegU();
     Reg#(MEM_ADDRESS) bound  <- mkRegU();
 
+    // Debugging
+    DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
+    dbg_list <- addDebugScanField(dbg_list, "state", state);
+    dbg_list <- addDebugScanField(dbg_list, "count", count);
+    dbg_list <- addDebugScanField(dbg_list, "iterations", iterations);
+    dbg_list <- addDebugScanField(dbg_list, "errors", errors);
+    dbg_list <- addDebugScanField(dbg_list, "addr", addr);
+    dbg_list <- addDebugScanField(dbg_list, "stride", stride);
+    dbg_list <- addDebugScanField(dbg_list, "bound", bound);
+
+    let dbgNode <- mkDebugScanNode("Memory performance (mem-perf-common.bsv)", dbg_list);
+
+
     // Simple mixing function to swizzle write values a little bit
     function MEM_DATA addrMix(MEM_ADDRESS a) = zeroExtend(a + (a << 3));
 
