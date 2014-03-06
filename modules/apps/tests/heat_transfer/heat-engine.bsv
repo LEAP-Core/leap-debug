@@ -71,7 +71,7 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
               Bits#(t_DATA, t_DATA_SZ),
               NumAlias#(TLog#(N_X_POINTS), t_ADDR_X_SZ),
               NumAlias#(TLog#(N_Y_POINTS), t_ADDR_Y_SZ),
-              Add#(TAdd#(TAdd#(t_ADDR_Y_SZ, t_ADDR_Y_SZ),1), extraBits, t_ADDR_SZ),
+              Add#(TAdd#(TAdd#(t_ADDR_X_SZ, t_ADDR_Y_SZ),1), extraBits, t_ADDR_SZ),
               Alias#(Bit#(t_ADDR_X_SZ), t_ADDR_X),
               Alias#(Bit#(t_ADDR_Y_SZ), t_ADDR_Y));
 

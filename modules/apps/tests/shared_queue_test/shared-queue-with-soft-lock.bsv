@@ -69,13 +69,16 @@ module [CONNECTED_MODULE] mkSharedQueueTestWithSoftLock ()
     //
     // Allocate coherent scratchpads (producers and consumers)
     //
-    COH_SCRATCH_CONFIG conf = defaultValue;
-    conf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+    controllerConf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
     
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-    mkCoherentScratchpadController(`VDEV_SCRATCH_SHARED_QUEUE_DATA, `VDEV_SCRATCH_SHARED_QUEUE_BITS, addr_size, data_size, conf);
+    mkCoherentScratchpadController(`VDEV_SCRATCH_SHARED_QUEUE_DATA, `VDEV_SCRATCH_SHARED_QUEUE_BITS, addr_size, data_size, controllerConf);
 
+    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    clientConf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    
     Vector#(N_PRODUCERS, DEBUG_FILE) debugLogsP = newVector();
     Vector#(N_PRODUCERS, DEBUG_FILE) debugLogsPM = newVector();
     Vector#(N_PRODUCERS, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesP = newVector();
@@ -85,7 +88,7 @@ module [CONNECTED_MODULE] mkSharedQueueTestWithSoftLock ()
     begin
         debugLogsP[p] <- mkDebugFile("producer_"+integerToString(p)+".out");
         debugLogsPM[p] <- mkDebugFile("producer_memory_"+integerToString(p)+".out");
-        memoriesP[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, p, conf, debugLogsPM[p]);
+        memoriesP[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, p, clientConf, debugLogsPM[p]);
         producers[p] <- mkProducerSoftLock(p, memoriesP[p], debugLogsP[p], p == 0);
     end
 
@@ -98,7 +101,7 @@ module [CONNECTED_MODULE] mkSharedQueueTestWithSoftLock ()
     begin
         debugLogsC[p] <- mkDebugFile("consumer_"+integerToString(p)+".out");
         debugLogsCM[p] <- mkDebugFile("consumer_memory_"+integerToString(p)+".out");
-        memoriesC[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, (p + valueOf(N_PRODUCERS)), conf, debugLogsCM[p]);
+        memoriesC[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, (p + valueOf(N_PRODUCERS)), clientConf, debugLogsCM[p]);
         consumers[p] <- mkConsumerSoftLock(p, memoriesC[p], debugLogsC[p], p == 0);
     end
 

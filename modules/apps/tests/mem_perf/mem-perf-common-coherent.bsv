@@ -53,7 +53,7 @@ module [CONNECTED_MODULE] mkTestMemory#(Integer scratchpadID, Bool addCaches) (M
     // Allocate scratchpads
     //
 
-    COH_SCRATCH_CONFIG conf = defaultValue;
+    COH_SCRATCH_CLIENT_CONFIG conf = defaultValue;
     conf.cacheMode = (addCaches) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(scratchpadID)+".out");

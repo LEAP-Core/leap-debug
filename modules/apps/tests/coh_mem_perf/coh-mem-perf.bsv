@@ -84,7 +84,7 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate scratchpads
     //
-    COH_SCRATCH_CONFIG conf = defaultValue;
+    COH_SCRATCH_CONTROLLER_CONFIG conf = defaultValue;
     conf.cacheMode = (`COH_SCRATCH_MEM_PERF_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     // Coherent scratchpads

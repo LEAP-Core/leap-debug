@@ -1,5 +1,14 @@
-// Coherent Scratchpads
+// Coherent scratchpads
 def VDEV.SCRATCH.HEAT_DATA          "heat_transfer_coherent_scratch_data";
 def VDEV.SCRATCH.HEAT_BITS          "heat_transfer_coherent_scratch_bits";
+
+// Second set of coherent scratchpad difinitions for distributed central caches
+def VDEV.SCRATCH.HEAT_DATA2         "heat_transfer_coherent_scratch_data_2";
+def VDEV.SCRATCH.HEAT_BITS2         "heat_transfer_coherent_scratch_bits_2";
+
+// Coherence domain
+def VDEV.COH.SCRATCH.HEAT           "heat_transfer_coherence_domain";
+
+// Synchronization group
 def VDEV.SYNCGROUP.HEAT_TRANSFER    "heat_transfer_sync_group";
 

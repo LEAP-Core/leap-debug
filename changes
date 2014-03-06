@@ -1874,3 +1874,45 @@ Directory modules/apps/tests/mem_test
  mem-test.bsv              Locally Modified           70 
 
 Switch to BSD license.
+
+----------
+hjyang      Date: Thu Mar  6 16:19:12 EST 2014  CSN: CSN-leap-debug-72
+                  Thu Mar  6 21:19:12 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_dual_exe.apm Locally Modified           71 
+ heat_transfer_test_hybrid_dual_vc707.apm Locally Modified           71 
+
+Directory modules/apps/tests/mem_perf
+ mem-perf-wrapper-coherent.bsv Locally Modified           71 
+ mem-perf-common-coherent.bsv Locally Modified           71 
+
+Directory modules/apps/tests/coh_mem_test
+ coh-mem-test.bsv          Locally Modified           71 
+
+Directory modules/apps/tests/shared_queue_test
+ shared-queue-with-hard-lock.bsv Locally Modified           71 
+ shared-queue-with-lock.bsv Locally Modified           71 
+ shared-queue-no-lock.bsv  Locally Modified           71 
+ shared-queue-with-soft-lock.bsv Locally Modified           71 
+
+Directory modules/apps/tests/coh_mem_perf
+ coh-mem-perf-test.bsv     Locally Modified           71 
+ coh-mem-perf-simple.bsv   Locally Modified           71 
+ coh-mem-perf-remote.bsv   Locally Modified           71 
+ coh-mem-perf-remote-synth.bsv Locally Modified           71 
+ coh-mem-perf.bsv          Locally Modified           71 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer.bsv         Locally Modified           71 
+ heat-engine.bsv           Locally Modified           71 
+ heat-transfer.dic         Locally Modified           71 
+ heat-transfer-common.awb  Locally Modified           71 
+ heat-transfer-common.bsv  Locally Modified           71 
+ heat-transfer-local.bsv   Locally Modified           71 
+ heat-transfer-remote.bsv  Locally Modified           71 
+
+(1) Add a multi-controller option for the heat transfer benchmark.
+(2) Update coherent scratchpad benchmarks because of the change of 
+    coherent scratchpad configuration. 

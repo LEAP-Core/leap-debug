@@ -107,31 +107,34 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // Allocate scratchpads
     //
-    COH_SCRATCH_CONFIG conf = defaultValue;
-    conf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+    controllerConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    
+    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    clientConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
 
     // Medium data (same container size as data)
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_MD_SZ) data_md_size = ?;
-    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, `VDEV_SCRATCH_COH_MEMTEST_MD_BITS, addr_size, data_md_size, conf);
+    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, `VDEV_SCRATCH_COH_MEMTEST_MD_BITS, addr_size, data_md_size, controllerConf);
     DEBUG_FILE debugLogMD0 <- mkDebugFile("coherent_scratchpad_md_0.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD0 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 0, conf, debugLogMD0);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD0 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 0, clientConf, debugLogMD0);
     DEBUG_FILE debugLogMD1 <- mkDebugFile("coherent_scratchpad_md_1.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD1 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 1, conf, debugLogMD1);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD1 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 1, clientConf, debugLogMD1);
     DEBUG_FILE debugLogMD2 <- mkDebugFile("coherent_scratchpad_md_2.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD2 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 2, conf, debugLogMD2);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD2 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 2, clientConf, debugLogMD2);
     DEBUG_FILE debugLogMD3 <- mkDebugFile("coherent_scratchpad_md_3.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD3 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 3, conf, debugLogMD3);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_MD) memoryMD3 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_MD_DATA, 3, clientConf, debugLogMD3);
 
     // Small data (multiple data per container)
     NumTypeParam#(t_MEM_DATA_SM_SZ) data_sm_size = ?;
-    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, `VDEV_SCRATCH_COH_MEMTEST_SM_BITS, addr_size, data_sm_size, conf);
+    mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, `VDEV_SCRATCH_COH_MEMTEST_SM_BITS, addr_size, data_sm_size, controllerConf);
     DEBUG_FILE debugLogSM0 <- mkDebugFile("coherent_scratchpad_sm_0.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM0 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 0, conf, debugLogSM0);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM0 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 0, clientConf, debugLogSM0);
     DEBUG_FILE debugLogSM1 <- mkDebugFile("coherent_scratchpad_sm_1.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM1 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 1, conf, debugLogSM1);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM1 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 1, clientConf, debugLogSM1);
     DEBUG_FILE debugLogSM2 <- mkDebugFile("coherent_scratchpad_sm_2.out");
-    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM2 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 2, conf, debugLogSM2);
+    MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA_SM) memorySM2 <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMTEST_SM_DATA, 2, clientConf, debugLogSM2);
     
     DEBUG_FILE debugLog <- mkDebugFile("coh_mem_test.out");
 

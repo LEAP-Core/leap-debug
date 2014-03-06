@@ -46,6 +46,7 @@ import DefaultValue::*;
 `include "awb/provides/heat_transfer_common.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
+`include "asim/dict/VDEV_COH_SCRATCH.bsh"
 `include "asim/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
 
 //
@@ -55,24 +56,42 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
 
+    if (valueOf(N_TOTAL_ENGINES)>1 && `HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
+    begin
+        // Allocate coherent scratchpad controller for heat engines
+        COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+        controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        controllerConf.multiController = True;
+        controllerConf.baseAddr = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
+        controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_REMOTE_ENGINES, N_POINTS_PER_ENGINE),2)));
+        controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
+        controllerConf.isMaster = False;
+        
+        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
+        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
+    end
+    
     if (valueOf(N_REMOTE_ENGINES)>0)
     begin
         //
         // Allocate coherent scratchpads for heat engines
         //
-        COH_SCRATCH_CONFIG conf = defaultValue;
-        conf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+        clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
         
         Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs = newVector();
         Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs = newVector();
         Vector#(N_REMOTE_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();
         Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines = newVector();
+        Integer scratchpadID = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_HEAT_DATA2 : `VDEV_SCRATCH_HEAT_DATA;
 
         for(Integer p = 0; p < valueOf(N_REMOTE_ENGINES); p = p + 1)
         begin
             debugLogMs[p] <- mkDebugFile("heat_engine_memory_" + integerToString(p + valueOf(N_LOCAL_ENGINES)) + ".out");
             debugLogEs[p] <- mkDebugFile("heat_engine_" + integerToString(p + valueOf(N_LOCAL_ENGINES)) + ".out");
-            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_HEAT_DATA, p + valueOf(N_LOCAL_ENGINES), conf, debugLogMs[p]);
+            memories[p] <- mkDebugCoherentScratchpadClient(scratchpadID, p + valueOf(N_LOCAL_ENGINES), clientConf, debugLogMs[p]);
             engines[p] <- mkHeatEngine(memories[p], debugLogEs[p], False);
         end
 

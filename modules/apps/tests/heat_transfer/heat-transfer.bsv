@@ -56,18 +56,6 @@ module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
 
-
-    if (valueOf(N_TOTAL_ENGINES)>1)
-    begin
-        // Allocate coherent scratchpad controller for heat engines
-        COH_SCRATCH_CONFIG conf = defaultValue;
-        conf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        
-        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
-        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, conf);
-    end
-
     mkHeatTransferTestLocal();
     mkHeatTransferTestRemote();
 

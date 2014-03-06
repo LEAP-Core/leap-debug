@@ -8,7 +8,8 @@
 %public heat-transfer-common.bsv
 %public heat-engine.bsv
 
-%param --global HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE    1  "0: disable, 1: enable private caches"
+%param --global HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE         1  "0: disable, 1: enable private caches"
+%param --global HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE  1  "0: disable, 1: enable multiple coherent scratchpad controllers"
 
-%param --dynamic HEAT_TRANSFER_TEST_ITER             128  "number of iterations"
+%param --dynamic HEAT_TRANSFER_TEST_ITER                  128  "number of iterations"
 
