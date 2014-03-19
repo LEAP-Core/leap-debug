@@ -1916,3 +1916,26 @@ Directory modules/apps/tests/heat_transfer
 (1) Add a multi-controller option for the heat transfer benchmark.
 (2) Update coherent scratchpad benchmarks because of the change of 
     coherent scratchpad configuration. 
+
+----------
+hjyang      Date: Wed Mar 19 15:03:12 EDT 2014  CSN: CSN-leap-debug-73
+                  Wed Mar 19 19:03:12 UTC 2014
+
+
+Directory config/pm/leap/tests
+ sync_perf/                Locally Added               0 
+
+Directory config/pm/leap/tests/sync_perf
+ sync_perf_test_hybrid_exe.apm Locally Added               0 
+ sync_perf_test_hybrid_ml605.apm Locally Added               0 
+
+Directory modules/apps/tests
+ sync_perf/                Locally Added               0 
+
+Directory modules/apps/tests/sync_perf
+ sync-test-engine.bsv      Locally Added               0 
+ sync-perf-test.awb        Locally Added               0 
+ sync-perf-test.bsv        Locally Added               0 
+ sync-perf-test.dic        Locally Added               0 
+
+Add synchronization (barrier) performance test. 

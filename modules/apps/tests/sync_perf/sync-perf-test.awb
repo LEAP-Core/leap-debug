@@ -1,0 +1,13 @@
+%name Synchronization Performance Test
+%desc Synchronization Performance Test
+
+%attributes sync_perf test
+
+%provides hardware_system
+
+%public sync-perf-test.bsv
+%public sync-test-engine.bsv
+%public sync-perf-test.dic
+
+%param --dynamic SYNC_PERF_TEST_ITER    1000      "number of iterations"
+
