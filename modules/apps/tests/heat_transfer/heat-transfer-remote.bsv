@@ -56,30 +56,31 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
 
-    if (valueOf(N_TOTAL_ENGINES)>1 && `HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
-    begin
-        // Allocate coherent scratchpad controller for heat engines
-        COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
-        controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        controllerConf.multiController = True;
-        controllerConf.baseAddr = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
-        controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_REMOTE_ENGINES, N_POINTS_PER_ENGINE),2)));
-        controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
-        controllerConf.isMaster = False;
-        
-        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
-        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
-    end
+    // if (valueOf(N_TOTAL_ENGINES)>1 && `HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
+    // begin
+    //     // Allocate coherent scratchpad controller for heat engines
+    //     COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+    //     controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    //     controllerConf.multiController = True;
+    //     controllerConf.baseAddr = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
+    //     controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_REMOTE_ENGINES, N_POINTS_PER_ENGINE),2)));
+    //     controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
+    //     controllerConf.isMaster = False;
+    //     
+    //     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
+    //     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+    //     mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
+    // end
     
     if (valueOf(N_REMOTE_ENGINES)>0)
     begin
         //
         // Allocate coherent scratchpads for heat engines
         //
-        COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+        // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+        COH_SCRATCH_CONFIG clientConf = defaultValue;
         clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+        // clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
         
         Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs = newVector();
         Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs = newVector();

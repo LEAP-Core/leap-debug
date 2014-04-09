@@ -1939,3 +1939,39 @@ Directory modules/apps/tests/sync_perf
  sync-perf-test.dic        Locally Added               0 
 
 Add synchronization (barrier) performance test. 
+
+----------
+hjyang      Date: Wed Apr  9 14:01:37 EDT 2014  CSN: CSN-leap-debug-74
+                  Wed Apr  9 18:01:37 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_exe.apm Locally Modified           73 
+ heat_transfer_test_hybrid_ml605.apm Locally Modified           73 
+ heat_transfer_test_hybrid_dual_exe.apm Locally Modified           73 
+ heat_transfer_test_hybrid_vc707.apm Locally Added               0 
+ heat_transfer_test_hybrid_dual_vc707.apm Locally Modified           73 
+
+Directory config/pm/leap/tests/sync_perf
+ sync_perf_test_hybrid_ml605.apm Locally Modified           73 
+ sync_perf_test_hybrid_vc707.apm Locally Added               0 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-local.bsv   Locally Modified           73 
+ heat-transfer-remote.bsv  Locally Modified           73 
+ heat-transfer-control.awb Locally Added               0 
+ heat-transfer-control.bsv Locally Added               0 
+ heat-transfer.awb         Locally Modified           73 
+ heat-transfer.bsv         Locally Modified           73 
+ sim-mapping.map           Locally Modified           73 
+ heat-transfer-common.awb  Locally Modified           73 
+ heat-transfer-common.bsv  Locally Modified           73 
+
+Directory modules/apps/tests/sync_perf
+ sync-perf-test.bsv        Locally Modified           73 
+ sync-perf-test.dic        Locally Modified           73 
+ sync-test-engine.bsv      Locally Modified           73 
+ sync-perf-test.awb        Locally Modified           73 
+
+(1) Add a through-memory barrier option to the synchronization performance test benchmark (sync_perf)
+(2) Reorganize synthesis boundaries in the heat transfer benchmark to measure areas

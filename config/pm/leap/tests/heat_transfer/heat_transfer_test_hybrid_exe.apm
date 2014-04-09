@@ -55,6 +55,7 @@ Packagehint=leap-debug
 heat_transfer_remote=Heat Transfer Test Remote Module
 heat_transfer_local=Heat Transfer Test Local Module
 heat_transfer_common=Heat Transfer Test Common
+heat_transfer_control=Heat Transfer Test Controller Module
 
 [Heat Transfer Test Remote Module]
 File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
@@ -66,4 +67,8 @@ Packagehint=leap-debug
 
 [Heat Transfer Test Local Module]
 File=modules/apps/tests/heat_transfer/heat-transfer-local.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Controller Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-control.awb
 Packagehint=leap-debug

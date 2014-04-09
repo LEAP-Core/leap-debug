@@ -7,6 +7,7 @@
 %requires heat_transfer_local
 %requires heat_transfer_remote
 %requires heat_transfer_common
+%requires heat_transfer_control
 
 %public heat-transfer.bsv
 %public heat-transfer.dic

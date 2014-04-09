@@ -1,3 +1,7 @@
+// Coherent scratchpads
+def VDEV.SCRATCH.SYNC_DATA  "sync_test_coherent_scratch_data";
+def VDEV.SCRATCH.SYNC_BITS  "sync_test_coherent_scratch_bits";
+
 // Synchronization group
-def VDEV.SYNCGROUP.TEST    "test_sync_group";
+def VDEV.SYNCGROUP.TEST     "test_sync_group";
 

@@ -44,9 +44,13 @@ import DefaultValue::*;
 `include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
 
 `include "asim/dict/VDEV_SYNCGROUP.bsh"
+`include "asim/dict/VDEV_SCRATCH.bsh"
 
 typedef Bit#(64) CYCLE_COUNTER;
 typedef 8 N_TOTAL_ENGINES;
+
+typedef Bit#(14) MEM_ADDRESS;
+typedef Bit#(64) MEM_DATA;
 
 typedef enum
 {
@@ -62,18 +66,45 @@ STATE
 // Implement a synchronization performance test
 //
 module [CONNECTED_MODULE] mkSystem ()
-    provisos ();
+    provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
+              Bits#(MEM_DATA, t_MEM_DATA_SZ));
 
     Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
     Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
+    // Allocate coherent scratchpad controller for sync test engines
+    if (`SYNC_PERF_TEST_MEM_ENABLE == 1)
+    begin
+        // COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+        COH_SCRATCH_CONFIG controllerConf = defaultValue;
+        controllerConf.cacheMode = COH_SCRATCH_CACHED;
+        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
+        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+        mkCoherentScratchpadController(`VDEV_SCRATCH_SYNC_DATA, `VDEV_SCRATCH_SYNC_BITS, addr_size, data_size, controllerConf);
+    end
+    
     Vector#(N_TOTAL_ENGINES, SYNC_TEST_ENGINE_IFC) syncEngines = newVector(); 
     Vector#(N_TOTAL_ENGINES, DEBUG_FILE) debugLogs = newVector();
+    Vector#(N_TOTAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     
+    Vector#(N_TOTAL_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, MEM_DATA)) memories = newVector();
+    // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    COH_SCRATCH_CONFIG clientConf = defaultValue;
+    clientConf.cacheMode = COH_SCRATCH_CACHED;
+
     for(Integer p = 0; p < valueOf(N_TOTAL_ENGINES); p = p + 1)
     begin
-        debugLogs[p]   <- mkDebugFile("sync_test_engine_"+integerToString(p)+".out");
-        syncEngines[p] <- mkSyncTestEngine(debugLogs[p], (p == 0)); 
+        debugLogs[p] <- mkDebugFile("sync_test_engine_"+integerToString(p)+".out");
+        if (`SYNC_PERF_TEST_MEM_ENABLE == 1)
+        begin
+            debugLogMs[p] <- mkDebugFile("sync_test_engine_memory_"+integerToString(p)+".out");
+            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SYNC_DATA, p, clientConf, debugLogMs[p]);
+            syncEngines[p] <- mkMemSyncTestEngine(memories[p], debugLogs[p], (p == 0)); 
+        end
+        else
+        begin
+            syncEngines[p] <- mkSyncTestEngine(debugLogs[p], (p == 0)); 
+        end
     end
     
     DEBUG_FILE debugLog <- mkDebugFile("sync_perf_test.out");

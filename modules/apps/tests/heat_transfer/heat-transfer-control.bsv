@@ -28,6 +28,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
+import Vector::*;
 import DefaultValue::*;
 
 `include "asim/provides/librl_bsv.bsh"
@@ -43,23 +44,38 @@ import DefaultValue::*;
 `include "asim/provides/coherent_scratchpad_memory_service.bsh"
 `include "asim/provides/heat_transfer_common_params.bsh"
 `include "awb/provides/heat_transfer_common.bsh"
-`include "awb/provides/heat_transfer_local.bsh"
-`include "awb/provides/heat_transfer_remote.bsh"
-`include "awb/provides/heat_transfer_control.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
+`include "asim/dict/VDEV_COH_SCRATCH.bsh"
+
 
 //
-// Implement a heat transfer test
+// Implement a heat transfer controller
 //
-module [CONNECTED_MODULE] mkSystem ()
+module [CONNECTED_MODULE] mkHeatTransferTestController ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
-    
-    mkHeatTransferTestController();
-    mkHeatTransferTestLocal();
-    mkHeatTransferTestRemote();
 
+    if (valueOf(N_TOTAL_ENGINES)>1)
+    begin
+        // Allocate coherent scratchpad controller for heat engines
+        COH_SCRATCH_CONFIG controllerConf = defaultValue;
+        // COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+        controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        
+        // if (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
+        // begin
+        //     controllerConf.multiController = True;
+        //     controllerConf.baseAddr = unpack(0);
+        //     controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
+        //     controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
+        //     controllerConf.isMaster = True;
+        // end
+        
+        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
+        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, controllerConf);
+    end
+    
 endmodule
 

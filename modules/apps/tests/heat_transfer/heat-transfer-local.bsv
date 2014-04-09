@@ -70,32 +70,13 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     Connection_Receive#(Bool) linkStarterStartRun <- mkConnectionRecv("vdev_starter_start_run");
     Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
-    if (valueOf(N_TOTAL_ENGINES)>1)
-    begin
-        // Allocate coherent scratchpad controller for heat engines
-        COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
-        controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        
-        if (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
-        begin
-            controllerConf.multiController = True;
-            controllerConf.baseAddr = unpack(0);
-            controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
-            controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
-            controllerConf.isMaster = True;
-        end
-        
-        NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
-        NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-        mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, controllerConf);
-    end
-    
     //
     // Allocate coherent scratchpads for heat engines
     //
-    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    COH_SCRATCH_CONFIG clientConf = defaultValue;
     clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+    // clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
 
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogEs = newVector();

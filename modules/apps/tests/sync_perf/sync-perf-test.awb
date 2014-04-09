@@ -9,5 +9,6 @@
 %public sync-test-engine.bsv
 %public sync-perf-test.dic
 
-%param --dynamic SYNC_PERF_TEST_ITER    1000      "number of iterations"
+%param --dynamic SYNC_PERF_TEST_ITER         1000    "number of iterations"
+%param --global  SYNC_PERF_TEST_MEM_ENABLE      0    "0: use sync primitives, 1: use memory-based sync"
 
