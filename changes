@@ -1975,3 +1975,14 @@ Directory modules/apps/tests/sync_perf
 
 (1) Add a through-memory barrier option to the synchronization performance test benchmark (sync_perf)
 (2) Reorganize synthesis boundaries in the heat transfer benchmark to measure areas
+
+----------
+hjyang      Date: Fri Apr 11 16:32:36 EDT 2014  CSN: CSN-leap-debug-75
+                  Fri Apr 11 20:32:36 UTC 2014
+
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-local.bsv   Locally Modified           74 
+ heat-transfer-remote.bsv  Locally Modified           74 
+
+Remove for loops to speed up compilation time. 

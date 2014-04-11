@@ -82,20 +82,43 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
         clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
         // clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
         
-        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs = newVector();
-        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs = newVector();
-        Vector#(N_REMOTE_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();
-        Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines = newVector();
-        Integer scratchpadID = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_HEAT_DATA2 : `VDEV_SCRATCH_HEAT_DATA;
+        function String genDebugMemoryFileName(Integer id);
+            return "heat_engine_memory_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
+        endfunction
+        
+        function String genDebugEngineFileName(Integer id);
+            return "heat_engine_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
+        endfunction
 
-        for(Integer p = 0; p < valueOf(N_REMOTE_ENGINES); p = p + 1)
-        begin
-            debugLogMs[p] <- mkDebugFile("heat_engine_memory_" + integerToString(p + valueOf(N_LOCAL_ENGINES)) + ".out");
-            debugLogEs[p] <- mkDebugFile("heat_engine_" + integerToString(p + valueOf(N_LOCAL_ENGINES)) + ".out");
-            memories[p] <- mkDebugCoherentScratchpadClient(scratchpadID, p + valueOf(N_LOCAL_ENGINES), clientConf, debugLogMs[p]);
-            engines[p] <- mkHeatEngine(memories[p], debugLogEs[p], False);
-        end
+        function ActionValue#(MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) doCurryCohClient(mFunction, x, y);
+            actionvalue
+                Integer scratchpadID = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_HEAT_DATA2 : `VDEV_SCRATCH_HEAT_DATA;
+                let m <- mFunction(scratchpadID, x + valueOf(N_LOCAL_ENGINES), clientConf, y);
+                return m;
+            endactionvalue
+        endfunction
 
+        function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, x, y);
+            actionvalue
+                let m <- mFunction(x, y, False);
+                return m;
+            endactionvalue
+        endfunction
+        
+        Vector#(N_REMOTE_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
+        Vector#(N_REMOTE_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
+        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs <- mapM(mkDebugFile, debugLogMNames); 
+        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs <- mapM(mkDebugFile, debugLogENames);
+
+        Vector#(N_REMOTE_ENGINES, Integer) clientIds = genVector();
+        let mkCohClientVec = replicate(mkDebugCoherentScratchpadClient);
+        Vector#(N_REMOTE_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories <- 
+            zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
+
+        let mkHeatEngineVec = replicate(mkHeatEngine);
+        Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines <-
+            zipWith3M(doCurryHeatEngine, mkHeatEngineVec, memories, debugLogEs);
+        
         DEBUG_FILE debugLog <- mkDebugFile("heat_transfer_test_remote.out");
 
         Reg#(Bit#(5))  bidX               <- mkReg(0);

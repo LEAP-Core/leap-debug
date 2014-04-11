@@ -89,15 +89,47 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
         error("Invalid number of local heat engines");
     end
     
+    function String genDebugMemoryFileName(Integer id);
+        return "heat_engine_memory_"+integerToString(id)+".out";
+    endfunction
+    
+    function String genDebugEngineFileName(Integer id);
+        return "heat_engine_"+integerToString(id)+".out";
+    endfunction
+
+    function ActionValue#(MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) doCurryCohClient(mFunction, x, y);
+        actionvalue
+            let m <- mFunction(`VDEV_SCRATCH_HEAT_DATA, x, clientConf, y);
+            return m;
+        endactionvalue
+    endfunction
+
+    function doCurryHeatEngineConstructor(mFunction, x, y);
+        return mFunction(x,y);
+    endfunction
+
+    function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, id);
+        actionvalue
+            let m <- mFunction(id == 0);
+            return m;
+        endactionvalue
+    endfunction
+
     if (valueOf(N_TOTAL_ENGINES)>1)
     begin
-        for(Integer p = 0; p < valueOf(N_LOCAL_ENGINES); p = p + 1)
-        begin
-            debugLogMs[p] <- mkDebugFile("heat_engine_memory_"+integerToString(p)+".out");
-            debugLogEs[p] <- mkDebugFile("heat_engine_"+integerToString(p)+".out");
-            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_HEAT_DATA, p, clientConf, debugLogMs[p]);
-            engines[p] <- mkHeatEngine(memories[p], debugLogEs[p], p == 0);
-        end
+        Vector#(N_LOCAL_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
+        Vector#(N_LOCAL_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
+
+        debugLogMs <- mapM(mkDebugFile, debugLogMNames);
+        debugLogEs <- mapM(mkDebugFile, debugLogENames);
+       
+        Vector#(N_LOCAL_ENGINES, Integer) clientIds = genVector();
+        let mkCohClientVec = replicate(mkDebugCoherentScratchpadClient);
+        memories <- zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
+
+        let mkHeatEngineVec = replicate(mkHeatEngine);
+        let engineConstructors = zipWith3(doCurryHeatEngineConstructor, mkHeatEngineVec, memories, debugLogEs);
+        engines <- zipWithM(doCurryHeatEngine, engineConstructors, genVector());
     end
     else
     begin
@@ -147,16 +179,16 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
         debugLog.record($format("doInit: initCnt = 0"));
     endrule
 
+    function Bool genBarrierInitVal(Integer id);
+        return (id < valueOf(N_TOTAL_ENGINES))? True : False;
+    endfunction
+
     rule doInit1 (state == STATE_init && initCnt == 1);
-        Vector#(N_SYNC_NODES, Bool) barriers = replicate(False);
-        for(Integer p = 0; p < valueOf(N_TOTAL_ENGINES); p = p + 1)
-        begin 
-            barriers[p] = True;
-        end
+        Vector#(N_SYNC_NODES, Bool) barriers = genWith(genBarrierInitVal);
         engines[0].setIter(iterParam);
         engines[0].setBarrier(pack(barriers));
         initCnt <= initCnt + 1;
-        debugLog.record($format("doInit: initCnt = 1"));
+        debugLog.record($format("doInit: initCnt = 1, barrier = 0x%x", pack(barriers)));
         stdio.printf(msgTest, list4(fromInteger(valueOf(N_X_POINTS)), 
                                     fromInteger(valueOf(N_Y_POINTS)), 
                                     fromInteger(valueOf(N_X_ENGINES)*valueOf(N_Y_ENGINES)), 
