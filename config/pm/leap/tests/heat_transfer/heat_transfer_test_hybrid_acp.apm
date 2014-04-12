@@ -1,0 +1,76 @@
+
+[Global]
+SaveParameters=0
+Description=Heat Transfer Test for ACP
+File=heat_transfer_test_hybrid_acp
+Version=2.2
+Name=Heat Transfer Test for ACP
+Type=Leap
+Class=Asim::Model
+DefaultBenchmark=
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=bram-test hasim hybrid
+model=HW/SW Hybrid Pipeline Build
+
+[Default Software Connected Application]
+File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
+Packagehint=leap
+
+[Default Software Connected Application/Requires]
+hardware_system=Heat Transfer System
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid ACP M2 Compute Environment (Nallatech)
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Default Software Connected Application
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+
+
+[Heat Transfer System/Requires]
+heat_transfer_remote=Heat Transfer Test Remote Module
+heat_transfer_control=Heat Transfer Test Controller Module
+heat_transfer_local=Heat Transfer Test Local Module
+heat_transfer_common=Heat Transfer Test Common
+
+[Heat Transfer Test Controller Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-control.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Remote Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
+Packagehint=leap-debug
+
+[Heat Transfer System]
+File=modules/apps/tests/heat_transfer/heat-transfer.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Local Module]
+File=modules/apps/tests/heat_transfer/heat-transfer-local.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Common]
+File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
+Packagehint=leap-debug
+
+[Hybrid ACP M2 Compute Environment (Nallatech)]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
+Packagehint=leap-platforms-acp

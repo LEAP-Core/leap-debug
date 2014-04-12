@@ -1986,3 +1986,14 @@ Directory modules/apps/tests/heat_transfer
  heat-transfer-remote.bsv  Locally Modified           74 
 
 Remove for loops to speed up compilation time. 
+
+----------
+hjyang      Date: Sat Apr 12 15:14:31 EDT 2014  CSN: CSN-leap-debug-76
+                  Sat Apr 12 19:14:31 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_acp.apm Locally Added               0 
+ heat_transfer_test_hybrid_dual_acp.apm Locally Added               0 
+
+Add heat transfer ACP apms for measuring area results.
