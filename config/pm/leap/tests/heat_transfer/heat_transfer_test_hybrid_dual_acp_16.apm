@@ -2,7 +2,7 @@
 [Global]
 SaveParameters=0
 Description=has strange module alingments
-File=heat_transfer_test_hybrid_dual_acp
+File=heat_transfer_test_hybrid_dual_acp_16
 Version=2.2
 Name=Heat Transfer Multifpga Synthesis Test for Dual ACP
 DefaultBenchmark=
@@ -141,3 +141,7 @@ lim_common=Latency-insensitive Module Common Files
 [ACP Dual FPGA Env with Dual SRAM]
 File=modules/leap-platforms/fpga-environments/acp/acp_fpga_env_dual_sram.awb
 Packagehint=multifpga
+
+[Heat Transfer Test Common/Params]
+HEAT_TRANSFER_X_ENGINE=4
+HEAT_TRANSFER_Y_ENGINE=4

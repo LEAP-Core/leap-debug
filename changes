@@ -1997,3 +1997,26 @@ Directory config/pm/leap/tests/heat_transfer
  heat_transfer_test_hybrid_dual_acp.apm Locally Added               0 
 
 Add heat transfer ACP apms for measuring area results.
+
+----------
+keflemin    Date: Mon Apr 14 13:43:09 EDT 2014  CSN: CSN-leap-debug-77
+                  Mon Apr 14 17:43:09 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_dual_acp_16.apm Locally Added               0 
+ heat_transfer_test_hybrid_acp_2.apm Locally Added               0 
+ heat_transfer_test_hybrid_vc707_2.apm Locally Added               0 
+ heat_transfer_test_hybrid_dual_acp.apm Locally Modified           76 
+ heat_transfer_test_hybrid_acp_16.apm Locally Added               0 
+ heat_transfer_test_hybrid_acp_8.apm Locally Added               0 
+ heat_transfer_test_hybrid_dual_acp_32.apm Locally Added               0 
+ heat_transfer_test_hybrid_vc707_16.apm Locally Added               0 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-common.awb  Locally Modified           76 
+ heat-transfer-common.bsv  Locally Modified           76 
+
+
+Added awb parameters for controlling heat problem sizes. Added new
+apms using these parameters.
