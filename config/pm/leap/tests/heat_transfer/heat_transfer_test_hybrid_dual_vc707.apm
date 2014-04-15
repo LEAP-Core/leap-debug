@@ -46,11 +46,9 @@ Packagehint=multifpga
 [multiFPGA Log Generation/Requires]
 fpga_environment_parser=FPGA Environment Datatype
 
-
 [FPGAMap]
 File=modules/leap/build-support/build-pipelines/stages/parsers/map/fpgamap_parser.awb
 Packagehint=multifpga
-
 
 [multiFPGA Generate bitfle]
 File=modules/leap/build-support/build-pipelines/stages/multifpga_generate_bitfile/multifpga-generate-bitfile.awb
@@ -71,7 +69,6 @@ Packagehint=leap
 
 [Default Software Connected Application/Requires]
 hardware_system=Heat Transfer System
-
 
 [VC707 Dual FPGA Environment (SMA)]
 File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_env.awb
@@ -144,3 +141,8 @@ fpgamap_parser=FPGAMap
 type_parser=Bluespec Type parser
 umf=Little-Endian Unified Message Format
 lim_common=Latency-insensitive Module Common Files
+lim_place_modules=Latency-insensitive Module Places
+
+[Latency-insensitive Module Places]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/map/place-modules-multifpga.awb
+Packagehint=multifpga

@@ -141,3 +141,8 @@ fpgamap_parser=FPGAMap
 type_parser=Bluespec Type parser
 umf=Little-Endian Unified Message Format
 lim_common=Latency-insensitive Module Common Files
+lim_place_modules=Latency-insensitive Module Places
+
+[Latency-insensitive Module Places]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/map/place-modules-multifpga.awb
+Packagehint=multifpga
