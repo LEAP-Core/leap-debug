@@ -2041,3 +2041,17 @@ Directory config/pm/leap/submodels
 
 
 Fixed broken apms.
+
+----------
+hjyang      Date: Thu Apr 24 17:33:57 EDT 2014  CSN: CSN-leap-debug-79
+                  Thu Apr 24 21:33:57 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_ml605.apm Locally Modified           78 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-common.awb  Locally Modified           78 
+ heat-transfer-common.bsv  Locally Modified           78 
+
+Add awb parameters.
