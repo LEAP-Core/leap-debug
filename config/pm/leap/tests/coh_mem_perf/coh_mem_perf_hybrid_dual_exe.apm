@@ -32,7 +32,7 @@ Packagehint=multifpga
 
 [multiFPGA Build Pipeline/Requires]
 multi_fpga_log_generator=multiFPGA Log Generation
-multi_fpga_connect=MultiFPGA Communication Complex Generator
+multi_fpga_connect=Latency-insensitive Module Communication Complex Generator
 multi_fpga_generate_bitfile=multiFPGA Generate bitfle
 
 [multiFPGA Log Generation]
@@ -40,23 +40,15 @@ File=modules/leap/build-support/build-pipelines/stages/multifpga_generate_logfil
 Packagehint=multifpga
 
 [FPGA Environment Datatype]
-File=modules/leap/build-support/build-pipelines/stages/multifpga_generate_logfile/fpgaenvironment.awb
+File=modules/leap/build-support/build-pipelines/stages/parsers/environment/fpgaenvironment.awb
 Packagehint=multifpga
 
 [multiFPGA Log Generation/Requires]
 fpga_environment_parser=FPGA Environment Datatype
 
-[MultiFPGA Communication Complex Generator]
-File=modules/leap/build-support/build-pipelines/stages/multi_fpga_connect/multi-fpga-connect.awb
-Packagehint=multifpga
-
 [FPGAMap]
-File=modules/leap/build-support/build-pipelines/stages/wrapper_gen/fpgamap_parser.awb
+File=modules/leap/build-support/build-pipelines/stages/parsers/map/fpgamap_parser.awb
 Packagehint=multifpga
-
-[MultiFPGA Communication Complex Generator/Requires]
-fpgamap_parser=FPGAMap
-type_parser=Bluespec Type parser
 
 [multiFPGA Generate bitfle]
 File=modules/leap/build-support/build-pipelines/stages/multifpga_generate_bitfile/multifpga-generate-bitfile.awb
@@ -72,7 +64,7 @@ File=modules/leap-platforms/fpga-environments/sim/sim_fpga_cache_env.awb
 Packagehint=multifpga
 
 [Bluespec Type parser]
-File=modules/leap/build-support/build-pipelines/stages/multi_fpga_connect/typeparser.awb
+File=modules/leap/build-support/build-pipelines/stages/parsers/bsv-types/typeparser.awb
 Packagehint=multifpga
 
 [Default Software Connected Application]
@@ -103,10 +95,49 @@ coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Co
 File=modules/apps/tests/coh_mem_perf/sim_mapping.awb
 Packagehint=leap-debug
 
-[MultiFPGA Communication Complex Generator/Params]
-MAX_NUMBER_OF_VIAS=1
-
-
 [Coherent Scratchpad Tester Remote Module]
 File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote.awb
 Packagehint=leap-debug
+
+[Little-Endian Unified Message Format]
+File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-little-endian.awb
+Packagehint=leap-platforms
+
+[LEAP LI Module Handler]
+File=modules/leap/build-support/build-pipelines/stages/li_module/li_module.awb
+Packagehint=leap
+
+[Latency-insensitive Module Communication Complex Generator]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/multi-fpga-connect.awb
+Packagehint=multifpga
+
+[Latency-insensitive Module Type Compression]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/type-compression/lim-compression.awb
+Packagehint=multifpga
+
+[Latency-insensitive Module Communication Complex Generator/Requires]
+type_parser=Bluespec Type parser
+fpgamap_parser=FPGAMap
+li_module=LEAP LI Module Handler
+umf=Little-Endian Unified Message Format
+lim_compression=Latency-insensitive Module Type Compression
+lim_common=Latency-insensitive Module Common Files
+lim_generate_code=Latency-insensitive Module Code Generation
+lim_analyze_network=Latency-insensitive Module Network Analysis
+lim_place_modules=Latency-insensitive Module Places
+
+[Latency-insensitive Module Common Files]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/common/lim-common.awb
+Packagehint=multifpga
+
+[Latency-insensitive Module Code Generation]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/generate-code/generate-code.awb
+Packagehint=multifpga
+
+[Latency-insensitive Module Network Analysis]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/analyze-network/analyze-network.awb
+Packagehint=multifpga
+
+[Latency-insensitive Module Places]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/map/place-modules-multifpga.awb
+Packagehint=multifpga

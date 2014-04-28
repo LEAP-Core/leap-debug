@@ -2020,3 +2020,38 @@ Directory modules/apps/tests/heat_transfer
 
 Added awb parameters for controlling heat problem sizes. Added new
 apms using these parameters.
+
+----------
+keflemin    Date: Tue Apr 15 16:02:29 EDT 2014  CSN: CSN-leap-debug-78
+                  Tue Apr 15 20:02:29 UTC 2014
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_dual_exe_simple.apm Locally Modified           77 
+ coh_mem_perf_hybrid_dual_vc707_simple.apm Locally Modified           77 
+ coh_mem_perf_hybrid_dual_exe.apm Locally Modified           77 
+ coh_mem_perf_hybrid_dual_vc707.apm Locally Modified           77 
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_dual_exe.apm Locally Modified           77 
+ heat_transfer_test_hybrid_dual_vc707.apm Locally Modified           77 
+
+Directory config/pm/leap/submodels
+ fpgaenv-hybrid-ml605-sram-debugger.apm Locally Modified           77 
+
+
+Fixed broken apms.
+
+----------
+hjyang      Date: Thu Apr 24 17:33:57 EDT 2014  CSN: CSN-leap-debug-79
+                  Thu Apr 24 21:33:57 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_ml605.apm Locally Modified           78 
+
+Directory modules/apps/tests/heat_transfer
+ heat-transfer-common.awb  Locally Modified           78 
+ heat-transfer-common.bsv  Locally Modified           78 
+
+Add awb parameters.
