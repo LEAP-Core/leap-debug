@@ -53,8 +53,9 @@ import LFSR::*;
 interface HEAT_ENGINE_IFC#(type t_ADDR);
     method Action setIter(Bit#(16) num);
     method Action setBarrier(Bit#(N_SYNC_NODES) barrier);
-    method Action setAddrX(t_ADDR x);
-    method Action setAddrY(t_ADDR y);
+    method Action setFrameSize(t_ADDR x, t_ADDR y);
+    method Action setAddrX(t_ADDR startX, t_ADDR endX);
+    method Action setAddrY(t_ADDR startY, t_ADDR endY);
     method Bool initialized();
     method Bool done();
 endinterface
@@ -69,11 +70,11 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
     (HEAT_ENGINE_IFC#(t_ADDR))
     provisos (Bits#(t_ADDR, t_ADDR_SZ),
               Bits#(t_DATA, t_DATA_SZ),
-              NumAlias#(TLog#(N_X_POINTS), t_ADDR_X_SZ),
-              NumAlias#(TLog#(N_Y_POINTS), t_ADDR_Y_SZ),
-              Add#(TAdd#(TAdd#(t_ADDR_X_SZ, t_ADDR_Y_SZ),1), extraBits, t_ADDR_SZ),
-              Alias#(Bit#(t_ADDR_X_SZ), t_ADDR_X),
-              Alias#(Bit#(t_ADDR_Y_SZ), t_ADDR_Y));
+              NumAlias#(TLog#(N_X_MAX_POINTS), t_ADDR_MAX_X_SZ),
+              NumAlias#(TLog#(N_Y_MAX_POINTS), t_ADDR_MAX_Y_SZ),
+              Add#(TAdd#(TAdd#(t_ADDR_MAX_X_SZ, t_ADDR_MAX_Y_SZ), 2), extraBits, t_ADDR_SZ),
+              Alias#(Bit#(t_ADDR_MAX_X_SZ), t_ADDR_MAX_X),
+              Alias#(Bit#(t_ADDR_MAX_Y_SZ), t_ADDR_MAX_Y));
 
     // =======================================================================
     //
@@ -88,26 +89,30 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
     // Initialization
     //
     // =======================================================================
+
+    Reg#(Bool) initDone                              <- mkReg(False);
+    Reg#(Bool) masterInitDone                        <- mkReg(!isMaster);
+    Reg#(Bit#(16)) numIter                           <- mkReg(0);
+    Reg#(Bit#(16)) maxIter                           <- mkReg(0);
+    Reg#(Bit#(32)) cycleCnt                          <- mkReg(0);
+    Reg#(Bit#(N_SYNC_NODES)) barrierInitValue        <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) startAddrX                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) startAddrY                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) endAddrX                      <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) endAddrY                      <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) testAddrX                     <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) testAddrY                     <- mkReg(0);
     
+    Reg#(t_ADDR_MAX_X) frameSizeX                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) frameSizeY                    <- mkReg(0);
+    Reg#(Bit#(TAdd#(t_ADDR_MAX_X_SZ, 1))) rowLength  <- mkReg(0);
+
     // addr function
-    function t_ADDR calAddr(t_ADDR_X rx, t_ADDR_Y ry, Bit#(1) b);
-        Tuple3#(t_ADDR_Y, t_ADDR_X, Bit#(1)) addr = tuple3(ry, rx, b);
+    function t_ADDR calAddr(t_ADDR_MAX_X rx, t_ADDR_MAX_Y ry, Bit#(1) b);
+        Bit#(TAdd#(TAdd#(t_ADDR_MAX_X_SZ, 1), t_ADDR_MAX_Y_SZ)) pixel_addr = (zeroExtend(ry) * zeroExtend(rowLength)) + zeroExtend(rx); 
+        let addr = tuple2(pixel_addr, b);
         return unpack(zeroExtend(pack(addr)));
     endfunction
-
-    // Random number generator
-    Reg#(Bool) initDone                        <- mkReg(False);
-    Reg#(Bool) masterInitDone                  <- mkReg(!isMaster);
-    Reg#(Bit#(16)) numIter                     <- mkReg(0);
-    Reg#(Bit#(16)) maxIter                     <- mkReg(0);
-    Reg#(Bit#(32)) cycleCnt                    <- mkReg(0);
-    Reg#(Bit#(N_SYNC_NODES)) barrierInitValue  <- mkReg(0);
-    Reg#(t_ADDR_X) startAddrX                  <- mkReg(0);
-    Reg#(t_ADDR_Y) startAddrY                  <- mkReg(0);
-    Reg#(t_ADDR_X) endAddrX                    <- mkReg(0);
-    Reg#(t_ADDR_Y) endAddrY                    <- mkReg(0);
-    Reg#(t_ADDR_X) testAddrX                   <- mkReg(0);
-    Reg#(t_ADDR_Y) testAddrY                   <- mkReg(0);
 
     rule countCycle(True);
         cycleCnt <= cycleCnt + 1;
@@ -126,7 +131,7 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         Reg#(Bit#(10)) masterIdleCnt    <- mkReg(0);
         Reg#(Bool) initIter0            <- mkReg(True);
 
-        rule doMasterInit0 (!initDone && !masterInitDone && masterInitCnt == 0);
+        rule doMasterInit0 (!initDone && !masterInitDone && masterInitCnt == 0 && frameSizeX != 0 && frameSizeY != 0);
             lfsr.seed(1);
             masterInitCnt <= masterInitCnt + 1;
         endrule
@@ -153,7 +158,7 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         rule masterFrameInitIter0 (!initDone && !masterInitDone && masterInitCnt == 1 && !frameInitDone && initIter0);
             let addr = calAddr(testAddrX, testAddrY,0);
             t_DATA init_value = ?;
-            if ((testAddrX == 0) || (testAddrX == fromInteger(valueOf(N_X_POINTS)-1)) || (testAddrY == 0) || (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))) //boundaries
+            if ((testAddrX == 0) || (testAddrX == frameSizeX) || (testAddrY == 0) || (testAddrY == frameSizeY)) //boundaries
             begin
                 init_value = unpack(0);
             end
@@ -171,11 +176,11 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         rule masterFrameInitIter1 (!initDone && !masterInitDone && masterInitCnt == 1 && !frameInitDone && !initIter0);
             let addr = calAddr(testAddrX, testAddrY,1);
             cohMem.write(addr, unpack(0));
-            if (testAddrX == fromInteger(valueOf(N_X_POINTS)-1)) 
+            if (testAddrX == frameSizeX) 
             begin
                 testAddrX <= 0;
                 testAddrY <= testAddrY + 1;
-                if (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))
+                if (testAddrY == frameSizeY)
                 begin
                     frameInitDone <= True;
                 end
@@ -207,8 +212,8 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
     Reg#(Bool)               writeFlipRow   <- mkReg(False);
     Reg#(Tuple2#(Bool, Bit#(3))) headAddr   <- mkReg(unpack(0));
     Reg#(Tuple2#(Bool, Bit#(3))) tailAddr   <- mkReg(unpack(0));
-    Reg#(t_ADDR_X)             writeAddrX   <- mkReg(0);
-    Reg#(t_ADDR_Y)             writeAddrY   <- mkReg(0);
+    Reg#(t_ADDR_MAX_X)         writeAddrX   <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y)         writeAddrY   <- mkReg(0);
     PulseWire                    reqFullW   <- mkPulseWire();
 
     // increase set addr (head/tail)
@@ -247,11 +252,11 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         startAddrY <= (startAddrY == 0)? 1 : startAddrY;
         writeAddrX <= (startAddrX == 0)? 1 : startAddrX;
         writeAddrY <= (startAddrY == 0)? 1 : startAddrY;
-        if (endAddrX == fromInteger(valueOf(N_X_POINTS)-1))
+        if (endAddrX == frameSizeX)
         begin
             endAddrX <= endAddrX - 1;
         end
-        if (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))
+        if (testAddrY == frameSizeY)
         begin
             endAddrY <= endAddrY - 1;
         end
@@ -416,16 +421,22 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         debugLog.record($format("setTestIter: numItern = %08d", num));
     endmethod
     
-    method Action setAddrX(t_ADDR x);
-        startAddrX <= truncateNP(pack(x));
-        endAddrX <= truncateNP(pack(x)) + fromInteger(valueOf(N_COLS_PER_ENGINE)-1);
-        debugLog.record($format("setAddrX: start address x = 0x%x", x));
+    method Action setFrameSize(t_ADDR x, t_ADDR y);
+        frameSizeX <= truncateNP(pack(x)-1);
+        frameSizeY <= truncateNP(pack(y)-1);
+        rowLength  <= truncateNP(pack(x));
+    endmethod
+   
+    method Action setAddrX(t_ADDR startX, t_ADDR endX);
+        startAddrX <= truncateNP(pack(startX));
+        endAddrX   <= truncateNP(pack(endX));
+        debugLog.record($format("setAddrX: start address x = 0x%x, end address x = 0x%x", startX, endX));
     endmethod
     
-    method Action setAddrY(t_ADDR y);
-        startAddrY <= truncateNP(pack(y));
-        endAddrY <= truncateNP(pack(y)) + fromInteger(valueOf(N_ROWS_PER_ENGINE)-1);
-        debugLog.record($format("setAddrY: start address y = 0x%x", y));
+    method Action setAddrY(t_ADDR startY, t_ADDR endY);
+        startAddrY <= truncateNP(pack(startY));
+        endAddrY   <= truncateNP(pack(endY));
+        debugLog.record($format("setAddrY: start address y = 0x%x, end address y = 0x%x", startY, endY));
     endmethod
 
     method Action setBarrier(Bit#(N_SYNC_NODES) barrier);
@@ -449,11 +460,11 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     (HEAT_ENGINE_IFC#(t_ADDR))
     provisos (Bits#(t_ADDR, t_ADDR_SZ),
               Bits#(t_DATA, t_DATA_SZ),
-              NumAlias#(TLog#(N_X_POINTS), t_ADDR_X_SZ),
-              NumAlias#(TLog#(N_Y_POINTS), t_ADDR_Y_SZ),
-              Add#(TAdd#(TAdd#(t_ADDR_Y_SZ, t_ADDR_Y_SZ),1), extraBits, t_ADDR_SZ),
-              Alias#(Bit#(t_ADDR_X_SZ), t_ADDR_X),
-              Alias#(Bit#(t_ADDR_Y_SZ), t_ADDR_Y));
+              NumAlias#(TLog#(N_X_MAX_POINTS), t_ADDR_MAX_X_SZ),
+              NumAlias#(TLog#(N_Y_MAX_POINTS), t_ADDR_MAX_Y_SZ),
+              Add#(TAdd#(TAdd#(t_ADDR_MAX_X_SZ, t_ADDR_MAX_Y_SZ), 2), extraBits, t_ADDR_SZ),
+              Alias#(Bit#(t_ADDR_MAX_X_SZ), t_ADDR_MAX_X),
+              Alias#(Bit#(t_ADDR_MAX_Y_SZ), t_ADDR_MAX_Y));
 
     // =======================================================================
     //
@@ -461,25 +472,29 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     //
     // =======================================================================
     
+    Reg#(Bool) initDone                              <- mkReg(False);
+    Reg#(Bool) masterInitDone                        <- mkReg(False);
+    Reg#(Bit#(16)) numIter                           <- mkReg(0);
+    Reg#(Bit#(16)) maxIter                           <- mkReg(0);
+    Reg#(Bit#(32)) cycleCnt                          <- mkReg(0);
+    Reg#(Bit#(N_SYNC_NODES)) barrierInitValue        <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) startAddrX                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) startAddrY                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) endAddrX                      <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) endAddrY                      <- mkReg(0);
+    Reg#(t_ADDR_MAX_X) testAddrX                     <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) testAddrY                     <- mkReg(0);
+    
+    Reg#(t_ADDR_MAX_X) frameSizeX                    <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y) frameSizeY                    <- mkReg(0);
+    Reg#(Bit#(TAdd#(t_ADDR_MAX_X_SZ, 1))) rowLength  <- mkReg(0);
+
     // addr function
-    function t_ADDR calAddr(t_ADDR_X rx, t_ADDR_Y ry, Bit#(1) b);
-        Tuple3#(t_ADDR_Y, t_ADDR_X, Bit#(1)) addr = tuple3(ry, rx, b);
+    function t_ADDR calAddr(t_ADDR_MAX_X rx, t_ADDR_MAX_Y ry, Bit#(1) b);
+        Bit#(TAdd#(TAdd#(t_ADDR_MAX_X_SZ, 1), t_ADDR_MAX_Y_SZ)) pixel_addr = (zeroExtend(ry) * zeroExtend(rowLength)) + zeroExtend(rx); 
+        let addr = tuple2(pixel_addr, b);
         return unpack(zeroExtend(pack(addr)));
     endfunction
-
-    // Random number generator
-    Reg#(Bool) initDone                        <- mkReg(False);
-    Reg#(Bool) masterInitDone                  <- mkReg(False);
-    Reg#(Bit#(16)) numIter                     <- mkReg(0);
-    Reg#(Bit#(16)) maxIter                     <- mkReg(0);
-    Reg#(Bit#(32)) cycleCnt                    <- mkReg(0);
-    Reg#(Bit#(N_SYNC_NODES)) barrierInitValue  <- mkReg(0);
-    Reg#(t_ADDR_X) startAddrX                  <- mkReg(0);
-    Reg#(t_ADDR_Y) startAddrY                  <- mkReg(0);
-    Reg#(t_ADDR_X) endAddrX                    <- mkReg(0);
-    Reg#(t_ADDR_Y) endAddrY                    <- mkReg(0);
-    Reg#(t_ADDR_X) testAddrX                   <- mkReg(0);
-    Reg#(t_ADDR_Y) testAddrY                   <- mkReg(0);
 
     rule countCycle(True);
         cycleCnt <= cycleCnt + 1;
@@ -496,7 +511,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     Reg#(Bit#(10)) masterIdleCnt    <- mkReg(0);
     Reg#(Bool) initIter0            <- mkReg(True);
 
-    rule doMasterInit0 (!masterInitDone && masterInitCnt == 0);
+    rule doMasterInit0 (!masterInitDone && masterInitCnt == 0 && frameSizeX != 0 && frameSizeY != 0);
         lfsr.seed(1);
         masterInitCnt <= masterInitCnt + 1;
     endrule
@@ -522,7 +537,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     rule masterFrameInitIter0 (!masterInitDone && masterInitCnt == 1 && !frameInitDone && initIter0);
         let addr = calAddr(testAddrX, testAddrY,0);
         t_DATA init_value = ?;
-        if ((testAddrX == 0) || (testAddrX == fromInteger(valueOf(N_X_POINTS)-1)) || (testAddrY == 0) || (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))) //boundaries
+        if ((testAddrX == 0) || (testAddrX == frameSizeX) || (testAddrY == 0) || (testAddrY == frameSizeY)) //boundaries
         begin
             init_value = unpack(0);
         end
@@ -540,11 +555,11 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     rule masterFrameInitIter1 (!masterInitDone && masterInitCnt == 1 && !frameInitDone && !initIter0);
         let addr = calAddr(testAddrX, testAddrY,1);
         cohMem.write(addr, unpack(0));
-        if (testAddrX == fromInteger(valueOf(N_X_POINTS)-1)) 
+        if (testAddrX == frameSizeX) 
         begin
             testAddrX <= 0;
             testAddrY <= testAddrY + 1;
-            if (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))
+            if (testAddrY == frameSizeY)
             begin
                 frameInitDone <= True;
             end
@@ -576,8 +591,8 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
     Reg#(Bool)               writeFlipRow   <- mkReg(False);
     Reg#(Tuple2#(Bool, Bit#(3))) headAddr   <- mkReg(unpack(0));
     Reg#(Tuple2#(Bool, Bit#(3))) tailAddr   <- mkReg(unpack(0));
-    Reg#(t_ADDR_X)             writeAddrX   <- mkReg(0);
-    Reg#(t_ADDR_Y)             writeAddrY   <- mkReg(0);
+    Reg#(t_ADDR_MAX_X)           writeAddrX <- mkReg(0);
+    Reg#(t_ADDR_MAX_Y)           writeAddrY <- mkReg(0);
     PulseWire                    reqFullW   <- mkPulseWire();
 
     // increase set addr (head/tail)
@@ -616,11 +631,11 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         startAddrY <= (startAddrY == 0)? 1 : startAddrY;
         writeAddrX <= (startAddrX == 0)? 1 : startAddrX;
         writeAddrY <= (startAddrY == 0)? 1 : startAddrY;
-        if (endAddrX == fromInteger(valueOf(N_X_POINTS)-1))
+        if (endAddrX == frameSizeX)
         begin
             endAddrX <= endAddrX - 1;
         end
-        if (testAddrY == fromInteger(valueOf(N_Y_POINTS)-1))
+        if (testAddrY == frameSizeY)
         begin
             endAddrY <= endAddrY - 1;
         end
@@ -780,18 +795,24 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         debugLog.record($format("setTestIter: numItern = %08d", num));
     endmethod
     
-    method Action setAddrX(t_ADDR x);
-        startAddrX <= truncateNP(pack(x));
-        endAddrX <= truncateNP(pack(x)) + fromInteger(valueOf(N_COLS_PER_ENGINE)-1);
-        debugLog.record($format("setAddrX: start address x = 0x%x", x));
+    method Action setFrameSize(t_ADDR x, t_ADDR y);
+        frameSizeX <= truncateNP(pack(x)-1);
+        frameSizeY <= truncateNP(pack(y)-1);
+        rowLength  <= truncateNP(pack(x));
+    endmethod
+   
+    method Action setAddrX(t_ADDR startX, t_ADDR endX);
+        startAddrX <= truncateNP(pack(startX));
+        endAddrX   <= truncateNP(pack(endX));
+        debugLog.record($format("setAddrX: start address x = 0x%x, end address x = 0x%x", startX, endX));
     endmethod
     
-    method Action setAddrY(t_ADDR y);
-        startAddrY <= truncateNP(pack(y));
-        endAddrY <= truncateNP(pack(y)) + fromInteger(valueOf(N_ROWS_PER_ENGINE)-1);
-        debugLog.record($format("setAddrY: start address y = 0x%x", y));
+    method Action setAddrY(t_ADDR startY, t_ADDR endY);
+        startAddrY <= truncateNP(pack(startY));
+        endAddrY   <= truncateNP(pack(endY));
+        debugLog.record($format("setAddrY: start address y = 0x%x, end address y = 0x%x", startY, endY));
     endmethod
-
+    
     method Action setBarrier(Bit#(N_SYNC_NODES) barrier);
         noAction;
     endmethod

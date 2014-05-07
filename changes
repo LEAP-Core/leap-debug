@@ -2055,3 +2055,20 @@ Directory modules/apps/tests/heat_transfer
  heat-transfer-common.bsv  Locally Modified           78 
 
 Add awb parameters.
+
+----------
+hjyang      Date: Wed May  7 14:22:12 EDT 2014  CSN: CSN-leap-debug-80
+                  Wed May  7 18:22:12 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_dual_vc707.apm Locally Modified           79 
+
+Directory modules/apps/tests/heat_transfer
+ heat-engine.bsv           Locally Modified           79 
+ heat-transfer-common.awb  Locally Modified           79 
+ heat-transfer-common.bsv  Locally Modified           79 
+ heat-transfer-local.bsv   Locally Modified           79 
+ heat-transfer-remote.bsv  Locally Modified           79 
+
+Enable changing the heat problem size dynamically.

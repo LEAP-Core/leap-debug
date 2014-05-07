@@ -121,18 +121,30 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
         
         DEBUG_FILE debugLog <- mkDebugFile("heat_transfer_test_remote.out");
 
+        // Dynamic parameters.
+        PARAMETER_NODE paramNode <- mkDynamicParameterNode();
+        Param#(16) numXParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_X_POINTS, paramNode);
+        Param#(16) numYParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_Y_POINTS, paramNode);
+        
         Reg#(Bit#(5))  bidX               <- mkReg(0);
         Reg#(Bit#(5))  bidY               <- mkReg(0);
         Reg#(Bit#(10)) engineID           <- mkReg(0);
         Reg#(Bool)     blockIdInitDone    <- mkReg(False);
+        
+        Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkReg(0);
+        Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkReg(0);
+    
+        Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1)) numColsPerEngine = numXPoints >> valueOf(TLog#(N_X_ENGINES));
+        Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1)) numRowsPerEngine = numYPoints >> valueOf(TLog#(N_Y_ENGINES));
   
         rule blockIdInit (!blockIdInitDone);
             if (engineID >= fromInteger(valueOf(N_LOCAL_ENGINES)))
             begin
-                MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * fromInteger(valueOf(N_COLS_PER_ENGINE)));
-                MEM_ADDRESS addr_y = unpack(zeroExtend(bidY) * fromInteger(valueOf(N_ROWS_PER_ENGINE)));
-                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrX(addr_x);
-                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrY(addr_y);
+                MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * zeroExtend(numColsPerEngine));
+                MEM_ADDRESS addr_y = unpack(zeroExtend(bidY) * zeroExtend(numRowsPerEngine));
+                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setFrameSize(unpack(zeroExtend(numXPoints)), unpack(zeroExtend(numYPoints)));
+                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrX(addr_x, addr_x + zeroExtend(numColsPerEngine) - 1);
+                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrY(addr_y, addr_y + zeroExtend(numRowsPerEngine) - 1);
                 debugLog.record($format("blockIdInit: engineID: %2d, addrX: 0x%x, addrY: 0x%x", engineID, addr_x, addr_y));
             end
             if (engineID == fromInteger(valueOf(N_TOTAL_ENGINES)-1))
