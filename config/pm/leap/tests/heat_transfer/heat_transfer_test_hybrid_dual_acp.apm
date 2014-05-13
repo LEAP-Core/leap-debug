@@ -137,7 +137,12 @@ fpgamap_parser=FPGAMap
 type_parser=Bluespec Type parser
 umf=Little-Endian Unified Message Format
 lim_common=Latency-insensitive Module Common Files
+lim_backend_builds=Latency-insensitive Backend Build Construction
 
 [ACP Dual FPGA Env with Dual SRAM]
 File=modules/leap-platforms/fpga-environments/acp/acp_fpga_env_dual_sram.awb
+Packagehint=multifpga
+
+[Latency-insensitive Backend Build Construction]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/construct-backend-builds/construct-backend-builds.awb
 Packagehint=multifpga

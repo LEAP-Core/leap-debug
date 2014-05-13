@@ -192,3 +192,10 @@ ddr_sdram_xilinx_driver=ML605 DDR3 SDRAM
 
 [Xilinx DDR SDRAM Physical Device/Params]
 DRAM_DEBUG=1
+
+[Common Physical Platform Utilities/Requires]
+physical_platform_defs=Common Physical Platform Definitions
+
+[Common Physical Platform Definitions]
+File=modules/bluespec/common/fpgaenv/physical-platform/utils/physical-defs.awb
+Packagehint=leap-platforms

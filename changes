@@ -2072,3 +2072,30 @@ Directory modules/apps/tests/heat_transfer
  heat-transfer-remote.bsv  Locally Modified           79 
 
 Enable changing the heat problem size dynamically.
+
+----------
+keflemin    Date: Tue May 13 08:38:40 EDT 2014  CSN: CSN-leap-debug-81
+                  Tue May 13 12:38:40 UTC 2014
+
+
+Directory config/pm/leap/tests/coh_mem_perf
+ coh_mem_perf_hybrid_dual_vc707_simple.apm Locally Modified           80 
+ coh_mem_perf_hybrid_dual_exe.apm Locally Modified           80 
+ coh_mem_perf_hybrid_dual_vc707.apm Locally Modified           80 
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_dual_acp_16.apm Locally Modified           80 
+ heat_transfer_test_hybrid_dual_exe.apm Locally Modified           80 
+ heat_transfer_test_hybrid_vc707_2.apm Locally Modified           80 
+ heat_transfer_test_hybrid_dual_acp.apm Locally Modified           80 
+ heat_transfer_test_hybrid_dual_acp_32.apm Locally Modified           80 
+ heat_transfer_test_hybrid_vc707_16.apm Locally Modified           80 
+
+Directory config/pm/leap/debuggers/sram
+ nallatech_fake_sram_debugger.apm Locally Modified           80 
+
+Directory config/pm/leap/submodels
+ fpgaenv-hybrid-ml605-sram-debugger.apm Locally Modified           80 
+
+
+updated apms.

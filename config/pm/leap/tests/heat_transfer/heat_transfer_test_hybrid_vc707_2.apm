@@ -49,6 +49,7 @@ Packagehint=leap
 
 [Hybrid VC707 PCIE FPGA Environment/Params]
 MODEL_CLOCK_FREQ=75
+COHERENT_SCRATCHPAD_PVT_CACHE_ENTRIES=4096
 
 [Heat Transfer System/Requires]
 heat_transfer_remote=Heat Transfer Test Remote Module
@@ -75,3 +76,4 @@ Packagehint=leap-debug
 [Heat Transfer Test Common]
 File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
 Packagehint=leap-debug
+
