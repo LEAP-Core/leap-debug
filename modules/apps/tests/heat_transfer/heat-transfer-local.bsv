@@ -110,7 +110,7 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
 
     function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, id);
         actionvalue
-            let m <- mFunction(id == 0);
+            let m <- mFunction(id, id == 0);
             return m;
         endactionvalue
     endfunction

@@ -1,0 +1,11 @@
+%name Coherent Scratchpad Memory Test Local Module 
+%desc Coherent Scratchpad Memory Test Local Module 
+
+%attributes coherent_scratchpad_test test
+
+%provides coh_mem_test_local
+
+%public coh-mem-test-local.bsv
+
+%param SYNTH_BOUNDARY mkCohMemTestLocal "name of synthesis boundary"
+

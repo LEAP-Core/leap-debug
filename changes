@@ -2099,3 +2099,46 @@ Directory config/pm/leap/submodels
 
 
 updated apms.
+
+----------
+hjyang      Date: Fri May 30 18:07:03 EDT 2014  CSN: CSN-leap-debug-82
+                  Fri May 30 22:07:03 UTC 2014
+
+
+Directory config/pm/leap/tests/heat_transfer
+ heat_transfer_test_hybrid_ml605.apm Locally Modified           81 
+ heat_transfer_test_hybrid_acp_2.apm Locally Removed            81 
+ heat_transfer_test_hybrid_vc707_2.apm Locally Removed            81 
+ heat_transfer_test_hybrid_acp_16.apm Locally Removed            81 
+ heat_transfer_test_hybrid_acp_8.apm Locally Removed            81 
+ heat_transfer_test_hybrid_dual_acp_32.apm Locally Removed            81 
+ heat_transfer_test_hybrid_vc707_16.apm Locally Removed            81 
+ heat_transfer_test_hybrid_dual_acp_16.apm Locally Removed            81 
+
+Directory config/pm/leap/tests/coh_mem_test
+ coh_mem_test_hybrid_exe.apm Locally Modified           81 
+ coh_mem_test_hybrid_ml605.apm Locally Modified           81 
+ coh_mem_test_hybrid_vc707.apm Locally Added               0 
+
+Directory modules/apps/tests/coh_mem_test
+ coh-mem-test.awb          Locally Modified           81 
+ coh-mem-test.bsv          Locally Modified           81 
+ coh-mem-test-engine.bsv   Locally Added               0 
+ coh-mem-test.dic          Locally Modified           81 
+ coh-mem-test-common.awb   Locally Added               0 
+ coh-mem-test-common.bsv   Locally Added               0 
+ coh-mem-test-local.awb    Locally Added               0 
+ coh-mem-test-local.bsv    Locally Added               0 
+ coh-mem-test-remote.awb   Locally Added               0 
+ coh-mem-test-remote.bsv   Locally Added               0 
+
+Directory modules/apps/tests/heat_transfer
+ heat-engine.bsv           Locally Modified           81 
+ heat-transfer-common.awb  Locally Modified           81 
+ heat-transfer-common.bsv  Locally Modified           81 
+ heat-transfer-local.bsv   Locally Modified           81 
+ heat-transfer-remote.bsv  Locally Modified           81 
+
+(1) Re-write coh-mem-test and add a coherence torture test
+(2) Add debug scan code in heat-transfer-test for debugging
+(3) Remove redundant apm files for the heat transfer test

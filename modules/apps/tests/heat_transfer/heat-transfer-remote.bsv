@@ -98,9 +98,13 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
             endactionvalue
         endfunction
 
-        function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, x, y);
+        function doCurryHeatEngineConstructor(mFunction, x, y);
+            return mFunction(x,y);
+        endfunction
+
+        function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, id);
             actionvalue
-                let m <- mFunction(x, y, False);
+                let m <- mFunction(id + valueOf(N_LOCAL_ENGINES), False);
                 return m;
             endactionvalue
         endfunction
@@ -116,8 +120,8 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
             zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
 
         let mkHeatEngineVec = replicate(mkHeatEngine);
-        Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines <-
-            zipWith3M(doCurryHeatEngine, mkHeatEngineVec, memories, debugLogEs);
+        let engineConstructors = zipWith3(doCurryHeatEngineConstructor, mkHeatEngineVec, memories, debugLogEs);
+        Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines <- zipWithM(doCurryHeatEngine, engineConstructors, genVector());
         
         DEBUG_FILE debugLog <- mkDebugFile("heat_transfer_test_remote.out");
 

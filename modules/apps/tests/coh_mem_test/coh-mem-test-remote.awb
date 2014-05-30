@@ -1,0 +1,11 @@
+%name Coherent Scratchpad Memory Test Remote Module 
+%desc Coherent Scratchpad Memory Test Remote Module 
+
+%attributes coherent_scratchpad_test test
+
+%provides coh_mem_test_remote
+
+%public coh-mem-test-remote.bsv
+
+%param SYNTH_BOUNDARY mkCohMemTestRemote "name of synthesis boundary"
+

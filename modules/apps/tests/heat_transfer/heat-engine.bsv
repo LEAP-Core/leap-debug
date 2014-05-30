@@ -65,6 +65,7 @@ endinterface
 //
 module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) cohMem,
                                         DEBUG_FILE debugLog,
+                                        Integer engineId,
                                         Bool isMaster)
     // interface:
     (HEAT_ENGINE_IFC#(t_ADDR))
@@ -338,10 +339,10 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         testReqQ.deq();
         let data <- cohMem.readRsp();
         let h = tpl_2(headAddr);
+        debugLog.record($format("recv: testValues[%02d] = value=0x%x", testValueIdx(h, idx), data));
         if (idx != 4) // not the last response
         begin
             testValues[testValueIdx(h, idx)] <= data;
-            debugLog.record($format("recv: testValues[%02d] = value=0x%x", testValueIdx(h, idx), data));
         end
         else // get the last value
         begin
@@ -409,6 +410,28 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
             debugLog.record($format("waitForOthers: all complete, numIter=%05d", numIter));
         endrule
     end
+    
+    // ====================================================================
+    //
+    // Heat engine debug scan for deadlock debugging.
+    //
+    // ====================================================================
+    
+    DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
+    dbg_list <- addDebugScanField(dbg_list, "Completed Iterations", numIter);
+    dbg_list <- addDebugScanField(dbg_list, "testAddrX", testAddrX);
+    dbg_list <- addDebugScanField(dbg_list, "testAddrY", testAddrY);
+    dbg_list <- addDebugScanField(dbg_list, "writeAddrX", writeAddrX);
+    dbg_list <- addDebugScanField(dbg_list, "writeAddrY", writeAddrY);
+    dbg_list <- addDebugScanField(dbg_list, "writeAddr", calAddr(writeAddrX, writeAddrY, ~(truncate(numIter))));
+    dbg_list <- addDebugScanField(dbg_list, "testPhase", testPhase);
+    dbg_list <- addDebugScanField(dbg_list, "issueDone", issueDone);
+    dbg_list <- addDebugScanField(dbg_list, "iterDone", iterDone);
+    dbg_list <- addDebugScanField(dbg_list, "request full", reqFullW);
+    dbg_list <- addDebugScanField(dbg_list, "testReqQ notEmpty", testReqQ.notEmpty);
+    dbg_list <- addDebugScanField(dbg_list, "testReqQ notFull", testReqQ.notFull);
+    
+    let dbgNode <- mkDebugScanNode("Heat Engine "+ integerToString(engineId) + "(heat-engine.bsv)", dbg_list);
 
     // =======================================================================
     //
@@ -784,6 +807,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         end
     endrule
     
+    
     // =======================================================================
     //
     // Methods
@@ -792,7 +816,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
 
     method Action setIter(Bit#(16) num);
         maxIter <= num - 1;
-        debugLog.record($format("setTestIter: numItern = %08d", num));
+        debugLog.record($format("setTestIter: numIter = %08d", num));
     endmethod
     
     method Action setFrameSize(t_ADDR x, t_ADDR y);

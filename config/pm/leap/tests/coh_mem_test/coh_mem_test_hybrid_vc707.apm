@@ -1,10 +1,10 @@
 
 [Global]
 SaveParameters=0
-Description=Heat Transfer Test for VC707
-File=heat_transfer_test_hybrid_vc707_2
+Description=Hybrid Virtual Coherent Memory Test Model with Private Caches for VC707
+File=coh_mem_test_hybrid_vc707
 Version=2.2
-Name=Heat Transfer Test for VC707
+Name=Hybrid Virtual Coherent Memory Test Model with Private Caches for VC707
 Type=Leap
 Class=Asim::Model
 DefaultBenchmark=
@@ -21,7 +21,7 @@ File=modules/leap/build-support/project/application-env/soft-services/default-sw
 Packagehint=leap
 
 [Default Software Connected Application/Requires]
-hardware_system=Heat Transfer System
+hardware_system=Coherent Scratchpad Memory Test System
 
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
@@ -43,37 +43,28 @@ connected_application=Default Software Connected Application
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
 
+
+[Coherent Scratchpad Memory Test System]
+File=modules/apps/tests/coh_mem_test/coh-mem-test.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Local Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-local.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Remote Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-remote.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Common]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-common.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test System/Requires]
+coh_mem_test_remote=Coherent Scratchpad Memory Test Remote Module
+coh_mem_test_local=Coherent Scratchpad Memory Test Local Module
+coh_mem_test_common=Coherent Scratchpad Memory Test Common
+
 [Hybrid VC707 PCIE FPGA Environment]
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie.apm
 Packagehint=leap
-
-[Hybrid VC707 PCIE FPGA Environment/Params]
-MODEL_CLOCK_FREQ=75
-COHERENT_SCRATCHPAD_PVT_CACHE_ENTRIES=4096
-
-[Heat Transfer System/Requires]
-heat_transfer_remote=Heat Transfer Test Remote Module
-heat_transfer_control=Heat Transfer Test Controller Module
-heat_transfer_local=Heat Transfer Test Local Module
-heat_transfer_common=Heat Transfer Test Common
-
-[Heat Transfer Test Controller Module]
-File=modules/apps/tests/heat_transfer/heat-transfer-control.awb
-Packagehint=leap-debug
-
-[Heat Transfer Test Remote Module]
-File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
-Packagehint=leap-debug
-
-[Heat Transfer System]
-File=modules/apps/tests/heat_transfer/heat-transfer.awb
-Packagehint=leap-debug
-
-[Heat Transfer Test Local Module]
-File=modules/apps/tests/heat_transfer/heat-transfer-local.awb
-Packagehint=leap-debug
-
-[Heat Transfer Test Common]
-File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
-Packagehint=leap-debug
-
