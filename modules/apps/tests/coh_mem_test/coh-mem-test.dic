@@ -1,8 +1,4 @@
 // Scratchpads
-def VDEV.SCRATCH.COH_MEMTEST_LG_DATA     "coh_scratch_memtest_large_data";
-def VDEV.SCRATCH.COH_MEMTEST_LG_BITS     "coh_scratch_memtest_large_bits";
-def VDEV.SCRATCH.COH_MEMTEST_MD_DATA     "coh_scratch_memtest_medium_data";
-def VDEV.SCRATCH.COH_MEMTEST_MD_BITS     "coh_scratch_memtest_medium_bits";
-def VDEV.SCRATCH.COH_MEMTEST_SM_DATA     "coh_scratch_memtest_small_data";
-def VDEV.SCRATCH.COH_MEMTEST_SM_BITS     "coh_scratch_memtest_small_bits";
+def VDEV.SCRATCH.COH_MEMTEST_DATA     "coh_scratch_memtest_data";
+def VDEV.SCRATCH.COH_MEMTEST_BITS     "coh_scratch_memtest_bits";
 

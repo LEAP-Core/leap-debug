@@ -142,7 +142,17 @@ type_parser=Bluespec Type parser
 umf=Little-Endian Unified Message Format
 lim_common=Latency-insensitive Module Common Files
 lim_place_modules=Latency-insensitive Module Places
+lim_backend_builds=Latency-insensitive Backend Build Construction
 
 [Latency-insensitive Module Places]
 File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/map/place-modules-multifpga.awb
 Packagehint=multifpga
+
+[Latency-insensitive Backend Build Construction]
+File=modules/leap/build-support/build-pipelines/stages/multifpga_connect/construct-backend-builds/construct-backend-builds.awb
+Packagehint=multifpga
+
+[Heat Transfer Test Common/Params]
+HEAT_TRANSFER_DUAL_FPGA_ENABLE=1
+HEAT_TRANSFER_X_POINTS=64
+HEAT_TRANSFER_Y_POINTS=64

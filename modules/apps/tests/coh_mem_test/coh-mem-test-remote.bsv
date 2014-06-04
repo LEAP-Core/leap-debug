@@ -44,19 +44,15 @@
 `include "asim/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
 
 `include "awb/provides/coh_mem_test_common.bsh"
-`include "awb/provides/coh_mem_test_local.bsh"
-`include "awb/provides/coh_mem_test_remote.bsh"
 
 
 //
-// Implement a coherent scratchpad functionality/torture test
+// Coherent scratchpad memory test remote module
+// This module is used for multi-controller test
 //
-module [CONNECTED_MODULE] mkSystem ()
+module [CONNECTED_MODULE] mkCohMemTestRemote ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
     
-    mkCohMemTestLocal();
-    mkCohMemTestRemote();
-
 endmodule
 

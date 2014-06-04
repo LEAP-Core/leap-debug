@@ -182,3 +182,10 @@ starter_service=Starter Service
 [Starter Service]
 File=modules/leap/libraries/platform-services/starter-service/starter-service.awb
 Packagehint=leap
+
+[Common Physical Platform Utilities/Requires]
+physical_platform_defs=Common Physical Platform Definitions
+
+[Common Physical Platform Definitions]
+File=modules/bluespec/common/fpgaenv/physical-platform/utils/physical-defs.awb
+Packagehint=leap-platforms

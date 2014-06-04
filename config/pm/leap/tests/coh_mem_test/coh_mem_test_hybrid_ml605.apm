@@ -23,7 +23,6 @@ Packagehint=leap
 [Default Software Connected Application/Requires]
 hardware_system=Coherent Scratchpad Memory Test System
 
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
@@ -51,3 +50,20 @@ Packagehint=leap
 [Coherent Scratchpad Memory Test System]
 File=modules/apps/tests/coh_mem_test/coh-mem-test.awb
 Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Local Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-local.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Remote Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-remote.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Common]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-common.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test System/Requires]
+coh_mem_test_remote=Coherent Scratchpad Memory Test Remote Module
+coh_mem_test_local=Coherent Scratchpad Memory Test Local Module
+coh_mem_test_common=Coherent Scratchpad Memory Test Common

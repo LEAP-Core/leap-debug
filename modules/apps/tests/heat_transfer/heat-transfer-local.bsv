@@ -110,7 +110,7 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
 
     function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, id);
         actionvalue
-            let m <- mFunction(id == 0);
+            let m <- mFunction(id, id == 0);
             return m;
         endactionvalue
     endfunction
@@ -147,6 +147,8 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     PARAMETER_NODE paramNode <- mkDynamicParameterNode();
 
     Param#(16) iterParam <-mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_ITER, paramNode);
+    Param#(16) numXParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_X_POINTS, paramNode);
+    Param#(16) numYParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_Y_POINTS, paramNode);
 
     // Output
     STDIO#(Bit#(64)) stdio <- mkStdIO();
@@ -157,16 +159,23 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     let msgInit <- getGlobalStringUID("heatTransferTest: start\n");
     let msgInitDone <- getGlobalStringUID("heatTransferTest: initialization done, cycle: %012d\n");
     let msgTest <- getGlobalStringUID("heatTransferTest: frame size: %05d x %05d, # engines: %03d, # iter: %06d\n");
+    let msgTest2 <- getGlobalStringUID("heatTransferTest: numColsPerEngine: %05d, numRowsPerEngine: %05d\n");
     let msgDone <- getGlobalStringUID("heatTransferTest: done cycle: %012d, test cycle count: %012d\n");
     
-    Reg#(Bit#(2)) initCnt             <- mkReg(0);
-    Reg#(CYCLE_COUNTER) cycleCnt      <- mkReg(0);
-    Reg#(CYCLE_COUNTER) initCycleCnt  <- mkReg(0);
-    Reg#(Bit#(5))  bidX               <- mkReg(0);
-    Reg#(Bit#(5))  bidY               <- mkReg(0);
-    Reg#(Bit#(10)) engineID           <- mkReg(0);
-    Reg#(Bool)     blockIdInitDone    <- mkReg(False);
-  
+    Reg#(Bit#(2)) initCnt              <- mkReg(0);
+    Reg#(CYCLE_COUNTER) cycleCnt       <- mkReg(0);
+    Reg#(CYCLE_COUNTER) initCycleCnt   <- mkReg(0);
+    Reg#(Bit#(5))  bidX                <- mkReg(0);
+    Reg#(Bit#(5))  bidY                <- mkReg(0);
+    Reg#(Bit#(10)) engineID            <- mkReg(0);
+    Reg#(Bool)     blockIdInitDone     <- mkReg(False);
+    
+    Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkReg(0);
+    Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkReg(0);
+    
+    Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1)) numColsPerEngine = numXPoints >> valueOf(TLog#(N_X_ENGINES));
+    Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1)) numRowsPerEngine = numYPoints >> valueOf(TLog#(N_Y_ENGINES));
+
     (* fire_when_enabled *)
     rule countCycle(True);
         cycleCnt <= cycleCnt + 1;
@@ -187,16 +196,19 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
         Vector#(N_SYNC_NODES, Bool) barriers = genWith(genBarrierInitVal);
         engines[0].setIter(iterParam);
         engines[0].setBarrier(pack(barriers));
-        initCnt <= initCnt + 1;
+        initCnt    <= initCnt + 1;
+        numXPoints <= resize(numXParam);
+        numYPoints <= resize(numYParam);
         debugLog.record($format("doInit: initCnt = 1, barrier = 0x%x", pack(barriers)));
-        stdio.printf(msgTest, list4(fromInteger(valueOf(N_X_POINTS)), 
-                                    fromInteger(valueOf(N_Y_POINTS)), 
+        stdio.printf(msgTest, list4(zeroExtend(numXParam), 
+                                    zeroExtend(numYParam),
                                     fromInteger(valueOf(N_X_ENGINES)*valueOf(N_Y_ENGINES)), 
                                     zeroExtend(iterParam)));
     endrule
 
     rule doInit2 (state == STATE_init && initCnt == 2 && blockIdInitDone);
         initCnt <= initCnt + 1;
+        stdio.printf(msgTest2, list2(zeroExtend(numColsPerEngine), zeroExtend(numRowsPerEngine)));
     endrule
 
     rule doInit3 (state == STATE_init && initCnt == 3 && engines[0].initialized());
@@ -208,10 +220,11 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     endrule
 
     rule blockIdInit (state == STATE_init && initCnt == 2 && !blockIdInitDone);
-        MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * fromInteger(valueOf(N_COLS_PER_ENGINE)));
-        MEM_ADDRESS addr_y = unpack(zeroExtend(bidY) * fromInteger(valueOf(N_ROWS_PER_ENGINE)));
-        engines[resize(engineID)].setAddrX(addr_x);
-        engines[resize(engineID)].setAddrY(addr_y);
+        MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * zeroExtend(numColsPerEngine));
+        MEM_ADDRESS addr_y = unpack(zeroExtend(bidY) * zeroExtend(numRowsPerEngine));
+        engines[resize(engineID)].setFrameSize(unpack(zeroExtend(numXPoints)), unpack(zeroExtend(numYPoints)));
+        engines[resize(engineID)].setAddrX(addr_x, addr_x + zeroExtend(numColsPerEngine) - 1);
+        engines[resize(engineID)].setAddrY(addr_y, addr_y + zeroExtend(numRowsPerEngine) - 1);
         debugLog.record($format("blockIdInit: engineID: %2d, addrX: 0x%x, addrY: 0x%x", engineID, addr_x, addr_y));
         if (engineID == fromInteger(valueOf(N_LOCAL_ENGINES)-1))
         begin

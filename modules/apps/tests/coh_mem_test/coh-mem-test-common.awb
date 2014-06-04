@@ -1,0 +1,18 @@
+%name Coherent Scratchpad Memory Test Common
+%desc Coherent Scratchpad Memory Test Common
+
+%attributes coherent_scratchpad_test test
+
+%provides coh_mem_test_common
+
+%public coh-mem-test-common.bsv
+%public coh-mem-test-engine.bsv
+
+%param --global  COH_MEM_TEST_PVT_CACHE_ENABLE     1  "0: disable, 1: enable private caches"
+%param --global  COH_MEM_TEST_ENGINE_NUM           2  "number of test engines"
+%param --global  COH_MEM_TEST_MEMORY_ADDR_BITS    20  "test memory address bit length"
+
+%param --dynamic COH_MEM_TEST_NUM               1024  "number of tests"
+%param --dynamic COH_MEM_TEST_WORKING_SET_BIT      8  "test working set bit length"
+%param --dynamic COH_MEM_TEST_VERBOSE              0  "0: disable, 1: enable verbose output"
+
