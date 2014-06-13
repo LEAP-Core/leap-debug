@@ -56,31 +56,40 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
 
-    // if (valueOf(N_TOTAL_ENGINES)>1 && `HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
-    // begin
-    //     // Allocate coherent scratchpad controller for heat engines
-    //     COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
-    //     controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    //     controllerConf.multiController = True;
-    //     controllerConf.baseAddr = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
-    //     controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_REMOTE_ENGINES, N_POINTS_PER_ENGINE),2)));
-    //     controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
-    //     controllerConf.isMaster = False;
-    //     
-    //     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
-    //     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-    //     mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
-    // end
-    
     if (valueOf(N_REMOTE_ENGINES)>0)
     begin
+        Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkWriteValidatedReg();
+        Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkWriteValidatedReg();
+    
+        Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1)) numColsPerEngine = numXPoints >> valueOf(TLog#(N_X_ENGINES));
+        Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1)) numRowsPerEngine = numYPoints >> valueOf(TLog#(N_Y_ENGINES));
+        
+        if (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
+        begin
+            // Allocate coherent scratchpad controller for heat engines
+            NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
+            NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+            MEM_ADDRESS numPointsPerEngine = zeroExtend(numColsPerEngine)*zeroExtend(numRowsPerEngine);
+
+            COH_SCRATCH_MEM_ADDRESS baseAddr  = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_LOCAL_ENGINES), 1));
+            COH_SCRATCH_MEM_ADDRESS addrRange = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_REMOTE_ENGINES), 1));
+            
+            COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+            controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+            controllerConf.multiController = True;
+            controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
+            controllerConf.isMaster = False;
+            controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
+            
+            mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
+        end
+
         //
         // Allocate coherent scratchpads for heat engines
         //
-        // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
-        COH_SCRATCH_CONFIG clientConf = defaultValue;
+        COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
         clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        // clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+        clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
         
         function String genDebugMemoryFileName(Integer id);
             return "heat_engine_memory_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
@@ -134,14 +143,15 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
         Reg#(Bit#(5))  bidY               <- mkReg(0);
         Reg#(Bit#(10)) engineID           <- mkReg(0);
         Reg#(Bool)     blockIdInitDone    <- mkReg(False);
+        Reg#(Bool)     initialized        <- mkReg(False);
         
-        Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkReg(0);
-        Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkReg(0);
-    
-        Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1)) numColsPerEngine = numXPoints >> valueOf(TLog#(N_X_ENGINES));
-        Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1)) numRowsPerEngine = numYPoints >> valueOf(TLog#(N_Y_ENGINES));
+        rule doInit (!initialized);
+            numXPoints  <= resize(numXParam);
+            numYPoints  <= resize(numYParam);
+            initialized <= True;
+        endrule
   
-        rule blockIdInit (!blockIdInitDone);
+        rule blockIdInit (initialized && !blockIdInitDone);
             if (engineID >= fromInteger(valueOf(N_LOCAL_ENGINES)))
             begin
                 MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * zeroExtend(numColsPerEngine));

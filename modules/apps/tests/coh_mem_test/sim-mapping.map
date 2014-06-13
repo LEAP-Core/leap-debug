@@ -2,7 +2,6 @@ model -> fpga0;
 common_services -> fpga0;
 connected_application -> fpga0;
 hardware_system -> fpga0;
-heat_transfer_control -> fpga0;
-heat_transfer_local -> fpga0;
-heat_transfer_remote -> fpga1;
+coh_mem_test_local -> fpga0;
+coh_mem_test_remote -> fpga1;
 

@@ -1,4 +1,11 @@
-// Scratchpads
+// Coherent scratchpads
 def VDEV.SCRATCH.COH_MEMTEST_DATA     "coh_scratch_memtest_data";
 def VDEV.SCRATCH.COH_MEMTEST_BITS     "coh_scratch_memtest_bits";
+
+// Second set of coherent scratchpad difinitions for distributed central caches
+def VDEV.SCRATCH.COH_MEMTEST_DATA2    "coh_scratch_memtest_data_2";
+def VDEV.SCRATCH.COH_MEMTEST_BITS2    "coh_scratch_memtest_bits_2";
+
+// Coherence domain
+def VDEV.COH.SCRATCH.MEMTEST          "memtest_coherence_domain";
 

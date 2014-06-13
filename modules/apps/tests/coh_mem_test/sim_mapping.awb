@@ -1,0 +1,13 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name Coherent Scratchpad Memory Test Mapping
+%desc This file describes the mapping of the test
+
+%attributes tool
+
+%provides fpga_mapping
+
+%sources -t FPGAENV_MAPPING -v PUBLIC sim-mapping.map
+

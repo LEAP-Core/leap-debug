@@ -2,9 +2,9 @@
 [Global]
 SaveParameters=0
 Description=has strange module alingments
-File=coh_mem_perf_hybrid_dual_exe_simple
+File=coh_mem_test_hybrid_dual_vc707
 Version=2.2
-Name=Multifpga synthesis test 
+Name=Coherent Scratchpad Memory Multifpga Synthesis Test for VC707
 DefaultBenchmark=
 Type=Leap
 Class=Asim::Model
@@ -18,27 +18,21 @@ model=HW/SW Hybrid Multifpga Project Foundation
 
 [HW/SW Hybrid Multifpga Project Foundation/Requires]
 connected_application=Default Software Connected Application
-environment_description=Simulation Dual FPGA Environment
+environment_description=VC707 Dual FPGA Environment (SMA)
 build_pipeline=LIM Build Pipeline
-fpga_mapping=Coherent Mem Perf Mapping
+fpga_mapping=Coherent Scratchpad Memory Test Mapping
 
 [HW/SW Hybrid Multifpga Project Foundation]
 File=modules/leap/build-support/project/project-multifpga.awb
 Packagehint=leap-multifpga
 
-
-
-
 [FPGA Environment Datatype]
 File=modules/leap/build-support/build-pipelines/stages/parsers/environment/fpgaenvironment.awb
 Packagehint=leap-multifpga
 
-
 [FPGAMap]
 File=modules/leap/build-support/build-pipelines/stages/parsers/map/fpgamap_parser.awb
 Packagehint=leap-multifpga
-
-
 
 [Bluespec Type parser]
 File=modules/leap/build-support/build-pipelines/stages/parsers/bsv-types/typeparser.awb
@@ -49,30 +43,10 @@ File=modules/leap/build-support/project/application-env/soft-services/default-sw
 Packagehint=leap
 
 [Default Software Connected Application/Requires]
-hardware_system=Coherent Scratchpad Memory Performance Test System (Simple)
+hardware_system=Coherent Scratchpad Memory Test System
 
-[Coherent Scratchpad Memory Performance Common]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-common.awb
-Packagehint=leap-debug
-
-[Coherent Mem Perf Mapping]
-File=modules/apps/tests/coh_mem_perf/sim_mapping.awb
-Packagehint=leap-debug
-
-[Coherent Scratchpad Tester Remote Module Synth]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-remote-synth.awb
-Packagehint=leap-debug
-
-[Coherent Scratchpad Memory Performance Test System (Simple)]
-File=modules/apps/tests/coh_mem_perf/coh-mem-perf-simple.awb
-Packagehint=leap-debug
-
-[Coherent Scratchpad Memory Performance Test System (Simple)/Requires]
-coherent_scratchpad_performance_remote=Coherent Scratchpad Tester Remote Module Synth
-coherent_scratchpad_performance_common=Coherent Scratchpad Memory Performance Common
-
-[Simulation Dual FPGA Environment]
-File=modules/leap-platforms/fpga-environments/sim/sim_fpga_env.awb
+[VC707 Dual FPGA Environment (SMA)]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_env.awb
 Packagehint=leap-multifpga
 
 [Little-Endian Unified Message Format]
@@ -83,40 +57,44 @@ Packagehint=leap-platforms
 File=modules/leap/build-support/build-pipelines/stages/li_module/li_module.awb
 Packagehint=leap
 
-[Latency-insensitive Module Communication Complex Generator]
-File=modules/leap/build-support/build-pipelines/stages/lim_connect/lim-connect.awb
-Packagehint=leap-multifpga
-
-[Latency-insensitive Module Type Compression]
-File=modules/leap/build-support/build-pipelines/stages/lim_connect/type-compression/lim-compression.awb
-Packagehint=leap-multifpga
-
-[Latency-insensitive Module Communication Complex Generator/Requires]
-type_parser=Bluespec Type parser
-fpgamap_parser=FPGAMap
-li_module=LEAP LI Module Handler
-umf=Little-Endian Unified Message Format
-lim_compression=Latency-insensitive Module Type Compression
-lim_common=Latency-insensitive Module Common Files
-lim_generate_code=Latency-insensitive Module Code Generation
-lim_analyze_network=Latency-insensitive Module Network Analysis
-lim_place_modules=Latency-insensitive Module Places
-lim_backend_builds=Latency-insensitive Backend Build Construction
-
-[Latency-insensitive Module Common Files]
-File=modules/leap/build-support/build-pipelines/stages/lim_connect/common/lim-common.awb
+[Latency-insensitive Module Network Analysis]
+File=modules/leap/build-support/build-pipelines/stages/lim_connect/analyze-network/analyze-network.awb
 Packagehint=leap-multifpga
 
 [Latency-insensitive Module Code Generation]
 File=modules/leap/build-support/build-pipelines/stages/lim_connect/generate-code/generate-code.awb
 Packagehint=leap-multifpga
 
-[Latency-insensitive Module Network Analysis]
-File=modules/leap/build-support/build-pipelines/stages/lim_connect/analyze-network/analyze-network.awb
+[Latency-insensitive Module Type Compression]
+File=modules/leap/build-support/build-pipelines/stages/lim_connect/type-compression/lim-compression.awb
 Packagehint=leap-multifpga
+
+[Latency-insensitive Module Communication Complex Generator]
+File=modules/leap/build-support/build-pipelines/stages/lim_connect/lim-connect.awb
+Packagehint=leap-multifpga
+
+[Latency-insensitive Module Common Files]
+File=modules/leap/build-support/build-pipelines/stages/lim_connect/common/lim-common.awb
+Packagehint=leap-multifpga
+
+[Latency-insensitive Module Communication Complex Generator/Requires]
+li_module=LEAP LI Module Handler
+lim_compression=Latency-insensitive Module Type Compression
+lim_generate_code=Latency-insensitive Module Code Generation
+lim_analyze_network=Latency-insensitive Module Network Analysis
+fpgamap_parser=FPGAMap
+type_parser=Bluespec Type parser
+umf=Little-Endian Unified Message Format
+lim_common=Latency-insensitive Module Common Files
+lim_place_modules=Latency-insensitive Module Places
+lim_backend_builds=Latency-insensitive Backend Build Construction
 
 [Latency-insensitive Module Places]
 File=modules/leap/build-support/build-pipelines/stages/lim_connect/map/lim-place-modules.awb
+Packagehint=leap-multifpga
+
+[Latency-insensitive Backend Build Construction]
+File=modules/leap/build-support/build-pipelines/stages/lim_connect/construct-backend-builds/construct-backend-builds.awb
 Packagehint=leap-multifpga
 
 [LIM Graph Generation/Requires]
@@ -139,6 +117,31 @@ Packagehint=leap-multifpga
 File=modules/leap/build-support/build-pipelines/pipelines/multifpga/multifpga-build-pipeline.awb
 Packagehint=leap-multifpga
 
-[Latency-insensitive Backend Build Construction]
-File=modules/leap/build-support/build-pipelines/stages/lim_connect/construct-backend-builds/construct-backend-builds.awb
-Packagehint=leap-multifpga
+[Coherent Scratchpad Memory Test Local Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-local.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Mapping]
+File=modules/apps/tests/coh_mem_test/sim_mapping.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test System]
+File=modules/apps/tests/coh_mem_test/coh-mem-test.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test System/Requires]
+coh_mem_test_remote=Coherent Scratchpad Memory Test Remote Module
+coh_mem_test_local=Coherent Scratchpad Memory Test Local Module
+coh_mem_test_common=Coherent Scratchpad Memory Test Common
+
+[Coherent Scratchpad Memory Test Remote Module]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-remote.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Common]
+File=modules/apps/tests/coh_mem_test/coh-mem-test-common.awb
+Packagehint=leap-debug
+
+[Coherent Scratchpad Memory Test Common/Params]
+COH_MEM_TEST_MULTI_CONTROLLER_ENABLE=1
+COH_MEM_TEST_DUAL_FPGA_ENABLE=1

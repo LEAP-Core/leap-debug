@@ -47,6 +47,7 @@ import DefaultValue::*;
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 `include "asim/dict/VDEV_COH_SCRATCH.bsh"
+`include "asim/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
 
 
 //
@@ -59,22 +60,43 @@ module [CONNECTED_MODULE] mkHeatTransferTestController ()
     if (valueOf(N_TOTAL_ENGINES)>1)
     begin
         // Allocate coherent scratchpad controller for heat engines
-        COH_SCRATCH_CONFIG controllerConf = defaultValue;
-        // COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
+        COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
         controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        
-        // if (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
-        // begin
-        //     controllerConf.multiController = True;
-        //     controllerConf.baseAddr = unpack(0);
-        //     controllerConf.addrRange = fromInteger(valueOf(TMul#(TMul#(N_LOCAL_ENGINES, N_POINTS_PER_ENGINE),2)));
-        //     controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
-        //     controllerConf.isMaster = True;
-        // end
-        
         NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
         NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+        
+        if (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)
+        begin
+            Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkWriteValidatedReg();
+            Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkWriteValidatedReg();
+            Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1)) numColsPerEngine = numXPoints >> valueOf(TLog#(N_X_ENGINES));
+            Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1)) numRowsPerEngine = numYPoints >> valueOf(TLog#(N_Y_ENGINES));
+            MEM_ADDRESS numPointsPerEngine = unpack(zeroExtend(numColsPerEngine)*zeroExtend(numRowsPerEngine));
+
+            COH_SCRATCH_MEM_ADDRESS baseAddr  = 0;
+            COH_SCRATCH_MEM_ADDRESS addrRange = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_LOCAL_ENGINES), 1));
+
+            controllerConf.multiController = True;
+            controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_HEAT;
+            controllerConf.isMaster = True;
+            controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
+        
+            // Dynamic parameters.
+            PARAMETER_NODE paramNode <- mkDynamicParameterNode();
+            Param#(16) numXParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_X_POINTS, paramNode);
+            Param#(16) numYParam <- mkDynamicParameter(`PARAMS_HEAT_TRANSFER_COMMON_HEAT_TRANSFER_TEST_Y_POINTS, paramNode);
+       
+            Reg#(Bool) initialized <- mkReg(False);
+
+            rule doInit (!initialized);
+                numXPoints  <= resize(numXParam);
+                numYPoints  <= resize(numYParam);
+                initialized <= True;
+            endrule
+        end
+        
         mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, controllerConf);
+    
     end
     
 endmodule

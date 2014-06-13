@@ -73,10 +73,9 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     //
     // Allocate coherent scratchpads for heat engines
     //
-    // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
-    COH_SCRATCH_CONFIG clientConf = defaultValue;
+    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
     clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    // clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+    clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
 
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogEs = newVector();
@@ -157,10 +156,10 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
 
     // Messages
     let msgInit <- getGlobalStringUID("heatTransferTest: start\n");
-    let msgInitDone <- getGlobalStringUID("heatTransferTest: initialization done, cycle: %012d\n");
+    let msgInitDone <- getGlobalStringUID("heatTransferTest: initialization done, cycle: %016ld\n");
     let msgTest <- getGlobalStringUID("heatTransferTest: frame size: %05d x %05d, # engines: %03d, # iter: %06d\n");
     let msgTest2 <- getGlobalStringUID("heatTransferTest: numColsPerEngine: %05d, numRowsPerEngine: %05d\n");
-    let msgDone <- getGlobalStringUID("heatTransferTest: done cycle: %012d, test cycle count: %012d\n");
+    let msgDone <- getGlobalStringUID("heatTransferTest: done cycle: %016ld, test cycle count: %016ld\n");
     
     Reg#(Bit#(2)) initCnt              <- mkReg(0);
     Reg#(CYCLE_COUNTER) cycleCnt       <- mkReg(0);

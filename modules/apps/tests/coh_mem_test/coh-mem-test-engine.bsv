@@ -123,7 +123,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
     // ====================================================================
 
     (* conservative_implicit_conditions *)
-    rule testWriteSeq (testReqQ.first() == COH_TEST_REQ_WRITE_SEQ);
+    rule testWriteSeq (initialized && testReqQ.first() == COH_TEST_REQ_WRITE_SEQ);
         t_DATA data = unpack(resize(pack(addr)+ pack(addrDiffQ.first())));
         memory.write(addr, data);
         debugLog.record($format("writeSeq: addr 0x%x, data 0x%x", addr, data));
@@ -141,7 +141,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
     endrule
     
     (* conservative_implicit_conditions *)
-    rule testWriteRand (testReqQ.first() == COH_TEST_REQ_WRITE_RAND);
+    rule testWriteRand (initialized && testReqQ.first() == COH_TEST_REQ_WRITE_RAND);
         t_ADDR w_addr = unpack(resize(lfsr.value()) & pack(wset));
         t_DATA data = unpack(resize(pack(w_addr)+ pack(addrDiffQ.first())));
         memory.write(w_addr, data);
@@ -169,7 +169,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
     FIFOF#(Tuple2#(t_ADDR, Bool)) readAddrQ  <- mkSizedFIFOF(64);
     Reg#(Bool) readTestReqDone <- mkReg(False);
 
-    rule testReadRand (testReqQ.first() == COH_TEST_REQ_READ_RAND && !readTestReqDone);
+    rule testReadRand (initialized && testReqQ.first() == COH_TEST_REQ_READ_RAND && !readTestReqDone);
         t_ADDR r_addr = unpack(resize(lfsr.value()) & pack(wset));
         lfsr.next();
         memory.readReq(r_addr);
@@ -188,7 +188,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
         end
     endrule
 
-    rule testReadSeq (testReqQ.first() == COH_TEST_REQ_READ_SEQ && !readTestReqDone);
+    rule testReadSeq (initialized && testReqQ.first() == COH_TEST_REQ_READ_SEQ && !readTestReqDone);
         memory.readReq(addr);
         let done = (testIter == maxIter);
         readAddrQ.enq(tuple2(addr, done));
@@ -207,7 +207,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
     endrule
 
     (* descending_urgency = "testReadRecv, testReadRand, testReadSeq" *)
-    rule testReadRecv (testReqQ.first() == COH_TEST_REQ_READ_SEQ || testReqQ.first() == COH_TEST_REQ_READ_RAND);
+    rule testReadRecv (initialized && (testReqQ.first() == COH_TEST_REQ_READ_SEQ || testReqQ.first() == COH_TEST_REQ_READ_RAND));
         match {.r_addr, .done} = readAddrQ.first();
         readAddrQ.deq();
         let val <- memory.readRsp();
@@ -245,7 +245,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
     //
     // ====================================================================
 
-    rule testFence (testReqQ.first() == COH_TEST_REQ_FENCE);
+    rule testFence (initialized && testReqQ.first() == COH_TEST_REQ_FENCE);
          if (!memory.writePending() && !memory.readPending())
          begin
              testReqQ.deq();
@@ -263,7 +263,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
 
     Reg#(Bool) randomTestReqDone <- mkReg(False);
 
-    rule testRandom (testReqQ.first() == COH_TEST_REQ_RANDOM && !randomTestReqDone);
+    rule testRandom (initialized && testReqQ.first() == COH_TEST_REQ_RANDOM && !randomTestReqDone);
         Bit#(1) is_write_req = truncate(lfsr2.value());
         lfsr2.next();
         
@@ -296,7 +296,7 @@ module [CONNECTED_MODULE] mkCohMemTestEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_D
         end
     endrule
 
-    rule testRandomWithFence (testReqQ.first() == COH_TEST_REQ_RANDOM_FENCE && !randomTestReqDone);
+    rule testRandomWithFence (initialized && testReqQ.first() == COH_TEST_REQ_RANDOM_FENCE && !randomTestReqDone);
         Bit#(2) req_type = truncate(lfsr2.value());
         lfsr2.next();
         

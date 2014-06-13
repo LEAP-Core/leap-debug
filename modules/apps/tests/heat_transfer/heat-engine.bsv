@@ -257,7 +257,7 @@ module [CONNECTED_MODULE] mkHeatEngine#(MEMORY_WITH_FENCE_IFC#(t_ADDR, t_DATA) c
         begin
             endAddrX <= endAddrX - 1;
         end
-        if (testAddrY == frameSizeY)
+        if (endAddrY == frameSizeY)
         begin
             endAddrY <= endAddrY - 1;
         end
@@ -823,6 +823,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         frameSizeX <= truncateNP(pack(x)-1);
         frameSizeY <= truncateNP(pack(y)-1);
         rowLength  <= truncateNP(pack(x));
+        debugLog.record($format("setFrameSize: frame size x = 0x%x, frame size y = 0x%x", x, y));
     endmethod
    
     method Action setAddrX(t_ADDR startX, t_ADDR endX);

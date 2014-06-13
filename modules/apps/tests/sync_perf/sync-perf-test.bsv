@@ -75,8 +75,7 @@ module [CONNECTED_MODULE] mkSystem ()
     // Allocate coherent scratchpad controller for sync test engines
     if (`SYNC_PERF_TEST_MEM_ENABLE == 1)
     begin
-        // COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
-        COH_SCRATCH_CONFIG controllerConf = defaultValue;
+        COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
         controllerConf.cacheMode = COH_SCRATCH_CACHED;
         NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
         NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
@@ -88,8 +87,7 @@ module [CONNECTED_MODULE] mkSystem ()
     Vector#(N_TOTAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     
     Vector#(N_TOTAL_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, MEM_DATA)) memories = newVector();
-    // COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
-    COH_SCRATCH_CONFIG clientConf = defaultValue;
+    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
     clientConf.cacheMode = COH_SCRATCH_CACHED;
 
     for(Integer p = 0; p < valueOf(N_TOTAL_ENGINES); p = p + 1)

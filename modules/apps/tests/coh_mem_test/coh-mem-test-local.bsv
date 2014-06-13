@@ -32,7 +32,6 @@
 
 import FIFO::*;
 import Vector::*;
-import GetPut::*;
 import DefaultValue::*;
 
 `include "asim/provides/librl_bsv.bsh"
@@ -49,6 +48,7 @@ import DefaultValue::*;
 `include "awb/provides/coh_mem_test_common.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
+`include "asim/dict/VDEV_COH_SCRATCH.bsh"
 `include "asim/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
 
 
@@ -93,24 +93,36 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
     //
     // Allocate coherent scratchpads
     //
-    COH_SCRATCH_CONFIG controllerConf = defaultValue;
+    COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
     controllerConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    
-    COH_SCRATCH_CONFIG clientConf = defaultValue;
-    clientConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    
+    Reg#(COH_SCRATCH_MEM_ADDRESS) memoryMax <- mkWriteValidatedReg();
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
+
+    if (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1)
+    begin
+        COH_SCRATCH_MEM_ADDRESS baseAddr  = 0;
+        COH_SCRATCH_MEM_ADDRESS addrRange = (memoryMax._read())>>1;
+        controllerConf.multiController = True;
+        controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_MEMTEST;
+        controllerConf.isMaster = True;
+        controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
+    end
+    
+    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
+    clientConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+    clientConf.multiController = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1);
+    
     mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_DATA, `VDEV_SCRATCH_COH_MEMTEST_BITS, addr_size, data_size, controllerConf);
    
-    Vector#(N_ENGINES, DEBUG_FILE) debugLogMs = newVector();
-    Vector#(N_ENGINES, DEBUG_FILE) debugLogEs = newVector();
-    Vector#(N_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();
-    Vector#(N_ENGINES, COH_MEM_TEST_ENGINE_IFC#(MEM_ADDRESS)) engines = newVector();
+    Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
+    Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogEs = newVector();
+    Vector#(N_LOCAL_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();
+    Vector#(N_LOCAL_ENGINES, COH_MEM_TEST_ENGINE_IFC#(MEM_ADDRESS)) engines = newVector();
 
-    if (valueOf(N_ENGINES) < 2)
+    if (valueOf(N_TOTAL_ENGINES) < 2)
     begin
-        // N_ENGINES should be at least 2
+        // N_TOTAL_ENGINES should be at least 2
         error("Invalid number of test engines");
     end
     
@@ -140,12 +152,12 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
         endactionvalue
     endfunction
 
-    Vector#(N_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
-    Vector#(N_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
+    Vector#(N_LOCAL_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
+    Vector#(N_LOCAL_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
     debugLogMs <- mapM(mkDebugFile, debugLogMNames);
     debugLogEs <- mapM(mkDebugFile, debugLogENames);
     
-    Vector#(N_ENGINES, Integer) clientIds = genVector();
+    Vector#(N_LOCAL_ENGINES, Integer) clientIds = genVector();
     let mkCohClientVec = replicate(mkDebugCoherentScratchpadClient);
     memories <- zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
 
@@ -176,7 +188,7 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
     Reg#(Bit#(24)) maxIter <- mkReg(0);
     Reg#(MEM_ADDRESS) wset <- mkReg(unpack(0));
     Reg#(Bit#(24))  errNum <- mkReg(0);
-    Vector#(N_ENGINES, Reg#(Bool)) engineStates <- replicateM(mkReg(False));
+    Vector#(N_TOTAL_ENGINES, Reg#(Bool)) engineStates <- replicateM(mkReg(False));
 
     // Messages
     let msgTest         <- getGlobalStringUID("cohMemTest: memory: 0x%08x, working set: 0x%08x, # engines: %03d, # iter per test: %06d\n");
@@ -210,12 +222,13 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
 
         stdio.printf(msgTest, list4(zeroExtend(memory_bound), 
                                     zeroExtend(w_set),
-                                    fromInteger(valueOf(N_ENGINES)), 
+                                    fromInteger(valueOf(N_TOTAL_ENGINES)), 
                                     zeroExtend(iterParam)));
     
-        state <= STATE_engine_init;
-        wset <= w_set;
-        maxIter <= iterParam;
+        state     <= STATE_engine_init;
+        wset      <= w_set;
+        maxIter   <= iterParam;
+        memoryMax <= zeroExtendNP(w_set);
     endrule
 
     Reg#(ENGINE_PORT_NUM) engineId <- mkReg(0);
@@ -224,7 +237,7 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
         engines[resize(engineId)].setIter(maxIter);
         engines[resize(engineId)].setWorkingSet(wset);
         engineId <= engineId + 1;
-        if (engineId == fromInteger(valueOf(N_ENGINES)-1))
+        if (engineId == fromInteger(valueOf(N_LOCAL_ENGINES)-1))
         begin
             state <= STATE_test;
         end
@@ -281,9 +294,9 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
     endrule
 
     rule testFence2 (state == STATE_test && testInitialized && testState == TEST_FENCE2 && !testReqSent);
-        link_test_req.enq(fromInteger(valueOf(N_ENGINES)), tuple2(COH_TEST_REQ_FENCE, unpack(0)));
+        link_test_req.enq(fromInteger(valueOf(N_TOTAL_ENGINES)), tuple2(COH_TEST_REQ_FENCE, unpack(0)));
         testReqSent <= True;
-        engineStates[fromInteger(valueOf(N_ENGINES)-1)] <= True;
+        engineStates[fromInteger(valueOf(N_TOTAL_ENGINES)-1)] <= True;
         debugLog.record($format("testFence2: send request to network..."));
     endrule
     
@@ -292,7 +305,7 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
         link_test_req.enq(engine_id, tuple2(COH_TEST_REQ_FENCE, unpack(0)));
         engineStates[reqSendState] <= True;
         debugLog.record($format("testFence34: send request to network..., sendState=%03d", reqSendState));
-        if (reqSendState == fromInteger(valueof(N_ENGINES)-1))
+        if (reqSendState == fromInteger(valueof(N_TOTAL_ENGINES)-1))
         begin
             testReqSent <= True;
             reqSendState <= 0;
@@ -321,7 +334,7 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
         ENGINE_PORT_NUM engine_id = reqSendState + 1;
         COH_MEM_ENGINE_TEST_REQ engine_req = ?;
         MEM_ADDRESS diff = unpack(0);
-        if (reqSendState == fromInteger(valueof(N_ENGINES)-1))
+        if (reqSendState == fromInteger(valueof(N_TOTAL_ENGINES)-1))
         begin
             engine_req = COH_TEST_REQ_WRITE_RAND;
             diff = unpack(3);
@@ -351,7 +364,7 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
         debugLog.record($format("test%s: send request to network..., sendState=%03d", 
                         (testState == TEST_TORTURE)? "Torture" : "TortureWithFence",
                         reqSendState));
-        if (reqSendState == fromInteger(valueof(N_ENGINES)-1))
+        if (reqSendState == fromInteger(valueof(N_TOTAL_ENGINES)-1))
         begin
             testReqSent <= True;
             reqSendState <= 0;
