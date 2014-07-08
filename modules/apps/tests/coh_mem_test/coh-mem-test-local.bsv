@@ -113,8 +113,11 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
     clientConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
     clientConf.multiController = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1);
     
+    let platformID <- getSynthesisBoundaryPlatformID();
+    putSynthesisBoundaryPlatformID(0);
     mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_DATA, `VDEV_SCRATCH_COH_MEMTEST_BITS, addr_size, data_size, controllerConf);
-   
+    putSynthesisBoundaryPlatformID(platformID);
+
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogEs = newVector();
     Vector#(N_LOCAL_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();

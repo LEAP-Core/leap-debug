@@ -95,7 +95,10 @@ module [CONNECTED_MODULE] mkHeatTransferTestController ()
             endrule
         end
         
+        let platformID <- getSynthesisBoundaryPlatformID();
+        putSynthesisBoundaryPlatformID(0);
         mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA, `VDEV_SCRATCH_HEAT_BITS, addr_size, data_size, controllerConf);
+        putSynthesisBoundaryPlatformID(platformID);
     
     end
     

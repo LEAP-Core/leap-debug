@@ -77,7 +77,17 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
         controllerConf.isMaster = False;
         controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
         
-        mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_DATA2, `VDEV_SCRATCH_COH_MEMTEST_BITS2, addr_size, data_size, controllerConf);
+        if (`FPGA_NUM_PLATFORMS != 1)
+        begin
+            let platformID <- getSynthesisBoundaryPlatformID();
+            putSynthesisBoundaryPlatformID(1);
+            mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_DATA2, `VDEV_SCRATCH_COH_MEMTEST_BITS2, addr_size, data_size, controllerConf);
+            putSynthesisBoundaryPlatformID(platformID);
+        end
+        else
+        begin
+            mkCoherentScratchpadController(`VDEV_SCRATCH_COH_MEMTEST_DATA2, `VDEV_SCRATCH_COH_MEMTEST_BITS2, addr_size, data_size, controllerConf);
+        end
     end
 
     
