@@ -33,7 +33,6 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid ACP M2 Compute Environment (Nallatech)
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment/Requires]
@@ -43,21 +42,18 @@ connected_application=Default Software Connected Application
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
 
-
-
 [Heat Transfer System/Requires]
-heat_transfer_remote=Heat Transfer Test Remote Module
 heat_transfer_control=Heat Transfer Test Controller Module
 heat_transfer_local=Heat Transfer Test Local Module
 heat_transfer_common=Heat Transfer Test Common
+heat_transfer_remote2=Heat Transfer Test Remote Module 2
+heat_transfer_remote3=Heat Transfer Test Remote Module 3
+heat_transfer_remote1=Heat Transfer Test Remote Module 1
 
 [Heat Transfer Test Controller Module]
 File=modules/apps/tests/heat_transfer/heat-transfer-control.awb
 Packagehint=leap-debug
 
-[Heat Transfer Test Remote Module]
-File=modules/apps/tests/heat_transfer/heat-transfer-remote.awb
-Packagehint=leap-debug
 
 [Heat Transfer System]
 File=modules/apps/tests/heat_transfer/heat-transfer.awb
@@ -71,6 +67,15 @@ Packagehint=leap-debug
 File=modules/apps/tests/heat_transfer/heat-transfer-common.awb
 Packagehint=leap-debug
 
-[Hybrid ACP M2 Compute Environment (Nallatech)]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-acp-m2c-nallatech.apm
-Packagehint=leap-platforms-acp
+
+[Heat Transfer Test Remote Module 1]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote1.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Remote Module 3]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote3.awb
+Packagehint=leap-debug
+
+[Heat Transfer Test Remote Module 2]
+File=modules/apps/tests/heat_transfer/heat-transfer-remote2.awb
+Packagehint=leap-debug

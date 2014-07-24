@@ -1,0 +1,11 @@
+%name Heat Transfer Test Remote Module 2
+%desc Heat Transfer Test Remote Module 2
+
+%attributes heat_transfer test
+
+%provides heat_transfer_remote2
+
+%public heat-transfer-remote2.bsv
+
+%param SYNTH_BOUNDARY mkHeatTransferTestRemote2 "name of synthesis boundary"
+

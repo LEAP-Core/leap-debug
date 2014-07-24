@@ -658,7 +658,7 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         begin
             endAddrX <= endAddrX - 1;
         end
-        if (testAddrY == frameSizeY)
+        if (endAddrY == frameSizeY)
         begin
             endAddrY <= endAddrY - 1;
         end
@@ -740,10 +740,10 @@ module [CONNECTED_MODULE] mkHeatEnginePrivate#(MEMORY_IFC#(t_ADDR, t_DATA) cohMe
         testReqQ.deq();
         let data <- cohMem.readRsp();
         let h = tpl_2(headAddr);
+        debugLog.record($format("recv: testValues[%02d] = value=0x%x", testValueIdx(h, idx), data));
         if (idx != 4) // not the last response
         begin
             testValues[testValueIdx(h, idx)] <= data;
-            debugLog.record($format("recv: testValues[%02d] = value=0x%x", testValueIdx(h, idx), data));
         end
         else // get the last value
         begin

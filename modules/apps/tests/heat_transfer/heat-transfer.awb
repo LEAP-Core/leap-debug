@@ -5,7 +5,9 @@
 
 %provides hardware_system
 %requires heat_transfer_local
-%requires heat_transfer_remote
+%requires heat_transfer_remote1
+%requires heat_transfer_remote2
+%requires heat_transfer_remote3
 %requires heat_transfer_common
 %requires heat_transfer_control
 

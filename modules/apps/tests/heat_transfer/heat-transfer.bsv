@@ -40,12 +40,14 @@ import DefaultValue::*;
 `include "asim/provides/mem_services.bsh"
 `include "asim/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
-`include "asim/provides/heat_transfer_common_params.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/heat_transfer_common_params.bsh"
 `include "awb/provides/heat_transfer_common.bsh"
 `include "awb/provides/heat_transfer_local.bsh"
-`include "awb/provides/heat_transfer_remote.bsh"
 `include "awb/provides/heat_transfer_control.bsh"
+`include "awb/provides/heat_transfer_remote1.bsh"
+`include "awb/provides/heat_transfer_remote2.bsh"
+`include "awb/provides/heat_transfer_remote3.bsh"
 
 `include "asim/dict/VDEV_SCRATCH.bsh"
 `include "asim/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
@@ -59,7 +61,9 @@ module [CONNECTED_MODULE] mkSystem ()
     
     mkHeatTransferTestController();
     mkHeatTransferTestLocal();
-    mkHeatTransferTestRemote();
+    mkHeatTransferTestRemote1();
+    mkHeatTransferTestRemote2();
+    mkHeatTransferTestRemote3();
 
 endmodule
 

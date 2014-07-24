@@ -12,7 +12,11 @@
 %param --global HEAT_TRANSFER_Y_ENGINE                      2  "number of Y engines"
 %param --global HEAT_TRANSFER_X_MAX_POINTS                512  "maximum number of X pixels"
 %param --global HEAT_TRANSFER_Y_MAX_POINTS                512  "maximum number of Y pixels"
-%param --global HEAT_TRANSFER_DUAL_FPGA_ENABLE              0  "0: single fpga, 1: engines across dual fpgas"
+%param --global HEAT_TRANSFER_NUM_PARTITIONS                1  "number of partitions"
+
+%param --global HEAT_TRANSFER_REMOTE_PLATFORM_1_ID          0  "platform ID for remote partition 1"
+%param --global HEAT_TRANSFER_REMOTE_PLATFORM_2_ID          0  "platform ID for remote partition 2"
+%param --global HEAT_TRANSFER_REMOTE_PLATFORM_3_ID          0  "platform ID for remote partition 3"
 
 %param --global HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE         1  "0: disable, 1: enable private caches"
 %param --global HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE  0  "0: disable, 1: enable multiple coherent scratchpad controllers"

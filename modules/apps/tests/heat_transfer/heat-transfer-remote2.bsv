@@ -52,11 +52,13 @@ import DefaultValue::*;
 //
 // Implement a heat transfer test
 //
-module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
+module [CONNECTED_MODULE] mkHeatTransferTestRemote2 ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
 
-    if (valueOf(N_REMOTE_ENGINES)>0)
+    Integer startEngineId = valueOf(REMOTE_START_ENGINE#(2));
+
+    if (valueOf(N_PARTITIONS) > 1)
     begin
         Reg#(Bit#(TAdd#(TLog#(N_X_MAX_POINTS), 1))) numXPoints <- mkWriteValidatedReg();
         Reg#(Bit#(TAdd#(TLog#(N_Y_MAX_POINTS), 1))) numYPoints <- mkWriteValidatedReg();
@@ -71,8 +73,8 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
             NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
             MEM_ADDRESS numPointsPerEngine = zeroExtend(numColsPerEngine)*zeroExtend(numRowsPerEngine);
 
-            COH_SCRATCH_MEM_ADDRESS baseAddr  = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_LOCAL_ENGINES), 1));
-            COH_SCRATCH_MEM_ADDRESS addrRange = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_REMOTE_ENGINES), 1));
+            COH_SCRATCH_MEM_ADDRESS baseAddr  = zeroExtendNP(pack(numPointsPerEngine)) * fromInteger(startEngineId*2);
+            COH_SCRATCH_MEM_ADDRESS addrRange = zeroExtendNP(pack(numPointsPerEngine)) << valueOf(TAdd#(TLog#(N_ENGINES_PER_PARTITION), 1));
             
             COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
             controllerConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
@@ -81,17 +83,11 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
             controllerConf.isMaster = False;
             controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
             
-            if (`FPGA_NUM_PLATFORMS != 1)
-            begin
-                let platformID <- getSynthesisBoundaryPlatformID();
-                putSynthesisBoundaryPlatformID(1);
-                mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
-                putSynthesisBoundaryPlatformID(platformID);
-            end
-            else
-            begin
-                mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA2, `VDEV_SCRATCH_HEAT_BITS2, addr_size, data_size, controllerConf);
-            end
+            let originID <- getSynthesisBoundaryPlatformID();
+            let platformID = (`FPGA_NUM_PLATFORMS != 1)? `HEAT_TRANSFER_REMOTE_PLATFORM_2_ID : 0;
+            putSynthesisBoundaryPlatformID(platformID);
+            mkCoherentScratchpadController(`VDEV_SCRATCH_HEAT_DATA3, `VDEV_SCRATCH_HEAT_BITS3, addr_size, data_size, controllerConf);
+            putSynthesisBoundaryPlatformID(originID);
         end
 
         //
@@ -102,17 +98,17 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
         clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
         
         function String genDebugMemoryFileName(Integer id);
-            return "heat_engine_memory_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
+            return "heat_engine_memory_"+integerToString(id + startEngineId)+".out";
         endfunction
         
         function String genDebugEngineFileName(Integer id);
-            return "heat_engine_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
+            return "heat_engine_"+integerToString(id + startEngineId)+".out";
         endfunction
 
         function ActionValue#(MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) doCurryCohClient(mFunction, x, y);
             actionvalue
-                Integer scratchpadID = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_HEAT_DATA2 : `VDEV_SCRATCH_HEAT_DATA;
-                let m <- mFunction(scratchpadID, x + valueOf(N_LOCAL_ENGINES), clientConf, y);
+                Integer scratchpadID = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_HEAT_DATA3 : `VDEV_SCRATCH_HEAT_DATA;
+                let m <- mFunction(scratchpadID, x + startEngineId, clientConf, y);
                 return m;
             endactionvalue
         endfunction
@@ -123,26 +119,26 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
 
         function ActionValue#(HEAT_ENGINE_IFC#(MEM_ADDRESS)) doCurryHeatEngine(mFunction, id);
             actionvalue
-                let m <- mFunction(id + valueOf(N_LOCAL_ENGINES), False);
+                let m <- mFunction(id + startEngineId, False);
                 return m;
             endactionvalue
         endfunction
         
-        Vector#(N_REMOTE_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
-        Vector#(N_REMOTE_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
-        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs <- mapM(mkDebugFile, debugLogMNames); 
-        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs <- mapM(mkDebugFile, debugLogENames);
+        Vector#(N_ENGINES_PER_PARTITION, String) debugLogMNames = genWith(genDebugMemoryFileName);
+        Vector#(N_ENGINES_PER_PARTITION, String) debugLogENames = genWith(genDebugEngineFileName);
+        Vector#(N_ENGINES_PER_PARTITION, DEBUG_FILE) debugLogMs <- mapM(mkDebugFile, debugLogMNames); 
+        Vector#(N_ENGINES_PER_PARTITION, DEBUG_FILE) debugLogEs <- mapM(mkDebugFile, debugLogENames);
 
-        Vector#(N_REMOTE_ENGINES, Integer) clientIds = genVector();
+        Vector#(N_ENGINES_PER_PARTITION, Integer) clientIds = genVector();
         let mkCohClientVec = replicate(mkDebugCoherentScratchpadClient);
-        Vector#(N_REMOTE_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories <- 
+        Vector#(N_ENGINES_PER_PARTITION, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories <- 
             zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
 
         let mkHeatEngineVec = replicate(mkHeatEngine);
         let engineConstructors = zipWith3(doCurryHeatEngineConstructor, mkHeatEngineVec, memories, debugLogEs);
-        Vector#(N_REMOTE_ENGINES, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines <- zipWithM(doCurryHeatEngine, engineConstructors, genVector());
+        Vector#(N_ENGINES_PER_PARTITION, HEAT_ENGINE_IFC#(MEM_ADDRESS)) engines <- zipWithM(doCurryHeatEngine, engineConstructors, genVector());
         
-        DEBUG_FILE debugLog <- mkDebugFile("heat_transfer_test_remote.out");
+        DEBUG_FILE debugLog <- mkDebugFile("heat_transfer_test_remote2.out");
 
         // Dynamic parameters.
         PARAMETER_NODE paramNode <- mkDynamicParameterNode();
@@ -162,16 +158,16 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote ()
         endrule
   
         rule blockIdInit (initialized && !blockIdInitDone);
-            if (engineID >= fromInteger(valueOf(N_LOCAL_ENGINES)))
+            if (engineID >= fromInteger(startEngineId))
             begin
                 MEM_ADDRESS addr_x = unpack(zeroExtend(bidX) * zeroExtend(numColsPerEngine));
                 MEM_ADDRESS addr_y = unpack(zeroExtend(bidY) * zeroExtend(numRowsPerEngine));
-                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setFrameSize(unpack(zeroExtend(numXPoints)), unpack(zeroExtend(numYPoints)));
-                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrX(addr_x, addr_x + zeroExtend(numColsPerEngine) - 1);
-                engines[resize(engineID - fromInteger(valueOf(N_LOCAL_ENGINES)))].setAddrY(addr_y, addr_y + zeroExtend(numRowsPerEngine) - 1);
+                engines[resize(engineID - fromInteger(startEngineId))].setFrameSize(unpack(zeroExtend(numXPoints)), unpack(zeroExtend(numYPoints)));
+                engines[resize(engineID - fromInteger(startEngineId))].setAddrX(addr_x, addr_x + zeroExtend(numColsPerEngine) - 1);
+                engines[resize(engineID - fromInteger(startEngineId))].setAddrY(addr_y, addr_y + zeroExtend(numRowsPerEngine) - 1);
                 debugLog.record($format("blockIdInit: engineID: %2d, addrX: 0x%x, addrY: 0x%x", engineID, addr_x, addr_y));
             end
-            if (engineID == fromInteger(valueOf(N_TOTAL_ENGINES)-1))
+            if (engineID == fromInteger(startEngineId + valueOf(N_ENGINES_PER_PARTITION) - 1))
             begin
                 blockIdInitDone <= True;
             end
