@@ -31,24 +31,24 @@
 import Vector::*;
 import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
-`include "asim/provides/lock_sync_service.bsh"
-`include "asim/provides/heat_transfer_common_params.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/lock_sync_service.bsh"
+`include "awb/provides/heat_transfer_common_params.bsh"
 `include "awb/provides/heat_transfer_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/VDEV_COH_SCRATCH.bsh"
-`include "asim/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/VDEV_COH_SCRATCH.bsh"
+`include "awb/dict/PARAMS_HEAT_TRANSFER_COMMON.bsh"
 
 typedef enum
 {
@@ -76,6 +76,7 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
     clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
     clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+    clientConf.requestMerging = (`HEAT_TRANSFER_TEST_REQ_MERGE_ENABLE == 1);
 
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogMs = newVector();
     Vector#(N_LOCAL_ENGINES, DEBUG_FILE) debugLogEs = newVector();
@@ -134,6 +135,7 @@ module [CONNECTED_MODULE] mkHeatTransferTestLocal ()
     begin
         SCRATCHPAD_CONFIG sconf = defaultValue;
         sconf.cacheMode = SCRATCHPAD_CACHED;
+        sconf.requestMerging = (`HEAT_TRANSFER_TEST_REQ_MERGE_ENABLE == 1);
         debugLogMs[0] <- mkDebugFile("heat_engine_memory_0.out");
         debugLogEs[0] <- mkDebugFile("heat_engine_0.out");
         MEMORY_IFC#(MEM_ADDRESS, TEST_DATA) memory <- mkScratchpad(`VDEV_SCRATCH_HEAT_DATA, sconf);

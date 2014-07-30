@@ -96,6 +96,7 @@ module [CONNECTED_MODULE] mkHeatTransferTestRemote2 ()
         COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
         clientConf.cacheMode = (`HEAT_TRANSFER_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
         clientConf.multiController = (`HEAT_TRANSFER_TEST_MULTI_CONTROLLER_ENABLE == 1);
+        clientConf.requestMerging = (`HEAT_TRANSFER_TEST_REQ_MERGE_ENABLE == 1);
         
         function String genDebugMemoryFileName(Integer id);
             return "heat_engine_memory_"+integerToString(id + startEngineId)+".out";
