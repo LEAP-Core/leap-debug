@@ -102,15 +102,13 @@ module [CONNECTED_MODULE] mkCoherentScratchpadTest ()
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
     
-    Vector#(`N_SCRATCH, DEBUG_FILE) debugLogsCohScratch = newVector();
     Vector#(`N_SCRATCH, MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA)) memoriesCohScratch = newVector();
     // Random number generators
     Vector#(`N_SCRATCH, LFSR#(Bit#(16))) lfsrsCohScratch = newVector();
 
     for(Integer p = 0; p < valueOf(`N_SCRATCH); p = p + 1)
     begin
-        debugLogsCohScratch[p] <- mkDebugFile("coherent_scratchpad_"+integerToString(p)+".out");
-        memoriesCohScratch[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, p, conf, debugLogsCohScratch[p]);
+        memoriesCohScratch[p] <- mkCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, conf);
         lfsrsCohScratch[p] <- mkLFSR_16();
     end
    

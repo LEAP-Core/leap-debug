@@ -47,7 +47,9 @@ Packagehint=leap
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
 Packagehint=leap
 
-
 [Synchronization Performance Test]
 File=modules/apps/tests/sync_perf/sync-perf-test.awb
 Packagehint=leap-debug
+
+[Hybrid Simulation FPGA Environment/Params]
+COHERENT_SCRATCHPAD_TEST_AND_SET_ENABLE=1

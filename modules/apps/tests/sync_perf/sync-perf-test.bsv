@@ -95,8 +95,7 @@ module [CONNECTED_MODULE] mkSystem ()
         debugLogs[p] <- mkDebugFile("sync_test_engine_"+integerToString(p)+".out");
         if (`SYNC_PERF_TEST_MEM_ENABLE == 1)
         begin
-            debugLogMs[p] <- mkDebugFile("sync_test_engine_memory_"+integerToString(p)+".out");
-            memories[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SYNC_DATA, p, clientConf, debugLogMs[p]);
+            memories[p] <- mkCoherentScratchpadClient(`VDEV_SCRATCH_SYNC_DATA, clientConf);
             syncEngines[p] <- mkMemSyncTestEngine(memories[p], debugLogs[p], (p == 0)); 
         end
         else

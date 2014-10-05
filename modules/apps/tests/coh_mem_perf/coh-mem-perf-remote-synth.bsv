@@ -70,10 +70,7 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-
-    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(`N_SCRATCH) +".out");
-    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, `N_SCRATCH, conf, debugLogsCohScratch);
-
+    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, conf);
 
     Reg#(t_COH_SCRATCH_ADDR) addr <- mkReg(0);
     Reg#(Bit#(10)) count <- mkReg(0);
@@ -83,7 +80,6 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     let msgCohRReq      <- getGlobalStringUID("cohMemRemote Read Req %x! \n");
     let msgCohRResp     <- getGlobalStringUID("cohMemRemote Read Resp %x! \n");
     let msgCohW         <- getGlobalStringUID("cohMemRemote Write %x %x! \n");
-   
 
     rule doOp(count < 10);
        if(count[0] == 1)
@@ -106,3 +102,4 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     endrule
 
 endmodule
+

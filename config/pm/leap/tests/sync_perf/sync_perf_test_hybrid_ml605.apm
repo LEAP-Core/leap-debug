@@ -51,6 +51,6 @@ Packagehint=leap
 File=modules/apps/tests/sync_perf/sync-perf-test.awb
 Packagehint=leap-debug
 
-
 [Hybrid ML605 PCIE FPGA Environment/Params]
 MODEL_CLOCK_FREQ=100
+COHERENT_SCRATCHPAD_TEST_AND_SET_ENABLE=1

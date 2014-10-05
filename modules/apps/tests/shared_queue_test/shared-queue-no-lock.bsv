@@ -73,32 +73,33 @@ module [CONNECTED_MODULE] mkSharedQueueTestNoLock ()
     COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
     controllerConf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
     
-    COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
-    clientConf.cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-    
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
     mkCoherentScratchpadController(`VDEV_SCRATCH_SHARED_QUEUE_DATA, `VDEV_SCRATCH_SHARED_QUEUE_BITS, addr_size, data_size, controllerConf);
     
-    Vector#(N_PRODUCERS, DEBUG_FILE) debugLogsP = newVector();
+    Vector#(N_PRODUCERS, COH_SCRATCH_CLIENT_CONFIG) clientConfsP = replicate(defaultValue);
     Vector#(N_PRODUCERS, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesP = newVector();
     // Random number generators
     Vector#(N_PRODUCERS, LFSR#(Bit#(16))) lfsrs = newVector();
 
     for(Integer p = 0; p < valueOf(N_PRODUCERS); p = p + 1)
     begin
-        debugLogsP[p] <- mkDebugFile("producer_"+integerToString(p)+".out");
-        memoriesP[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, p, clientConf, debugLogsP[p]);
+        clientConfsP[p].cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        clientConfsP[p].debugLogPath = (`SHARED_QUEUE_TEST_DEBUG_ENABLE != 0)? tagged Valid ("producer_"+integerToString(p)+".out") : tagged Invalid;
+        clientConfsP[p].enableStatistics = (`SHARED_QUEUE_TEST_DEBUG_ENABLE != 0)? tagged Valid ("producer_"+integerToString(p)+"_") : tagged Invalid;
+        memoriesP[p] <- mkCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, clientConfsP[p]);
         lfsrs[p] <- mkLFSR_16();
     end
 
-    Vector#(N_CONSUMERS, DEBUG_FILE) debugLogsC = newVector();
+    Vector#(N_CONSUMERS, COH_SCRATCH_CLIENT_CONFIG) clientConfsC = replicate(defaultValue);
     Vector#(N_CONSUMERS, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, t_MEM_DATA)) memoriesC = newVector();
 
     for(Integer p = 0; p < valueOf(N_CONSUMERS); p = p + 1)
     begin
-        debugLogsC[p] <- mkDebugFile("consumer_"+integerToString(p)+".out");
-        memoriesC[p] <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, (p + valueOf(N_PRODUCERS)), clientConf, debugLogsC[p]);
+        clientConfsC[p].cacheMode = (`SHARED_QUEUE_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+        clientConfsC[p].debugLogPath = (`SHARED_QUEUE_TEST_DEBUG_ENABLE != 0)? tagged Valid ("consumer_"+integerToString(p)+".out"): tagged Invalid;
+        clientConfsC[p].enableStatistics = (`SHARED_QUEUE_TEST_DEBUG_ENABLE != 0)? tagged Valid ("consumer_"+integerToString(p)+"_"): tagged Invalid;
+        memoriesC[p] <- mkCoherentScratchpadClient(`VDEV_SCRATCH_SHARED_QUEUE_DATA, clientConfsC[p]);
     end
 
     DEBUG_FILE debugLog <- mkDebugFile("shared_queue_test.out");

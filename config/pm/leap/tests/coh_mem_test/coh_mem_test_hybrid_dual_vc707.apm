@@ -18,9 +18,9 @@ model=HW/SW Hybrid Multifpga Project Foundation
 
 [HW/SW Hybrid Multifpga Project Foundation/Requires]
 connected_application=Default Software Connected Application
-environment_description=VC707 Dual FPGA Environment (SMA)
+environment_description=VC707 Dual FPGA Environment (SMA) with Coherent Fence Enabled
 build_pipeline=LIM Build Pipeline
-fpga_mapping=Coherent Scratchpad Memory Test Mapping
+fpga_mapping=Coherent Scratchpad Memory Test Mapping for Dual FPGA
 
 [HW/SW Hybrid Multifpga Project Foundation]
 File=modules/leap/build-support/project/project-multifpga.awb
@@ -45,9 +45,6 @@ Packagehint=leap
 [Default Software Connected Application/Requires]
 hardware_system=Coherent Scratchpad Memory Test System
 
-[VC707 Dual FPGA Environment (SMA)]
-File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_env.awb
-Packagehint=leap-multifpga
 
 [Little-Endian Unified Message Format]
 File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-little-endian.awb
@@ -121,10 +118,6 @@ Packagehint=leap-multifpga
 File=modules/apps/tests/coh_mem_test/coh-mem-test-local.awb
 Packagehint=leap-debug
 
-[Coherent Scratchpad Memory Test Mapping]
-File=modules/apps/tests/coh_mem_test/sim_mapping.awb
-Packagehint=leap-debug
-
 [Coherent Scratchpad Memory Test System]
 File=modules/apps/tests/coh_mem_test/coh-mem-test.awb
 Packagehint=leap-debug
@@ -145,3 +138,11 @@ Packagehint=leap-debug
 [Coherent Scratchpad Memory Test Common/Params]
 COH_MEM_TEST_MULTI_CONTROLLER_ENABLE=1
 COH_MEM_TEST_DUAL_FPGA_ENABLE=1
+
+[Coherent Scratchpad Memory Test Mapping for Dual FPGA]
+File=modules/apps/tests/coh_mem_test/fpga-mapping-dual.awb
+Packagehint=leap-debug
+
+[VC707 Dual FPGA Environment (SMA) with Coherent Fence Enabled]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_fence_env.awb
+Packagehint=leap-multifpga

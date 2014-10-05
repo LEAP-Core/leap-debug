@@ -1,0 +1,7 @@
+model -> sim0;
+common_services -> sim0;
+connected_application -> sim0;
+hardware_system -> sim0;
+coh_mem_test_local -> sim0;
+coh_mem_test_remote -> sim1;
+

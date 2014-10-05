@@ -73,7 +73,6 @@ module [CONNECTED_MODULE] mkCoherentScratchpadRemote ()
     NumTypeParam#(t_COH_SCRATCH_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
 
-    DEBUG_FILE debugLogsCohScratch <- mkDebugFile("coherent_scratchpad_"+integerToString(valueOf(`N_SCRATCH))+".out");
-    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkDebugCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, valueOf(`N_SCRATCH), conf, debugLogsCohScratch);
-  
+    MEMORY_WITH_FENCE_IFC#(t_COH_SCRATCH_ADDR, t_MEM_DATA) memoriesCohScratch <- mkCoherentScratchpadClient(`VDEV_SCRATCH_COH_MEMPERF_DATA, conf);
 endmodule
+

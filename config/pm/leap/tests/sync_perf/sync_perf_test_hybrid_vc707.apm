@@ -43,14 +43,9 @@ connected_application=Default Software Connected Application
 File=modules/leap/build-support/project/project-pipeline.awb
 Packagehint=leap
 
-
-
-
-
 [Hybrid VC707 PCIE FPGA Environment]
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie.apm
 Packagehint=leap
-
 
 [Synchronization Performance Test]
 File=modules/apps/tests/sync_perf/sync-perf-test.awb
@@ -58,3 +53,4 @@ Packagehint=leap-debug
 
 [Hybrid VC707 PCIE FPGA Environment/Params]
 MODEL_CLOCK_FREQ=125
+COHERENT_SCRATCHPAD_TEST_AND_SET_ENABLE=1

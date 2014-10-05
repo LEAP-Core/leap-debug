@@ -76,6 +76,8 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
         controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_MEMTEST;
         controllerConf.isMaster = False;
         controllerConf.partition = mkCohScratchControllerAddrPartition(baseAddr, addrRange, data_size); 
+        controllerConf.debugLogPath = tagged Valid "coherent_scratchpad_controller_remote.out";
+        controllerConf.enableStatistics = tagged Valid "coherent_scratchpad_controller_remote_";
         
         let originalID <- getSynthesisBoundaryPlatformID();
         let platformID = (`FPGA_NUM_PLATFORMS != 1)? 1 : 0;
@@ -87,30 +89,25 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
     
     if (valueOf(N_REMOTE_ENGINES)>0)
     begin
-        
-        COH_SCRATCH_CLIENT_CONFIG clientConf = defaultValue;
-        clientConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
-        clientConf.multiController = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1);
-   
-        Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogMs = newVector();
         Vector#(N_REMOTE_ENGINES, DEBUG_FILE) debugLogEs = newVector();
         Vector#(N_REMOTE_ENGINES, MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) memories = newVector();
         Vector#(N_REMOTE_ENGINES, COH_MEM_TEST_ENGINE_IFC#(MEM_ADDRESS)) engines = newVector();
         
-        function String genDebugMemoryFileName(Integer id);
-            return "coh_memory_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
+        function ActionValue#(MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) doCurryCohClient(mFunction, id);
+            actionvalue
+                Integer scratchpadId = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_COH_MEMTEST_DATA2 : `VDEV_SCRATCH_COH_MEMTEST_DATA;
+                COH_SCRATCH_CLIENT_CONFIG client_conf = defaultValue;
+                client_conf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
+                client_conf.multiController = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1);
+                client_conf.debugLogPath = tagged Valid ("coh_memory_" + integerToString(id + valueOf(N_LOCAL_ENGINES)) + ".out");
+                client_conf.enableStatistics = tagged Valid ("coh_memory_" + integerToString(id + valueOf(N_LOCAL_ENGINES)) + "_");
+                let m <- mFunction(scratchpadId, client_conf);
+                return m;
+            endactionvalue
         endfunction
         
         function String genDebugEngineFileName(Integer id);
             return "coh_test_engine_"+integerToString(id + valueOf(N_LOCAL_ENGINES))+".out";
-        endfunction
-
-        function ActionValue#(MEMORY_WITH_FENCE_IFC#(MEM_ADDRESS, TEST_DATA)) doCurryCohClient(mFunction, x, y);
-            actionvalue
-                Integer scratchpadId = (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1)? `VDEV_SCRATCH_COH_MEMTEST_DATA2 : `VDEV_SCRATCH_COH_MEMTEST_DATA;
-                let m <- mFunction(scratchpadId, x + valueOf(N_LOCAL_ENGINES), clientConf, y);
-                return m;
-            endactionvalue
         endfunction
 
         function doCurryTestEngineConstructor(mFunction, x, y);
@@ -124,19 +121,14 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
             endactionvalue
         endfunction
 
-        Vector#(N_REMOTE_ENGINES, String) debugLogMNames = genWith(genDebugMemoryFileName);
-        Vector#(N_REMOTE_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
-        debugLogMs <- mapM(mkDebugFile, debugLogMNames);
-        debugLogEs <- mapM(mkDebugFile, debugLogENames);
-        
-        Vector#(N_REMOTE_ENGINES, Integer) clientIds = genVector();
-        let mkCohClientVec = replicate(mkDebugCoherentScratchpadClient);
-        memories <- zipWith3M(doCurryCohClient, mkCohClientVec, clientIds, debugLogMs);
+        let mkCohClientVec = replicate(mkCoherentScratchpadClient);
+        memories <- zipWithM(doCurryCohClient, mkCohClientVec, genVector());
 
+        Vector#(N_REMOTE_ENGINES, String) debugLogENames = genWith(genDebugEngineFileName);
+        debugLogEs <- mapM(mkDebugFile, debugLogENames);
         let mkTestEngineVec = replicate(mkCohMemTestEngine);
         let engineConstructors = zipWith3(doCurryTestEngineConstructor, mkTestEngineVec, memories, genVector());
         engines <- zipWithM(doCurryTestEngine, engineConstructors, debugLogEs);
-        
         
         // Dynamic parameters.
         PARAMETER_NODE paramNode <- mkDynamicParameterNode();

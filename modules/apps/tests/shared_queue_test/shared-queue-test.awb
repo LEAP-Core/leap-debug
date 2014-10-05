@@ -18,6 +18,7 @@
 
 %param --global SHARED_QUEUE_TEST_LOCK_MODE             2  "0: use global arbiter, 1: use hardware lock, 2: use software lock"
 %param --global SHARED_QUEUE_TEST_PVT_CACHE_ENABLE      1  "0: disable, 1: enable private caches"
+%param --global SHARED_QUEUE_TEST_DEBUG_ENABLE          1  "Enables stats and debuglogging"
 
 %param --dynamic SHARED_QUEUE_TEST_VERBOSE              0  "0: disable, 1: enable verbose output"
 %param --dynamic SHARED_QUEUE_TEST_QUEUE_SIZE          64  "size of the shared queue"

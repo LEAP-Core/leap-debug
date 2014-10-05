@@ -18,9 +18,9 @@ model=HW/SW Hybrid Multifpga Project Foundation
 
 [HW/SW Hybrid Multifpga Project Foundation/Requires]
 connected_application=Default Software Connected Application
-environment_description=Simulation Dual FPGA Environment with Dual Cache
+environment_description=Simulation Dual FPGA Environment with Dual Cache and Pipelined Fence Enabled
 build_pipeline=LIM Build Pipeline
-fpga_mapping=Coherent Scratchpad Memory Test Mapping
+fpga_mapping=Coherent Scratchpad Memory Test Mapping for Dual FPGA Simulation
 
 [HW/SW Hybrid Multifpga Project Foundation]
 File=modules/leap/build-support/project/project-multifpga.awb
@@ -32,10 +32,6 @@ Packagehint=leap-multifpga
 
 [FPGAMap]
 File=modules/leap/build-support/build-pipelines/stages/parsers/map/fpgamap_parser.awb
-Packagehint=leap-multifpga
-
-[Simulation Dual FPGA Environment with Dual Cache]
-File=modules/leap-platforms/fpga-environments/sim/sim_fpga_cache_env.awb
 Packagehint=leap-multifpga
 
 [Bluespec Type parser]
@@ -121,9 +117,6 @@ Packagehint=leap-multifpga
 File=modules/apps/tests/coh_mem_test/coh-mem-test-local.awb
 Packagehint=leap-debug
 
-[Coherent Scratchpad Memory Test Mapping]
-File=modules/apps/tests/coh_mem_test/sim_mapping.awb
-Packagehint=leap-debug
 
 [Coherent Scratchpad Memory Test System]
 File=modules/apps/tests/coh_mem_test/coh-mem-test.awb
@@ -145,3 +138,11 @@ Packagehint=leap-debug
 [Coherent Scratchpad Memory Test Common/Params]
 COH_MEM_TEST_DUAL_FPGA_ENABLE=1
 COH_MEM_TEST_MULTI_CONTROLLER_ENABLE=1
+
+[Simulation Dual FPGA Environment with Dual Cache and Pipelined Fence Enabled]
+File=modules/leap-platforms/fpga-environments/sim/sim_fpga_cache_fence_env.awb
+Packagehint=leap-multifpga
+
+[Coherent Scratchpad Memory Test Mapping for Dual FPGA Simulation]
+File=modules/apps/tests/coh_mem_test/sim-mapping-dual.awb
+Packagehint=leap-debug
