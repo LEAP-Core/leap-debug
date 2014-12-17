@@ -37,22 +37,22 @@ import GetPut::*;
 import LFSR::*;
 import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/shared_scratchpad_memory_common.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
 `include "awb/provides/coherent_scratchpad_performance_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
-//`include "asim/dict/PARAMS_HARDWARE_SYSTEM.bsh"
-`include "asim/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/PARAMS_COHERENT_SCRATCHPAD_PERFORMANCE_COMMON.bsh"
 
 // It is normally NOT necessary to include scratchpad_memory.bsh to use
 // scratchpads.  mem-test includes it only to get the value of

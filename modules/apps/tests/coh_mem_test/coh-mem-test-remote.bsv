@@ -33,22 +33,23 @@ import FIFO::*;
 import Vector::*;
 import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
-`include "asim/provides/coh_mem_test_common_params.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/shared_scratchpad_memory_common.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/coh_mem_test_common_params.bsh"
 `include "awb/provides/coh_mem_test_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/VDEV_COH_SCRATCH.bsh"
-`include "asim/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/VDEV_COH_SCRATCH.bsh"
+`include "awb/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
 
 //
 // Coherent scratchpad memory test remote module
@@ -58,7 +59,7 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
     provisos (Bits#(MEM_ADDRESS, t_MEM_ADDR_SZ),
               Bits#(TEST_DATA, t_MEM_DATA_SZ));
     
-    Reg#(COH_SCRATCH_MEM_ADDRESS) memoryMax <- mkWriteValidatedReg();
+    Reg#(SHARED_SCRATCH_MEM_ADDRESS) memoryMax <- mkWriteValidatedReg();
     
     if (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1)
     begin
@@ -67,8 +68,8 @@ module [CONNECTED_MODULE] mkCohMemTestRemote ()
         //
         NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
         NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
-        COH_SCRATCH_MEM_ADDRESS baseAddr  = (memoryMax._read())>>1;
-        COH_SCRATCH_MEM_ADDRESS addrRange = (memoryMax._read());
+        SHARED_SCRATCH_MEM_ADDRESS baseAddr  = (memoryMax._read())>>1;
+        SHARED_SCRATCH_MEM_ADDRESS addrRange = (memoryMax._read());
         
         COH_SCRATCH_CONTROLLER_CONFIG controllerConf = defaultValue;
         controllerConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;

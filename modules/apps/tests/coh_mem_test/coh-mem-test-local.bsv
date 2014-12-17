@@ -34,22 +34,23 @@ import FIFO::*;
 import Vector::*;
 import DefaultValue::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
-`include "asim/provides/coh_mem_test_common_params.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/shared_scratchpad_memory_common.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/coh_mem_test_common_params.bsh"
 `include "awb/provides/coh_mem_test_common.bsh"
 
-`include "asim/dict/VDEV_SCRATCH.bsh"
-`include "asim/dict/VDEV_COH_SCRATCH.bsh"
-`include "asim/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
+`include "awb/dict/VDEV_SCRATCH.bsh"
+`include "awb/dict/VDEV_COH_SCRATCH.bsh"
+`include "awb/dict/PARAMS_COH_MEM_TEST_COMMON.bsh"
 
 
 typedef enum
@@ -97,14 +98,14 @@ module [CONNECTED_MODULE] mkCohMemTestLocal ()
     controllerConf.cacheMode = (`COH_MEM_TEST_PVT_CACHE_ENABLE != 0) ? COH_SCRATCH_CACHED : COH_SCRATCH_UNCACHED;
     controllerConf.debugLogPath = tagged Valid "coherent_scratchpad_controller_local.out";
     controllerConf.enableStatistics = tagged Valid "coherent_scratchpad_controller_local_";
-    Reg#(COH_SCRATCH_MEM_ADDRESS) memoryMax <- mkWriteValidatedReg();
+    Reg#(SHARED_SCRATCH_MEM_ADDRESS) memoryMax <- mkWriteValidatedReg();
     NumTypeParam#(t_MEM_ADDR_SZ) addr_size = ?;
     NumTypeParam#(t_MEM_DATA_SZ) data_size = ?;
 
     if (`COH_MEM_TEST_MULTI_CONTROLLER_ENABLE == 1)
     begin
-        COH_SCRATCH_MEM_ADDRESS baseAddr  = 0;
-        COH_SCRATCH_MEM_ADDRESS addrRange = (memoryMax._read())>>1;
+        SHARED_SCRATCH_MEM_ADDRESS baseAddr  = 0;
+        SHARED_SCRATCH_MEM_ADDRESS addrRange = (memoryMax._read())>>1;
         controllerConf.multiController = True;
         controllerConf.coherenceDomainID = `VDEV_COH_SCRATCH_MEMTEST;
         controllerConf.isMaster = True;

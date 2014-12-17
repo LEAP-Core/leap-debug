@@ -42,6 +42,7 @@ import DefaultValue::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
+`include "awb/provides/shared_scratchpad_memory_common.bsh"
 `include "awb/provides/coherent_scratchpad_memory_service.bsh"
 
 module [CONNECTED_MODULE] mkTestMemory#(Integer scratchpadID, Bool addCaches) (MEMORY_IFC#(t_ADDR, t_DATA))

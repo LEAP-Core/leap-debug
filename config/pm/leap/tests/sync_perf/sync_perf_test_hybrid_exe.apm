@@ -52,4 +52,4 @@ File=modules/apps/tests/sync_perf/sync-perf-test.awb
 Packagehint=leap-debug
 
 [Hybrid Simulation FPGA Environment/Params]
-COHERENT_SCRATCHPAD_TEST_AND_SET_ENABLE=1
+SHARED_SCRATCHPAD_TEST_AND_SET_ENABLE=1

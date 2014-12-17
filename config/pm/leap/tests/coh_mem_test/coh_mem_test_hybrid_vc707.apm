@@ -69,4 +69,4 @@ File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie.apm
 Packagehint=leap
 
 [Hybrid VC707 PCIE FPGA Environment/Params]
-COHERENT_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1
+SHARED_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1

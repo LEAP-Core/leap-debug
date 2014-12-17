@@ -52,5 +52,5 @@ File=modules/apps/tests/shared_queue_test/shared-queue-test.awb
 Packagehint=leap-debug
 
 [Hybrid Simulation FPGA Environment/Params]
-COHERENT_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1
-COHERENT_SCRATCHPAD_TEST_AND_SET_ENABLE=1
+SHARED_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1
+SHARED_SCRATCHPAD_TEST_AND_SET_ENABLE=1

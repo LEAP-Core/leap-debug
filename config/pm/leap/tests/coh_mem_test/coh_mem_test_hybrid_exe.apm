@@ -69,4 +69,4 @@ coh_mem_test_local=Coherent Scratchpad Memory Test Local Module
 coh_mem_test_common=Coherent Scratchpad Memory Test Common
 
 [Hybrid Simulation FPGA Environment/Params]
-COHERENT_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1
+SHARED_SCRATCHPAD_PIPELINED_FENCE_ENABLE=1

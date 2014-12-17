@@ -32,19 +32,20 @@ import FIFO::*;
 import FIFOF::*;
 import Vector::*;
 
-`include "asim/provides/librl_bsv.bsh"
+`include "awb/provides/librl_bsv.bsh"
 
-`include "asim/provides/soft_connections.bsh"
+`include "awb/provides/soft_connections.bsh"
 `include "awb/provides/soft_services.bsh"
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
-`include "asim/provides/mem_services.bsh"
-`include "asim/provides/common_services.bsh"
-`include "asim/provides/coherent_scratchpad_memory_service.bsh"
-`include "asim/provides/lock_sync_service.bsh"
+`include "awb/provides/mem_services.bsh"
+`include "awb/provides/common_services.bsh"
+`include "awb/provides/shared_scratchpad_memory_common.bsh"
+`include "awb/provides/coherent_scratchpad_memory_service.bsh"
+`include "awb/provides/lock_sync_service.bsh"
 
-`include "asim/dict/VDEV_SYNCGROUP.bsh"
+`include "awb/dict/VDEV_SYNCGROUP.bsh"
 
 `define BARRIER_ENTER_CNT_ADDR 1
 `define BARRIER_LEAVE_CNT_ADDR 2
