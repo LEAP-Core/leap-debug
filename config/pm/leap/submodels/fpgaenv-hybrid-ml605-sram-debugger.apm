@@ -103,9 +103,6 @@ Packagehint=leap
 File=modules/bluespec/common/fpgaenv/fpga-components/hardware-fpga-components-virtex6-generic.awb
 Packagehint=leap-platforms
 
-[Starter Virtual Device]
-File=modules/leap/virtual-platform/virtual-devices/devices/starter/hybrid/starter-device.awb
-Packagehint=leap
 
 [Standard Virtual Devices]
 File=modules/leap/virtual-platform/virtual-devices/virtual-device-sets/std/std-virtual-devices.awb
@@ -117,28 +114,20 @@ Packagehint=leap
 
 [Standard Virtual Devices/Requires]
 local_memory_device=NULL Local Memory Device
-starter_device=Starter Virtual Device
 common_utility_devices=Base Common Devices
-front_panel=Hybrid Front Panel
 
 [Base Common Devices]
 File=modules/leap/virtual-platform/virtual-devices/devices/common/common-utility-devices.awb
 Packagehint=leap
 
-[Hybrid Front Panel]
-File=modules/leap/virtual-platform/virtual-devices/devices/front-panel/hybrid/hybrid-fp.awb
-Packagehint=leap
 
 [ML605 Virtex-6 Platform with PCIe]
 File=modules/bluespec/common/fpgaenv/physical-platform/pci-express-generic/config/ml605/ml605-v6-pcie-dma.awb
 Packagehint=leap-platforms
 
-[Virtex-6 PCIE Device (BlueNoC)]
-File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express/pcie-bluenoc-virtex6/pcie-virtex6.awb
-Packagehint=leap-platforms
 
 [BlueNoC PCIe Bridge/Requires]
-pcie_bluenoc_device=Virtex-6 PCIE Device (BlueNoC)
+pcie_bluenoc_device=Virtex-7 PCIE Device v1.07 (BlueNoC)
 pcie_bluenoc_ifc=BlueNoC PCIe Bridge Interfaces
 
 [BlueNoC PCIe Bridge]
@@ -198,4 +187,8 @@ physical_platform_defs=Common Physical Platform Definitions
 
 [Common Physical Platform Definitions]
 File=modules/bluespec/common/fpgaenv/physical-platform/utils/physical-defs.awb
+Packagehint=leap-platforms
+
+[Virtex-7 PCIE Device v1.07 (BlueNoC)]
+File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/pci-express/pcie-bluenoc-virtex7/1_7/pcie-virtex7.awb
 Packagehint=leap-platforms
