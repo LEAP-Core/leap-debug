@@ -40,16 +40,16 @@ CONNECTED_APPLICATION_CLASS::Main()
     // for read value error detection.
     //
 
-    for (int ws = 9; ws < 13; ws++) {
+    for (int ws = 9; ws < 24; ws++) {
 	for (int rw_idx = 0; rw_idx < 3; rw_idx++) {
 
-            for (int stride_idx = 0; stride_idx < 2; stride_idx++) {
+            for (int stride_idx = 0; stride_idx < 12; stride_idx++) {
                 stringstream filename;
                 cout << "Test RW: " << ((rw[rw_idx])?"Read":"Write") << " Working Set: " << (1 << ws) << " stride " << stride[stride_idx] << endl;
 
                 OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
                                                               stride[stride_idx],
-                                                              1<<16,
+                                                              1<<18,
                                                               rw[rw_idx]);
 
                 filename << "cache_" << rw << "_" << stride_idx << "_" << ws << ".stats";
