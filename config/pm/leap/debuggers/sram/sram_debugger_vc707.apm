@@ -16,19 +16,6 @@ RootProvides=model
 DefaultAttributes=hybrid bluespec
 model=HW/SW Hybrid Pipeline Build
 
-[Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
-Packagehint=leap
-
-[Base Hybrid Application Environment/Requires]
-hybrid_application=SRAM Debugger Application
-
-[SRAM Debugger Application]
-File=modules/apps/debuggers/platform-debugger.awb
-Packagehint=leap-debug
-
-[SRAM Debugger Application/Params]
-MEM_CHECK_LATENCY=1
 
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
@@ -40,12 +27,24 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid VC707 PCIE FPGA Environment - No Memory/Central Cache
-application_env=Base Hybrid Application Environment
+fpgaenv=Hybrid VC707 PCIE FPGA Environment - No Centtral Cache (Vivado)
+application_env=Soft Services Hybrid Application Environment
 
-[Hybrid VC707 PCIE FPGA Environment - No Memory/Central Cache]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie-no-memory.apm
+[Hybrid VC707 PCIE FPGA Environment - No Centtral Cache (Vivado)]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie-no-cc-vivado.apm
 Packagehint=leap
 
-[Hybrid VC707 PCIE FPGA Environment - No Memory/Central Cache/Params]
+[Hybrid VC707 PCIE FPGA Environment - No Centtral Cache (Vivado)/Params]
+DRAM_DEBUG=1
 MODEL_CLOCK_FREQ=85
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=RAM Debugger Application
+
+[RAM Debugger Application]
+File=modules/apps/ram-debugger/ram-debugger.awb
+Packagehint=leap-debug

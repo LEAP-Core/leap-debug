@@ -1,0 +1,13 @@
+%name RAM Debugger Application
+%desc RAM Debugger Application
+
+%attributes ram-debugger unconnected hybrid
+
+%provides connected_application
+
+%sources -t BSV  -v PUBLIC  ram-debugger.bsv
+%sources -t H    -v PUBLIC  ram-debugger.h
+%sources -t CPP  -v PRIVATE ram-debugger.cpp
+%sources -t RRR  -v PUBLIC  ram-debugger.rrr
+
+%param MEM_CHECK_LATENCY 1   "Test RAM latency"

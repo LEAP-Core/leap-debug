@@ -13,8 +13,8 @@
 //
 
 //
-// @file platform-debugger.cpp
-// @brief Platform Debugger Application
+// @file ram-debugger.cpp
+// @brief RAM Debugger Application
 //
 // @author Angshuman Parashar
 //
@@ -27,7 +27,7 @@
 
 #include "asim/syntax.h"
 #include "asim/ioformat.h"
-#include "asim/provides/hybrid_application.h"
+#include "asim/provides/connected_application.h"
 #include "asim/provides/clocks_device.h"
 #include "asim/provides/ddr_sdram_device.h"
 #include "asim/provides/debug_scan_service.h"
@@ -35,95 +35,28 @@
 
 using namespace std;
 
-const char*  
-getIdxName(const int idx)
-{
-    switch(idx)
-    {
-        case 0:  return "prim_device.ram1.enqueue_address_RDY()";
-        case 1:  return "prim_device.ram1.enqueue_data_RDY()";
-        case 2:  return "prim_device.ram1.dequeue_data_RDY()";
-        case 3:  return "mergeReqQ.notEmpty()";
-        case 4:  return "mergeReqQ.ports[0].notFull()";
-        case 5:  return "mergeReqQ.ports[1].notFull()";
-        case 6:  return "syncReadDataQ.notEmpty()";
-        case 7:  return "syncReadDataQ.notFull()";
-        case 8:  return "initDone";
-        case 9:  return "phy reset asserted";
-        case 10: return "syncRequestQ.notEmpty()";
-        case 11: return "syncRequestQ.notFull()";
-        case 12: return "syncWriteDataQ.notEmpty()";
-        case 13: return "syncWriteDataQ.notFull()";
-        case 14: return "writePending";
-        case 15: return "readPending";
-        case 16: return "nInflightReads.value() == 0";
-        case 17: return "readBurstCnt == 0";
-        case 18: return "writeBurstIdx == 0";
-        case 19: return "state";
-        default: return "unused";
-    }
-}
-
-UINT64 
-getBit(UINT64 bvec, int idx, UINT64 mask)
-{
-    return (bvec >> idx) & mask;
-}
-
-void
-printRAMStatus(UINT64 status)
-{
-    cout << "RAM status:" << hex << status << dec << endl;
-    for (int x = 0; x < 20; x++)
-    {
-        cout << "    [" << getIdxName(x) << "]: " << getBit(status, x, 1) << endl;
-    }
-
-    cout << endl;
-}
-
-void
-printRAMStatusDiff(UINT64 new_status, UINT64 old_status)
-{
-    int any_change = 0;
-    for (int x = 0; x < 20; x++)
-    {
-        UINT64 b_old = getBit(old_status, x, 1);
-        UINT64 b_new = getBit(new_status, x, 1);
-        if (b_old != b_new)
-        {
-            cout << "    [" << getIdxName(x) << "] Now: " <<  b_new << endl;
-            any_change = 1;
-        }
-    }
-    if (!any_change)
-    {
-        cout << "No RAM change." << endl;  
-    }
-}
 // constructor
-HYBRID_APPLICATION_CLASS::HYBRID_APPLICATION_CLASS(
+CONNECTED_APPLICATION_CLASS::CONNECTED_APPLICATION_CLASS(
     VIRTUAL_PLATFORM vp)
 {
-    clientStub = new PLATFORM_DEBUGGER_CLIENT_STUB_CLASS(NULL);
+    clientStub = new RAM_DEBUGGER_CLIENT_STUB_CLASS(NULL);
 }
 
 // destructor
-HYBRID_APPLICATION_CLASS::~HYBRID_APPLICATION_CLASS()
+CONNECTED_APPLICATION_CLASS::~CONNECTED_APPLICATION_CLASS()
 {
     delete clientStub;
 }
 
 void
-HYBRID_APPLICATION_CLASS::Init()
+CONNECTED_APPLICATION_CLASS::Init()
 {
 }
 
 // main
 void
-HYBRID_APPLICATION_CLASS::Main()
+CONNECTED_APPLICATION_CLASS::Main()
 {
-    UINT64 sts, oldsts;
     UINT64 data;
 
     // Different memory styles have different minimum offsets This is
@@ -133,22 +66,14 @@ HYBRID_APPLICATION_CLASS::Main()
 
     // print banner
     cout << endl
-         << "Welcome to the Platform Debugger" << endl
+         << "Welcome to the RAM Debugger" << endl
          << "--------------------------------" << endl << endl;
 
     cout << "Initializing hardware" << endl;
 
-    sts = clientStub->StatusCheck(0);
-    oldsts = sts;
-    printRAMStatus(sts);
-
     // transfer control to hardware
-    sts = clientStub->StartDebug(0);
+    uint32_t sts = clientStub->StartDebug(0);
     cout << "debugging started, sts = " << sts << endl << flush;
-
-    sts = clientStub->StatusCheck(0);
-    oldsts = sts;
-    printRAMStatus(sts);
 
     UINT64 total_mem_mb = ADDR_END / (1024 * 1024) *
                           (DRAM_WORD_WIDTH / 8) *
@@ -161,14 +86,6 @@ HYBRID_APPLICATION_CLASS::Main()
         cout << "  " << total_mem_mb / DRAM_NUM_BANKS << " MB per bank" << endl;
     }
     cout << endl;
-
-    // Hardware side doesn't implement the automatic debug scan.  Use the dynamic
-    // parameter to trigger a scan from software.
-    if (DEBUG_SCAN_DEADLINK_TIMEOUT != 0)
-    {
-        sleep(2);
-        DEBUG_SCAN_SERVER_CLASS::GetInstance()->Scan();
-    }
 
     // Masks so each data value is different
     static const UINT64 masks[4] = { 0,
@@ -189,16 +106,16 @@ HYBRID_APPLICATION_CLASS::Main()
                 data <<= bank;
             }
 
-            sts = clientStub->WriteReq(bank, addr);
+            clientStub->WriteReq(bank, addr);
             for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
             {
-                sts = clientStub->WriteData(bank,
-                                            data ^ masks[3],
-                                            data ^ masks[2],
-                                            data ^ masks[1],
-                                            data ^ masks[0],
-                                            0);
-                oldsts = sts;
+                clientStub->WriteData(bank,
+                                      0, 0, 0, 0,
+                                      data ^ masks[3],
+                                      data ^ masks[2],
+                                      data ^ masks[1],
+                                      data ^ masks[0],
+                                      0);
                 data = ~data;
             }
         }
@@ -240,7 +157,7 @@ HYBRID_APPLICATION_CLASS::Main()
                 {
                     OUT_TYPE_ReadRsp d = clientStub->ReadRsp(bank);
                     const UINT64 data[4] = { d.data0, d.data1, d.data2, d.data3 };
-                    for (int w = 0; w < (DRAM_BEAT_WIDTH / 64); w += 1)
+                    for (int w = 0; w < (DRAM_BEAT_WIDTH / 128); w += 1)
                     {
                         if (data[w] != (masks[w] ^ expect))
                         {
@@ -268,7 +185,7 @@ HYBRID_APPLICATION_CLASS::Main()
     clientStub->WriteReq(0, 0);
     for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
     {
-        clientStub->WriteData(0, 0, 0, 0, 0, 0);
+        clientStub->WriteData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     // Write at increasing address and look for an alias
@@ -281,7 +198,7 @@ HYBRID_APPLICATION_CLASS::Main()
             clientStub->WriteReq(0, addr);
             for (int burst = 0; burst < DRAM_MIN_BURST; burst++)
             {
-                clientStub->WriteData(0, i, i, i, i, 0);
+                clientStub->WriteData(0, i, i, i, i, i, i, i, i, 0);
             }
 
             // Read back address 0 and make sure it is still 0
@@ -345,6 +262,7 @@ HYBRID_APPLICATION_CLASS::Main()
         {
             clientStub->WriteData(0,
                                   -1, -1, -1, -1,
+                                  -1, -1, -1, -1,
                                   0);
         }
 
@@ -352,6 +270,7 @@ HYBRID_APPLICATION_CLASS::Main()
         for (int b = 0; b < DRAM_MIN_BURST; b++)
         {
             clientStub->WriteData(0,
+                                  0, 0, 0, 0,
                                   0, 0, 0, 0,
                                   1 << m);
         }
@@ -377,7 +296,7 @@ HYBRID_APPLICATION_CLASS::Main()
         }
     }
 
-    cout << errors << " mask errors" << endl << endl << flush;
+    cout << endl << errors << " mask errors" << endl << endl << flush;
 
     // report results and exit
     cout << "Done" << endl;

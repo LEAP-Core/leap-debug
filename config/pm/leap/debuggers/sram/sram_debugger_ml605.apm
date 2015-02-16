@@ -16,16 +16,6 @@ RootProvides=model
 DefaultAttributes=hybrid bluespec
 model=HW/SW Hybrid Pipeline Build
 
-[Base Hybrid Application Environment]
-File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
-Packagehint=leap
-
-[Base Hybrid Application Environment/Requires]
-hybrid_application=SRAM Debugger Application
-
-[SRAM Debugger Application]
-File=modules/apps/debuggers/platform-debugger.awb
-Packagehint=leap-debug
 
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
@@ -38,11 +28,22 @@ Packagehint=leap
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
 fpgaenv=Hybrid ML605 PCIE FPGA Environment - SRAM Debugger
-application_env=Base Hybrid Application Environment
+application_env=Soft Services Hybrid Application Environment
 
 [Hybrid ML605 PCIE FPGA Environment - SRAM Debugger/Params]
 MODEL_CLOCK_FREQ=85
 
 [Hybrid ML605 PCIE FPGA Environment - SRAM Debugger]
 File=config/pm/leap/submodels/fpgaenv-hybrid-ml605-sram-debugger.apm
+Packagehint=leap-debug
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=RAM Debugger Application
+
+[RAM Debugger Application]
+File=modules/apps/ram-debugger/ram-debugger.awb
 Packagehint=leap-debug

@@ -13,8 +13,8 @@
 //
 
 //
-// @file platform-debugger.cpp
-// @brief Platform Debugger Application
+// @file ram-debugger.cpp
+// @brief RAM Debugger Application
 //
 // @author Angshuman Parashar
 //
@@ -33,9 +33,9 @@ import LFSR::*;
 `include "awb/provides/low_level_platform_interface.bsh"
 
 `include "awb/provides/soft_connections.bsh"
-`include "awb/provides/hybrid_application.bsh"
+`include "awb/provides/connected_application.bsh"
 
-`include "awb/rrr/server_stub_PLATFORM_DEBUGGER.bsh"
+`include "awb/rrr/server_stub_RAM_DEBUGGER.bsh"
 
 // types
 
@@ -51,17 +51,15 @@ STATE
 
 // mkApplication
 
-module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
-    
-    LowLevelPlatformInterface llpi    = vp.llpint;
-    PHYSICAL_DRIVERS          drivers = llpi.physicalDrivers;
-    let sram = drivers.ddrDriver;
-    
+module [CONNECTED_MODULE] mkConnectedApplication ();
+
+    let ram <- mkLocalMemDDRConnection();
+
     Reg#(STATE) state <- mkReg(STATE_idle);
-    
+
     // instantiate stubs
-    ServerStub_PLATFORM_DEBUGGER serverStub <- mkServerStub_PLATFORM_DEBUGGER(llpi.rrrServer);
-    
+    ServerStub_RAM_DEBUGGER serverStub <- mkServerStub_RAM_DEBUGGER();
+
     Reg#(Bit#(48)) curCycle <- mkReg(0);
     (* no_implicit_conditions *)
     (* fire_when_enabled *)
@@ -92,84 +90,67 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
     Vector#(FPGA_DDR_BANKS, FIFO#(FPGA_DDR_DUALEDGE_BEAT)) readRspQ <- replicateM(mkSizedFIFO(`DRAM_MIN_BURST * 32));
 
     rule accept_load_req (state == STATE_running);
-
         let req <- serverStub.acceptRequest_ReadReq();
         serverStub.sendResponse_ReadReq(0);
 
         readReqQ.enq(tuple2(truncate(req.bank), req.addr));
-
     endrule
 
     rule accept_load_doReads (state == STATE_running);
-
         let dummy <- serverStub.acceptRequest_DoReads();
         serverStub.sendResponse_DoReads(0);
 
         state <= STATE_doReads;
-
     endrule
 
     rule doReads (state == STATE_doReads);
-
         if (readReqQ.notEmpty())
         begin
             match {.bank, .addr} = readReqQ.first();
-            sram[bank].readReq(truncate(addr));
+            ram[bank].readReq(truncate(addr));
             readReqQ.deq();
         end
         else
         begin
             state <= STATE_running;
         end
-
     endrule
 
     for (Integer bank = 0; bank < valueOf(FPGA_DDR_BANKS); bank = bank + 1)
     begin
         rule bufReads ((state == STATE_running) || (state == STATE_doReads));
 
-            let data <- sram[bank].readRsp();
-            readRspQ[bank].enq(truncate(data));
+            let data <- ram[bank].readRsp();
+            readRspQ[bank].enq(data);
 
         endrule
     end
     
     rule accept_load_rsp (state == STATE_running);
-
         let bank <- serverStub.acceptRequest_ReadRsp();
 
-        Vector#(4, Bit#(64)) data = unpack(resize(readRspQ[bank].first()));
+        Vector#(8, Bit#(64)) data = unpack(resize(readRspQ[bank].first()));
         readRspQ[bank].deq();
 
-        serverStub.sendResponse_ReadRsp(data[3], data[2], data[1], data[0]);
-
+        serverStub.sendResponse_ReadRsp(data[7], data[6], data[5], data[4],
+                                        data[3], data[2], data[1], data[0]);
     endrule
 
 
     rule accept_write_req (state == STATE_running);
-        
         let req <- serverStub.acceptRequest_WriteReq();        
         serverStub.sendResponse_WriteReq(0);
 
-        sram[req.bank].writeReq(truncate(req.addr));
-        
+        ram[req.bank].writeReq(truncate(req.addr));
     endrule
     
     rule accept_write_data (state == STATE_running);
-        
         let req <- serverStub.acceptRequest_WriteData();
-        let data = { req.data3, req.data2, req.data1, req.data0 };
+        let data = { req.data7, req.data6, req.data5, req.data4,
+                     req.data3, req.data2, req.data1, req.data0 };
 
-        sram[req.bank].writeData(truncate(data), truncate(req.mask));
+        ram[req.bank].writeData(resize(data), resize(req.mask));
         serverStub.sendResponse_WriteData(0);
-        
-    endrule
-    
-    rule accept_status_check (True);
-        
-        let bank <- serverStub.acceptRequest_StatusCheck();
-        serverStub.sendResponse_StatusCheck(sram[bank[0]].statusCheck());
-        
     endrule
     
 
@@ -194,7 +175,7 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
 
     rule accept_read_latency (state == STATE_running);
         let cal <- serverStub.acceptRequest_ReadLatency();
-        sram[0].setMaxReads(truncate(cal.maxOutstanding));
+        ram[0].setMaxReads(truncate(cal.maxOutstanding));
 
         state <= STATE_calibrating;
         calAddr <= 0;
@@ -211,15 +192,14 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
     rule read_latency_req ((state == STATE_calibrating) &&
                            (calReqCnt < calReads));
         let randomizer = (calRandomize) ? {lfsr.value,lfsr.value} : 0;
-        sram[0].readReq(calAddr ^ truncate(randomizer));
+        ram[0].readReq(calAddr ^ truncate(randomizer));
         calAddr <= calAddr + fromInteger(valueOf(TMul#(FPGA_DDR_BURST_LENGTH, TDiv#(FPGA_DDR_DUALEDGE_BEAT_SZ, FPGA_DDR_WORD_SZ))));
         calReqCnt <= calReqCnt + 1;
         latencyFIFO.enq(curCycle);
     endrule
 
-    (* descending_urgency = "accept_status_check, read_latency_resp" *)
     rule read_latency_resp (state == STATE_calibrating);
-        let data  <- sram[0].readRsp();
+        let data  <- ram[0].readRsp();
 
         // We expect some number of bursts, so we only dequeue when the op is 
         // complete
@@ -252,28 +232,74 @@ module [CONNECTED_MODULE] mkApplication#(VIRTUAL_PLATFORM vp)();
         calRespCnt <= calRespCnt + 1;
     endrule
 
+endmodule
 
-    // ====================================================================
-    //
-    // Debugging
-    //
-    // ====================================================================
-    
-    DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
 
-    // Collect debug scan state for physical memory controllers
-    for (Integer b = 0; b < valueOf(FPGA_DDR_BANKS); b = b + 1)
-    begin
-        List#(Tuple2#(String, Bool)) lm_scan = drivers.ddrDriver[b].debugScanState();
-        while (lm_scan matches tagged Nil ? False : True)
-        begin
-            let fld = List::head(lm_scan);
-            dbg_list <- addDebugScanField(dbg_list, tpl_1(fld), tpl_2(fld));
+//
+// DRAM is accessed via soft connections.  Wrap the soft connections in a
+// method interface.  The methods simply forward requests to the corresponding
+// soft connections.
+//
+interface LOCAL_MEM_DDR_BANK;
+    method Action readReq(FPGA_DDR_ADDRESS addr);
+    method ActionValue#(FPGA_DDR_DUALEDGE_BEAT) readRsp();
 
-            lm_scan = List::tail(lm_scan);
-        end
-    end
+    method Action writeReq(FPGA_DDR_ADDRESS addr);
+    method Action writeData(FPGA_DDR_DUALEDGE_BEAT data, FPGA_DDR_DUALEDGE_BEAT_MASK mask);
 
-    let dbgNode <- mkDebugScanNode("Top level", dbg_list);
+    method Action setMaxReads(Bit#(TLog#(TAdd#(`DRAM_MAX_OUTSTANDING_READS, 1))) m);
+endinterface
 
+typedef Vector#(FPGA_DDR_BANKS, LOCAL_MEM_DDR_BANK) LOCAL_MEM_DDR;
+
+
+module [CONNECTED_MODULE] mkLocalMemDDRConnection
+    // Interface:
+    (LOCAL_MEM_DDR);
+
+    LOCAL_MEM_DDR banks <- genWithM(mkLocalMemDDRBankConnection);
+    return banks;
+endmodule
+
+
+module [CONNECTED_MODULE] mkLocalMemDDRBankConnection#(Integer bankIdx)
+    // Interface:
+    (LOCAL_MEM_DDR_BANK);
+
+    String ddrName = "DRAM_Bank" + integerToString(bankIdx) + "_";
+
+    CONNECTION_SEND#(FPGA_DDR_REQUEST) commandQ <-
+        mkConnectionSend(ddrName + "command");
+
+    CONNECTION_RECV#(FPGA_DDR_DUALEDGE_BEAT) readRspQ <-
+        mkConnectionRecv(ddrName + "readResponse");
+
+    CONNECTION_SEND#(Tuple2#(FPGA_DDR_DUALEDGE_BEAT, FPGA_DDR_DUALEDGE_BEAT_MASK)) writeDataQ <-
+        mkConnectionSend(ddrName + "writeData");
+
+    CONNECTION_SEND#(Bit#(TLog#(TAdd#(`DRAM_MAX_OUTSTANDING_READS, 1))))
+        maxReadsConnection <- mkConnectionSend(ddrName + "setMaxReads");
+
+    method Action readReq(FPGA_DDR_ADDRESS addr);
+        commandQ.send(tagged DRAM_READ addr);
+    endmethod
+
+    method ActionValue#(FPGA_DDR_DUALEDGE_BEAT) readRsp();
+        let d = readRspQ.receive();
+        readRspQ.deq();
+
+        return d;
+    endmethod
+
+    method Action writeReq(FPGA_DDR_ADDRESS addr);
+        commandQ.send(tagged DRAM_WRITE addr);
+    endmethod
+
+    method Action writeData(FPGA_DDR_DUALEDGE_BEAT data, FPGA_DDR_DUALEDGE_BEAT_MASK mask);
+        writeDataQ.send(tuple2(data, mask));
+    endmethod
+
+    method Action setMaxReads(Bit#(TLog#(TAdd#(`DRAM_MAX_OUTSTANDING_READS, 1))) m);
+        maxReadsConnection.send(m);
+    endmethod
 endmodule
