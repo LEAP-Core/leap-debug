@@ -1,0 +1,2 @@
+Compilation message: "hw/model/expose-connections.bsv", line 142, column 187: Dangling Recv {umf::GENERIC_UMF_PACKET#(umf::GENERIC_UMF_PACKET_HEADER#(4, 8, 4, 10, 6, 96), Bit#(128))} [0]:rrr_server_MEMPERFRRR_resp:False:129:cpu0:None
+Compilation message: "hw/model/expose-connections.bsv", line 149, column 185: Dangling Send {umf::GENERIC_UMF_PACKET#(umf::GENERIC_UMF_PACKET_HEADER#(4, 8, 4, 10, 6, 96), Bit#(128))} [0]:rrr_server_MEMPERFRRR_req:False:129:cpu0:None
