@@ -2,7 +2,7 @@
 [Global]
 SaveParameters=0
 Description=Hybrid Virtual Memory Test Model with Private Caches for VC707
-File=mem_perf_hybrid_vc707_li
+File=mem_perf_hybrid_vc707_li_vivado
 Version=2.2
 Name=Hybrid Virtual Memory Test Model with Private Caches for VC707
 Type=Leap
@@ -15,11 +15,6 @@ RootProvides=model
 [Model]
 DefaultAttributes=bram-test hasim hybrid
 model=HW/SW Hybrid Multifpga Project Foundation
-
-
-
-
-
 
 [Scratchpad Memory Performance Test System]
 File=modules/apps/tests/mem_perf/mem-perf.awb
@@ -44,8 +39,6 @@ mem_perf_wrapper=Scratchpad Memory Performance Test System Wrapper
 File=modules/apps/tests/mem_perf/mem-perf-common.awb
 Packagehint=leap-debug
 
-
-
 [LIM Compiler Pipeline]
 File=config/pm/leap/submodels/pipelines/build-pipeline-lim.apm
 Packagehint=leap-multifpga
@@ -54,16 +47,17 @@ Packagehint=leap-multifpga
 fpga_mapping=Null FPGA Mapping
 build_pipeline=LIM Compiler Pipeline
 connected_application=Scratchpad Perf Test Connected Application
-environment_description=VC707 HW/SW Environment (Synplify)
+environment_description=VC707 HW/SW Environment
 
 [HW/SW Hybrid Multifpga Project Foundation]
 File=modules/leap/build-support/project/project-multifpga.awb
 Packagehint=leap-multifpga
 
-[VC707 HW/SW Environment (Synplify)]
-File=modules/leap-platforms/fpga-environments/vc707/vc707_hwsw_synplify.awb
-Packagehint=leap-multifpga
 
 [Null FPGA Mapping]
 File=modules/leap/build-support/project/null_mapping.awb
+Packagehint=leap-multifpga
+
+[VC707 HW/SW Environment]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_hwsw.awb
 Packagehint=leap-multifpga
