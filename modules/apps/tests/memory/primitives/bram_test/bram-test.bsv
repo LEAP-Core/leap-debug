@@ -48,22 +48,19 @@ import Vector::*;
 import BRAM::*;
 import ClientServer::*;
 import GetPut::*;
-
+import List::*;
 
 `include "asim/provides/librl_bsv_base.bsh"
 `include "asim/provides/fpga_components.bsh"
 
 `include "asim/provides/soft_connections.bsh"
+`include "asim/provides/soft_services.bsh"
+`include "asim/provides/soft_services_lib.bsh"
+`include "asim/provides/soft_services_deps.bsh"
 `include "asim/provides/common_services.bsh"
-`include "asim/provides/scratchpad_memory_service.bsh"
-
-`include "asim/dict/STREAMID.bsh"
-`include "asim/dict/STREAMS_BRAMTEST.bsh"
-`include "asim/dict/STREAMS_MESSAGE.bsh"
-
 
 // HAsim or Bluespec BRAM?
-`define HASIM_BRAM 1
+`define LEAP_BRAM 1
 
 
 // ========================================================================
@@ -88,7 +85,7 @@ interface BRAM_TEST#(type t_INDEX, type t_DATA);
 endinterface: BRAM_TEST
 
 
-module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
+module [CONNECTED_MODULE] mkBRAMTest
     // interface:
     (BRAM_TEST#(Bit#(indexBits), Bit#(dataBits)))
     provisos (Add#(a__, dataBits, 256),
@@ -100,12 +97,32 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
 
               Alias#(BRAMRequest#(Bit#(indexBits), Bit#(dataBits)), t_BRAM_REQ));
     
-`ifdef HASIM_BRAM
-    BRAM#(Bit#(indexBits), Bit#(dataBits)) ram <- mkBRAM();
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
+
+    let msgWRITE_PIPE     <- getGlobalStringUID("Write %d bits: 16 take %d cycles\n");
+    let msgWRITE_1        <- getGlobalStringUID("Write %d bits: 1 takes %d cycles\n");
+    let msgREAD_PIPE      <- getGlobalStringUID("Read %d bits: 16 take %d cycles\n");
+    let msgREAD_1         <- getGlobalStringUID("Read %d bits: 1 takes %d cycles\n");
+    let msgREADDELAY_PIPE <- getGlobalStringUID("Read %d bits with delays: 16 take %d cycles\n");
+    let msgREADWRITE_PIPE <- getGlobalStringUID("Read & write %d bits: 16 take %d cycles\n");
+    let msgREADWRITE_1    <- getGlobalStringUID("Read & write %d bits: 1 takes %d cycles\n");
+    let msgERR_VAL        <- getGlobalStringUID("BRAM-test: ERROR: unexpected read val (0x%08llx)\n");                                                     
+`ifdef LEAP_BRAM
+    BRAM#(Bit#(indexBits), Bit#(dataBits)) ram;
+
+    if(`BRAM_CONSTRUCTOR == 0)
+    begin
+        ram <- mkBRAM();
+    end
+
+    if(`BRAM_CONSTRUCTOR == 1)
+    begin
+        ram <- mkBRAMClockDivider();
+    end
+
 `else
     BRAM::BRAM#(Bit#(indexBits), Bit#(dataBits)) ram <- BRAM::mkBRAM();
 `endif
-
     Reg#(Bit#(64)) fpgaCycle <- mkReg(0);
     Reg#(Bit#(64)) lastCycle <- mkRegU();
 
@@ -152,7 +169,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Write only test.
     //
     rule doWrites (writeIdx != 0);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         ram.write(writeIdx, truncate(writeData));
 `else
         ram.portA.request.put(writeReq(writeIdx, truncate(writeData)));
@@ -166,11 +183,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
         // Compute single write latency one time
         if (writeIdx == 1)
         begin
-            Bit#(32) write_cycles = truncate(fpgaCycle - lastCycle);
-            streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                                stringID: `STREAMS_BRAMTEST_WRITE_1,
-                                                payload0: fromInteger(valueOf(dataBits)),
-                                                payload1: write_cycles });
+            Bit#(64) write_cycles = truncate(fpgaCycle - lastCycle);
+            stdio.printf(msgWRITE_1, list2(fromInteger(valueOf(dataBits)), write_cycles));
         end
 
         lastCycle <= fpgaCycle;
@@ -183,7 +197,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Read only test.
     //
     rule startReads (readIdx != 0);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         ram.readReq(readIdx);
 `else
         ram.portB.request.put(readReq(readIdx));
@@ -205,7 +219,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Read & write dual test using separate ports.
     //
     rule startReadWrites (readWriteIdx != 0);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         ram.write(readWriteIdx + 1, truncate(writeData));
 `else
         ram.portA.request.put(writeReq(readWriteIdx + 1, truncate(writeData)));
@@ -216,7 +230,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
         new_data[0] = writeData[255];
         writeData <= new_data;
 
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         ram.readReq(readWriteIdx);
 `else
         ram.portB.request.put(readReq(readWriteIdx));
@@ -238,7 +252,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Read consumer for both startReads and startReadWrites.
     //
     rule getReads (True);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         let v <- ram.readRsp();
 `else
         let v <- ram.portB.response.get();
@@ -253,10 +267,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
         if (expected_val != v)
         begin
             Bit#(64) p_v = truncate({ 64'b0, expected_val });
-            streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                           stringID: `STREAMS_BRAMTEST_ERR_VAL,
-                                           payload0: p_v[63:32],
-                                           payload1: p_v[31:0] });
+            stdio.printf(msgERR_VAL, list1(p_v));
             err = True;
         end
 
@@ -267,11 +278,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
 
             if (! err)
             begin
-                Bit#(32) read_cycles = truncate(fpgaCycle - lastCycle);
-                streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                               stringID: doingRW ? `STREAMS_BRAMTEST_READWRITE_1 : `STREAMS_BRAMTEST_READ_1,
-                                               payload0: fromInteger(valueOf(dataBits)),
-                                               payload1: read_cycles });
+                Bit#(64) read_cycles = truncate(fpgaCycle - lastCycle);
+                stdio.printf(doingRW ? msgREADWRITE_1 : msgREAD_1, list2(fromInteger(valueOf(dataBits)), read_cycles ));
             end
         end
     endrule
@@ -282,7 +290,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Read only test with consumer that doesn't run every cycle.
     //
     rule startDelayedReads (readDelayedIdx != 0);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         ram.readReq(readDelayedIdx);
 `else
         ram.portB.request.put(readReq(readDelayedIdx));
@@ -306,7 +314,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     or returning bad values.
     //
     rule getReadsDelayed (fpgaCycle[2] == 0);
-`ifdef HASIM_BRAM
+`ifdef LEAP_BRAM
         let v <- ram.readRsp();
 `else
         let v <- ram.portB.response.get();
@@ -320,10 +328,7 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
         if (expected_val != v)
         begin
             Bit#(64) p_v = truncate({ 64'b0, expected_val });
-            streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                           stringID: `STREAMS_BRAMTEST_ERR_VAL,
-                                           payload0: p_v[63:32],
-                                           payload1: p_v[31:0] });
+            stdio.printf(msgERR_VAL, list1(p_v));
         end
 
         readDone <= is_last;
@@ -352,11 +357,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Wait for write-only test to complete and print summary.
     //
     method Action writeEnd() if (writeIdx == 0);
-        Bit#(32) total_cycles = truncate(fpgaCycle - startCycle - 1);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_WRITE_PIPE,
-                                       payload0: fromInteger(valueOf(dataBits)),
-                                       payload1: total_cycles });
+        Bit#(64) total_cycles = truncate(fpgaCycle - startCycle - 1);
+        stdio.printf(msgWRITE_PIPE, list2(fromInteger(valueOf(dataBits)), total_cycles));
     endmethod
 
 
@@ -378,11 +380,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Wait for read-only test to complete and print summary.
     //
     method Action readEnd() if (readDone);
-        Bit#(32) total_cycles = truncate(fpgaCycle - startCycle - 2);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_READ_PIPE,
-                                       payload0: fromInteger(valueOf(dataBits)),
-                                       payload1: total_cycles });
+        Bit#(64) total_cycles = truncate(fpgaCycle - startCycle - 2);
+        stdio.printf(msgREAD_PIPE, list2(fromInteger(valueOf(dataBits)), total_cycles ));
     endmethod
 
 
@@ -404,11 +403,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Wait for read-only test with delays to complete and print summary.
     //
     method Action readDelayedEnd() if (readDone);
-        Bit#(32) total_cycles = truncate(fpgaCycle - startCycle - 2);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_READDELAY_PIPE,
-                                       payload0: fromInteger(valueOf(dataBits)),
-                                       payload1: total_cycles });
+        Bit#(64) total_cycles = truncate(fpgaCycle - startCycle - 2);
+        stdio.printf(msgREADDELAY_PIPE, list2(fromInteger(valueOf(dataBits)), total_cycles ));
     endmethod
 
 
@@ -432,11 +428,8 @@ module mkBRAMTest#(FIFO#(STREAMS_REQUEST) streamsQ)
     //     Wait for read & write test to complete and print summary.
     //
     method Action readWriteEnd() if (readDone);
-        Bit#(32) total_cycles = truncate(fpgaCycle - startCycle - 2);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_READWRITE_PIPE,
-                                       payload0: fromInteger(valueOf(dataBits)),
-                                       payload1: total_cycles });
+        Bit#(64) total_cycles = truncate(fpgaCycle - startCycle - 2);
+        stdio.printf(msgREADWRITE_PIPE, list2(fromInteger(valueOf(dataBits)), total_cycles ));
         doingRW <= False;
     endmethod
 
@@ -448,7 +441,7 @@ interface BRAM_TEST_DRIVER#(type t_INDEX, type t_DATA);
     method Action finish();
 endinterface: BRAM_TEST_DRIVER
 
-module mkBRAMTestDriver#(FIFO#(STREAMS_REQUEST) streamsQ)
+module [CONNECTED_MODULE] mkBRAMTestDriver
     // interface:
     (BRAM_TEST_DRIVER#(Bit#(indexBits), Bit#(dataBits)))
     provisos (Add#(a__, dataBits, 256),
@@ -459,7 +452,7 @@ module mkBRAMTestDriver#(FIFO#(STREAMS_REQUEST) streamsQ)
               Add#(y, 1, dataBits));
 
     
-    BRAM_TEST#(Bit#(indexBits), Bit#(dataBits)) bram <- mkBRAMTest(streamsQ);
+    BRAM_TEST#(Bit#(indexBits), Bit#(dataBits)) bram <- mkBRAMTest();
     Reg#(Bit#(5)) state <- mkReg(0);
 
     rule driverWriteStart (state == 1);
@@ -521,22 +514,22 @@ endmodule
 
 module [CONNECTED_MODULE] mkSystem ();
 
-    STREAMS_CLIENT link_streams <- mkStreamsClient(`STREAMID_BRAMTEST);
-
-    FIFO#(STREAMS_REQUEST) streamsQ <- mkSizedFIFO(128);
-
     Reg#(Bit#(5)) state <- mkReg(0);
 
+    STDIO#(Bit#(64)) stdio <- mkStdIO();
+
+    let msgStart <- getGlobalStringUID("BRAM-test: Start\n");
+    let msgDone  <- getGlobalStringUID("BRAM-test: Done\n"); 
+    let msgErr   <- getGlobalStringUID("BRAM-test: terminated with error\n");
+
+
     rule start (state == 0);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_START,
-                                       payload0: 0,
-                                       payload1: 0 });
+        stdio.printf(msgStart, List::nil);
         state <= state + 1;
     endrule
 
 
-    BRAM_TEST_DRIVER#(Bit#(10), Bit#(8)) bram8Test <- mkBRAMTestDriver(streamsQ);
+    BRAM_TEST_DRIVER#(Bit#(10), Bit#(8)) bram8Test <- mkBRAMTestDriver();
 
     rule bram8_Start (state == 1);
         bram8Test.start();
@@ -549,7 +542,7 @@ module [CONNECTED_MODULE] mkSystem ();
     endrule
 
 
-    BRAM_TEST_DRIVER#(Bit#(10), Bit#(64)) bram64Test <- mkBRAMTestDriver(streamsQ);
+    BRAM_TEST_DRIVER#(Bit#(10), Bit#(64)) bram64Test <- mkBRAMTestDriver();
 
     rule bram64_Start (state == 3);
         bram64Test.start();
@@ -562,7 +555,7 @@ module [CONNECTED_MODULE] mkSystem ();
     endrule
 
 
-    BRAM_TEST_DRIVER#(Bit#(5), Bit#(210)) bram210Test <- mkBRAMTestDriver(streamsQ);
+    BRAM_TEST_DRIVER#(Bit#(5), Bit#(210)) bram210Test <- mkBRAMTestDriver();
 
     rule bram210_Start (state == 5);
         bram210Test.start();
@@ -576,29 +569,12 @@ module [CONNECTED_MODULE] mkSystem ();
 
 
     rule doneMessage (state == 7);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_BRAMTEST,
-                                       stringID: `STREAMS_BRAMTEST_DONE,
-                                       payload0: 0,
-                                       payload1: 0 });
+        stdio.printf(msgDone, List::nil);
         state <= state + 1;
     endrule
 
     rule exit (state == 8);
-        streamsQ.enq(STREAMS_REQUEST { streamID: `STREAMID_NULL,
-                                       stringID: `STREAMS_MESSAGE_EXIT,
-                                       payload0: 0,
-                                       payload1: 0 });
-    endrule
-
-    //
-    // streams --
-    //     Monitor streams queue and emit messages to host.
-    //
-    rule streams (True);
-        let msg = streamsQ.first();
-        streamsQ.deq();
-        
-        link_streams.sendAs(msg.streamID, msg.stringID, msg.payload0, msg.payload1);
+        $finish;
     endrule
 
 endmodule

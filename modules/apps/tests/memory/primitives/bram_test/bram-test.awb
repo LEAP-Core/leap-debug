@@ -5,6 +5,7 @@
 
 %provides hardware_system
 
-%public bram-test.dic
+%param BRAM_CONSTRUCTOR  0  "Which BRAM constructor should we use? 0: Normal BRAM, 1: Clock Divided BRAM"
+
 %public bram-test.bsv
 
