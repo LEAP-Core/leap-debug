@@ -15,3 +15,5 @@
 %public clock_divider.bsv clock_divider.cpp clock_divider.h 
 
 %AWB_END
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"

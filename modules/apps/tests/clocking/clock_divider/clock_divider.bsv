@@ -21,8 +21,8 @@ module [CONNECTED_MODULE] mkConnectedApplication ();
     let slowClock   <- mkUserClock_Divider(4);
 
     Reg#(Bit#(64))         regFast   <- mkReg(0);
-    CrossingReg#(Bit#(64)) regMedium <- mkNullCrossingReg(fastClock, 0, clocked_by mediumClock.clk, reset_by mediumClock.rst);
-    CrossingReg#(Bit#(64)) regSlow   <- mkNullCrossingReg(fastClock, 0, clocked_by slowClock.clk, reset_by slowClock.rst);
+    CrossingReg#(Bit#(64)) regMedium <- mkNullCrossingReg(fastClock, 0, clocked_by mediumClock.clk.slowClock, reset_by mediumClock.rst);
+    CrossingReg#(Bit#(64)) regSlow   <- mkNullCrossingReg(fastClock, 0, clocked_by slowClock.clk.slowClock, reset_by slowClock.rst);
 
     Reg#(Bit#(64)) regFastLast   <- mkReg(0);
     Reg#(Bit#(64)) regMediumLast <- mkReg(0);
