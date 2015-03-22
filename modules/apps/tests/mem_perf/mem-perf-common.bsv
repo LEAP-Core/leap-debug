@@ -53,7 +53,9 @@ import DefaultValue::*;
 typedef enum
 {
     STATE_get_command,
-    STATE_test_done,
+    STATE_test_done0,
+    STATE_test_done1,
+    STATE_test_done2,
     STATE_writing,
     STATE_reading,
     STATE_finished,
@@ -180,14 +182,24 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
         reqsDone <= False;
     endrule
 
-    rule doTestDone (state == STATE_test_done);
+    rule doTestDone0 (state == STATE_test_done0);
         stdio.printf(perfMsg, list6(fromInteger(scratchpadID),
                                     zeroExtend(pack(bound)), 
                                     zeroExtend(pack(stride)), 
                                     0, 
                                     zeroExtend(pack(endCycle - startCycle)), 
                                     zeroExtend(pack(errors))));
-        finishChain.enq(0,?);
+        state <= STATE_test_done1;
+    endrule
+
+    rule doTestDone1 (state == STATE_test_done1);
+        stdio.sync_req(False);
+        state <= STATE_test_done2;
+    endrule
+
+    rule doTestDone2 (state == STATE_test_done2);
+        stdio.sync_rsp();
+        finishChain.enq(0, ?);
         state <= STATE_get_command;
     endrule
 
@@ -208,7 +220,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
         count <= count + 1;
         if(count + 1 == iterations)
         begin
-            state <= STATE_test_done;
+            state <= STATE_test_done0;
             endCycle <= cycle;
         end
     endrule
@@ -259,7 +271,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
 
         if(operationIsLast.first)
         begin
-            state <= STATE_test_done;
+            state <= STATE_test_done0;
             endCycle <= cycle;
         end
     endrule

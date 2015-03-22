@@ -13,3 +13,4 @@
 
 %param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
 
+%param --dynamic MEM_PERF_INDIVIDUAL_STATS  0 "Emit statistics for each test?"

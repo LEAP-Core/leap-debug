@@ -62,6 +62,7 @@ module [CONNECTED_MODULE] mkMemPerfDriver ()
     CONNECTION_ADDR_RING#(Bit#(8), Bit#(1)) finishIn <- mkConnectionAddrRingNode("finish",0);
 
     Reg#(Bit#(8)) operationsComplete <- mkReg(0);
+    FIFO#(Bool) doneQ <- mkFIFO();
 
     let startMsg <- getGlobalStringUID("Test Started %llu\n");
     let endMsg   <-  getGlobalStringUID("Test Ended %llu \n");	    
@@ -86,16 +87,26 @@ module [CONNECTED_MODULE] mkMemPerfDriver ()
 
     rule collectResponses;
         finishIn.deq;
-        if(operationsComplete + 1 == finishIn.maxID)
+        if (operationsComplete + 1 == finishIn.maxID)
         begin
-            serverStub.sendResponse_RunTest(0, 0);
             operationsComplete <= 0;
             stdio.printf(endMsg, list1(cycles));
+            doneQ.enq(?);
         end
         else 
         begin
             operationsComplete <= operationsComplete + 1;
         end
+    endrule
+
+    rule done0;
+        doneQ.deq();
+        stdio.sync_req(False);
+    endrule
+
+    rule done1;
+        stdio.sync_rsp();
+        serverStub.sendResponse_RunTest(0, 0);
     endrule
 
 endmodule
