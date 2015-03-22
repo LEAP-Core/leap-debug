@@ -3,10 +3,11 @@
 #include "awb/provides/stats_service.h"
 #include "awb/rrr/client_stub_MEMPERFRRR.h"
 #include "awb/provides/connected_application.h"
+#include "awb/provides/fpga_components.h"
 
 
 static UINT32 stride[] = {1,2,3,4,5,6,7,8,16,32,64,128};
-static UINT32 rw[] = {0,1,0,1};
+static UINT32 rw[] = {0,1,0,1,1};
 
 using namespace std;
 
@@ -41,20 +42,27 @@ CONNECTED_APPLICATION_CLASS::Main()
     cout << "Warmup" << endl;
     clientStub->RunTest(1, 1, 1, 1);
 
+    uint32_t iterations = 1 << 10;
+    if (! SYNTH)
+    {
+        // Run longer on the FPGA than in simulation
+        iterations <<= 10;
+    }
+
     //
     // Software controls the order of tests.  NOTE:  Writes for a given pattern
     // must precede reads!  The writes initialize memory values and are required
     // for read value error detection.
     //
     for (int ws = 9; ws < 24; ws++) {
-        for (int rw_idx = 0; rw_idx < 3; rw_idx++) {
+        for (int rw_idx = 0; rw_idx < 5; rw_idx++) {
             for (int stride_idx = 0; stride_idx < 12; stride_idx++) {
                 stringstream filename;
                 cout << "Test RW: " << ((rw[rw_idx])?"Read":"Write") << " Working Set: " << (1 << ws) << " stride " << stride[stride_idx] << endl;
 
                 OUT_TYPE_RunTest result = clientStub->RunTest(1 << ws,
                                                               stride[stride_idx],
-                                                              1<<18,
+                                                              iterations,
                                                               rw[rw_idx]);
 
                 if (MEM_PERF_INDIVIDUAL_STATS)
