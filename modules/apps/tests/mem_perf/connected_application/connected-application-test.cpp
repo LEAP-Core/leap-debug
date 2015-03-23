@@ -55,8 +55,8 @@ CONNECTED_APPLICATION_CLASS::Main()
     // for read value error detection.
     //
     for (int ws = 9; ws < 24; ws++) {
-        for (int rw_idx = 0; rw_idx < 5; rw_idx++) {
-            for (int stride_idx = 0; stride_idx < 12; stride_idx++) {
+        for (int stride_idx = 0; stride_idx < 12; stride_idx++) {
+            for (int rw_idx = 0; rw_idx < 5; rw_idx++) {
                 stringstream filename;
                 cout << "Test RW: " << ((rw[rw_idx])?"Read":"Write") << " Working Set: " << (1 << ws) << " stride " << stride[stride_idx] << endl;
 
