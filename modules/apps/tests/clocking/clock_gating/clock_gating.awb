@@ -1,0 +1,20 @@
+/********************************************************************
+ *
+ * Awb module specification
+ *
+ *******************************************************************/
+
+
+%AWB_START
+
+%name Clock Gating Test System
+%desc Clock Gating Test System
+
+%provides connected_application
+
+%public clock_gating.bsv clock_gating.cpp clock_gating.h 
+
+%AWB_END
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

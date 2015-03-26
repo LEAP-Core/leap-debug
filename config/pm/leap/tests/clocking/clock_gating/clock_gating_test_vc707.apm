@@ -1,0 +1,46 @@
+
+[Global]
+SaveParameters=0
+Description=Traffic Light from Bluespec Tutorial for ACP w. synthesis boundary
+File=clock_gating_test_vc707
+Version=2.2
+Name=Traffic Light Model - ACP with synthesis boundary
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project
+model=HW/SW Hybrid Pipeline Build
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid VC707 PCIE FPGA Environment (Vivado)
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Clock Gating Test System
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+
+[Hybrid VC707 PCIE FPGA Environment (Vivado)]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie-vivado.apm
+Packagehint=leap
+
+[Clock Gating Test System]
+File=modules/apps/tests/clocking/clock_gating/clock_gating.awb
+Packagehint=leap-debug
