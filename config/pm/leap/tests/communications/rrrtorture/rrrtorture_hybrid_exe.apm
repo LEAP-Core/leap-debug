@@ -1,0 +1,45 @@
+
+[Global]
+SaveParameters=0
+Description=RRR Torture Test Program (Bluesim)
+File=rrrtorture_hybrid_exe
+Version=2.2
+Name=RRR Torture Test Program (Bluesim)
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=rrrtest unconnected hybrid project exe
+model=HW/SW Hybrid Pipeline Build
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Hybrid Simulation FPGA Environment]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid Simulation FPGA Environment
+application_env=Soft Services Hybrid Application Environment
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Bluespec RRR Torture Test
+
+[Bluespec RRR Torture Test]
+File=modules/apps/tests/communications/rrrtorture/rrrtorture.awb
+Packagehint=leap-debug

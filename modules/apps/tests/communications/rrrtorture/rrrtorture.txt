@@ -1,0 +1,4 @@
+RRR Torture
+
+This application attempts to torture test RRR using many seperate and
+simulataneously active RRR channels.

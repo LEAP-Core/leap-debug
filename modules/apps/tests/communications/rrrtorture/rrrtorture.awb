@@ -1,0 +1,26 @@
+********************************************************************
+* Awb module specification
+********************************************************************
+
+%AWB_START
+
+%name Bluespec RRR Torture Test
+%desc Bluespec RRR Torture Test
+
+%attributes rrrtest unconnected hybrid
+
+%provides connected_application
+
+%notes rrrtest.txt
+
+%sources -t BSV  -v PUBLIC  rrrtorture.bsv
+%sources -t H    -v PUBLIC  rrrtorture.h   rrrtorture-server.h
+%sources -t CPP  -v PRIVATE rrrtorture.cpp rrrtorture-server.cpp
+%sources -t RRR  -v PUBLIC  rrrtorture.rrr
+%sources -t LOG  -v PUBLIC  rrrtorture.log
+
+%param --dynamic RRRTORTURE_TOTAL_TRANSACTIONS  1000000  "Total transactions for RRR Torture Test."
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+
+%AWB_END

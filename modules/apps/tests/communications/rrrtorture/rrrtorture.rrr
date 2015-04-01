@@ -1,0 +1,80 @@
+service RRRTORTURE_0
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg0(in UINT64[64] payload, out UINT64[64] return);
+    };
+};
+
+service RRRTORTURE_1
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg1(in UINT64[64] payload, out UINT64[64] return);
+    };
+};
+
+
+service RRRTORTURE_2
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg2(in UINT64[64] payload, out UINT64[64] return);
+    };
+};
+
+
+service RRRTORTURE_3
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg3(in UINT64[64] payload, out UINT64[64] return);
+    };
+};
+
+
+service RRRTORTURE_4
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg4(in UINT64[64] payload, out UINT64[64] return);
+    };
+
+};
+
+
+service RRRTORTURE_5
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg5(in UINT64[64] payload, out UINT64[64] return);
+    };
+
+};
+
+service RRRTORTURE_6
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg6(in UINT64[64] payload, out UINT64[64] return);
+    };
+
+};
+
+
+service RRRTORTURE_7
+{
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method F2HTwoWayMsg7(in UINT64[64] payload, out UINT64[64] return);
+    };
+
+};

@@ -1,0 +1,43 @@
+
+[Global]
+SaveParameters=0
+Description=A basic smoke test for the LIM compiler
+File=rrrtorture_li_vc707
+Version=2.2
+Name=Traffic Light Model - Exe with synthesis boundary
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Multifpga Project Foundation
+RootProvides=model
+
+[Model]
+DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project exe
+model=HW/SW Hybrid Multifpga Project Foundation
+
+[HW/SW Hybrid Multifpga Project Foundation/Requires]
+connected_application=Bluespec RRR Torture Test
+environment_description=VC707 HW/SW Environment
+build_pipeline=LIM Compiler Pipeline
+fpga_mapping=Null FPGA Mapping
+
+[HW/SW Hybrid Multifpga Project Foundation]
+File=modules/leap/build-support/project/project-multifpga.awb
+Packagehint=leap-multifpga
+
+[LIM Compiler Pipeline]
+File=config/pm/leap/submodels/pipelines/build-pipeline-lim.apm
+Packagehint=leap-multifpga
+
+[Null FPGA Mapping]
+File=modules/leap/build-support/project/null_mapping.awb
+Packagehint=leap-multifpga
+
+[Bluespec RRR Torture Test]
+File=modules/apps/tests/communications/rrrtorture/rrrtorture.awb
+Packagehint=leap-debug
+
+[VC707 HW/SW Environment]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_hwsw.awb
+Packagehint=leap-multifpga
