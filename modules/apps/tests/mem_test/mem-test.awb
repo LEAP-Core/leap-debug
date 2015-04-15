@@ -12,4 +12,5 @@
 %param --dynamic MEM_TEST_VERBOSE    0  "0: disable, 1: enable verbose output"
 %param --dynamic MEM_TEST_HEAP       1  "0: disable, 1: enable heap access test"
 
+%param MEM_TEST_REQUEST_MERGING 0 "ENable (1) / disable (0) scratchpad request merging"
 %param MEM_TEST_PRIVATE_CACHES 1  "Enable (1) / disable (0) private scratchpad caches"

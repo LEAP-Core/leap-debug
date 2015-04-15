@@ -16,7 +16,6 @@ RootProvides=model
 DefaultAttributes=hybrid bluespec
 model=HW/SW Hybrid Pipeline Build
 
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap

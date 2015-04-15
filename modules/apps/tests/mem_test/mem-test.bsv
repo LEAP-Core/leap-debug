@@ -106,6 +106,7 @@ module [CONNECTED_MODULE] mkSystem ()
     // Allocate scratchpads
     //
     SCRATCHPAD_CONFIG sconf = defaultValue;
+    sconf.requestMerging = (`MEM_TEST_REQUEST_MERGING != 0);
     sconf.cacheMode = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
                                                        SCRATCHPAD_NO_PVT_CACHE);
 
