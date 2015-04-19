@@ -300,4 +300,5 @@ CONNECTED_APPLICATION_CLASS::Main()
 
     // report results and exit
     cout << "Done" << endl;
+    exit(0);
 }
