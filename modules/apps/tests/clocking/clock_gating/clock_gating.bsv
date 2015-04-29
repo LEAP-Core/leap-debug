@@ -1,4 +1,5 @@
 import Clocks::*; 
+import List::*;
 
 `include "awb/provides/common_services.bsh"
 `include "awb/provides/fpga_components.bsh"
@@ -9,14 +10,16 @@ import Clocks::*;
 `include "awb/provides/soft_services_lib.bsh"
 `include "awb/provides/soft_services_deps.bsh"
 
+`include "awb/provides/gating_test.bsh"
+
 
 module [CONNECTED_MODULE] mkConnectedApplication ();
 
     STDIO#(Bit#(64)) stdio  <- mkStdIO();
 
-    let msg <- getGlobalStringUID("Fast Clock: %d (%d), Medium Clock: %d(%d) Slow Clock: %d(%d)\n");
+    let msg <- getGlobalStringUID("Fast Clock: %d (%d), Medium Clock: %d(%d) Medium ModuleClock: %d(%d), Slow Clock: %d(%d)\n");
     
-    Reg#(Bit#(2)) counter <- mkReg(0);
+    Reg#(Bit#(32)) counter <- mkReg(0);
 
     let fastClock   <- exposeCurrentClock();
     let mediumClock <- mkGatedClockFromCC(True);
@@ -25,24 +28,29 @@ module [CONNECTED_MODULE] mkConnectedApplication ();
     rule countUp;
         counter <= counter + 1;
         mediumClock.setGateCond(counter[0]==0);
-        slowClock.setGateCond(counter==0);
+        slowClock.setGateCond(counter[1:0]==0);
     endrule  
 
     Reg#(Bit#(64))         regFast   <- mkReg(0);
     CrossingReg#(Bit#(64)) regMedium <- mkNullCrossingReg(fastClock, 0, clocked_by mediumClock.new_clk);
     CrossingReg#(Bit#(64)) regSlow   <- mkNullCrossingReg(fastClock, 0, clocked_by slowClock.new_clk);
+    ReadOnly#(Bit#(64))    regModule <- mkGatedClockTest();
 
     Reg#(Bit#(64)) regFastLast   <- mkReg(0);
     Reg#(Bit#(64)) regMediumLast <- mkReg(0);
     Reg#(Bit#(64)) regSlowLast   <- mkReg(0);
+    Reg#(Bit#(64)) regModuleLast   <- mkReg(0);
     
     rule printResults;
-        stdio.printf(msg, list6(regFast, regFast - regFastLast, 
+        stdio.printf(msg, List::map(zeroExtend,list8(regFast, regFast - regFastLast, 
                                 regMedium.crossed(), regMedium.crossed() - regMediumLast, 
-                                regSlow.crossed(), regSlow.crossed() - regSlowLast));
+                                regModule, regModule - regModuleLast,
+                                regSlow.crossed(), regSlow.crossed() - regSlowLast)));
+
         regFastLast <= regFast; 
         regMediumLast <= regMedium.crossed(); 
         regSlowLast <= regSlow.crossed(); 
+        regModuleLast <= regModule; 
     endrule
     
     rule incrementFast;
@@ -58,3 +66,4 @@ module [CONNECTED_MODULE] mkConnectedApplication ();
     endrule
 
 endmodule
+

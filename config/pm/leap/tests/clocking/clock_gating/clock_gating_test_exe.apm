@@ -40,7 +40,13 @@ Packagehint=leap
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
-
 [Clock Gating Test System]
 File=modules/apps/tests/clocking/clock_gating/clock_gating.awb
+Packagehint=leap-debug
+
+[Clock Gating Test System/Requires]
+gating_test=Clock Gating Test Libraries
+
+[Clock Gating Test Libraries]
+File=modules/apps/tests/clocking/clock_gating/clock_gating_test.awb
 Packagehint=leap-debug

@@ -11,8 +11,10 @@
 %desc Clock Gating Test System
 
 %provides connected_application
+%requires gating_test
 
 %public clock_gating.bsv clock_gating.cpp clock_gating.h 
+
 
 %AWB_END
 

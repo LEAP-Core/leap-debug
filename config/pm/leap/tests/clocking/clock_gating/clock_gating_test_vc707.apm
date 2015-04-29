@@ -36,11 +36,21 @@ connected_application=Clock Gating Test System
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
 
-
 [Hybrid VC707 PCIE FPGA Environment (Vivado)]
 File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc707-pcie-vivado.apm
 Packagehint=leap
 
 [Clock Gating Test System]
 File=modules/apps/tests/clocking/clock_gating/clock_gating.awb
+Packagehint=leap-debug
+
+[Hybrid VC707 PCIE FPGA Environment (Vivado)/Params]
+MODEL_CLOCK_FREQ=130
+VIVADO_ENABLE_CLOCK_CONVERSION=1
+
+[Clock Gating Test System/Requires]
+gating_test=Clock Gating Test Libraries
+
+[Clock Gating Test Libraries]
+File=modules/apps/tests/clocking/clock_gating/clock_gating_test.awb
 Packagehint=leap-debug
