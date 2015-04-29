@@ -166,7 +166,12 @@ module [CONNECTED_MODULE] mkSystem ()
     // If not doing heap tests then mark heap test done already
     function Bit#(2) completeReadsInitVal() = enableHeap ? 0 : 1;
 
-    // Messages
+    // ====================================================================
+    //
+    // Messages and printing.
+    //
+    // ====================================================================
+
     let msgData <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x\n");
     let msgDataErr <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x  ERROR\n");
     let msgLG <- getGlobalStringUID("LG");
@@ -176,7 +181,41 @@ module [CONNECTED_MODULE] mkSystem ()
     let msgLatency <- getGlobalStringUID("latency (4 loads, 2 bytes per load) = 0x%016llx\n                                      0x%016llx\n");
     let msgDone <- getGlobalStringUID("memtest: done\n");
 
-    
+    FIFO#(Tuple3#(GLOBAL_STRING_UID, MEM_ADDRESS, t_MEM_DATA_LG)) memLGPrintQ <- mkFIFO();
+    FIFO#(Tuple3#(GLOBAL_STRING_UID, MEM_ADDRESS, t_MEM_DATA_MD)) memMDPrintQ <- mkFIFO();
+    FIFO#(Tuple3#(GLOBAL_STRING_UID, MEM_ADDRESS, t_MEM_DATA_SM)) memSMPrintQ <- mkFIFO();
+    FIFO#(Tuple3#(GLOBAL_STRING_UID, MEM_ADDRESS, t_MEM_DATA_SM)) memHPrintQ <- mkFIFO();
+
+    rule doPrintLG (True);
+        match {.msg, .r_addr, .v} = memLGPrintQ.first();
+        memLGPrintQ.deq();
+
+        stdio.printf(msg, list3(zeroExtend(msgLG), zeroExtend(r_addr), resize(pack(v))));
+    endrule
+
+    rule doPrintMD (True);
+        match {.msg, .r_addr, .v} = memMDPrintQ.first();
+        memMDPrintQ.deq();
+
+        stdio.printf(msg, list3(zeroExtend(msgMD), zeroExtend(r_addr), resize(pack(v))));
+    endrule
+
+    rule doPrintSM (True);
+        match {.msg, .r_addr, .v} = memSMPrintQ.first();
+        memSMPrintQ.deq();
+
+        stdio.printf(msg, list3(zeroExtend(msgSM), zeroExtend(r_addr), resize(pack(v))));
+    endrule
+
+    rule doPrintH (True);
+        match {.msg, .r_addr, .v} = memHPrintQ.first();
+        memHPrintQ.deq();
+
+        stdio.printf(msg, list3(zeroExtend(msgH), zeroExtend(r_addr), resize(pack(v))));
+    endrule
+
+
+
     (* fire_when_enabled *)
     rule cycleCount (True);
         cycle <= cycle + 1;
@@ -365,7 +404,7 @@ module [CONNECTED_MODULE] mkSystem ()
         if (verbose || error)
         begin
             let msg = (! error ? msgData : msgDataErr);
-            stdio.printf(msg, list3(zeroExtend(msgLG), zeroExtend(r_addr), resize(pack(v))));
+            memLGPrintQ.enq(tuple3(msg, r_addr, v));
         end
         
         if (done)
@@ -404,7 +443,7 @@ module [CONNECTED_MODULE] mkSystem ()
         if (verbose || error)
         begin
             let msg = (! error ? msgData : msgDataErr);
-            stdio.printf(msg, list3(zeroExtend(msgMD), zeroExtend(r_addr), resize(pack(v))));
+            memMDPrintQ.enq(tuple3(msg, r_addr, v));
         end
         
         if (done)
@@ -439,7 +478,7 @@ module [CONNECTED_MODULE] mkSystem ()
         if (verbose || error)
         begin
             let msg = (! error ? msgData : msgDataErr);
-            stdio.printf(msg, list3(zeroExtend(msgSM), zeroExtend(r_addr), resize(pack(v))));
+            memSMPrintQ.enq(tuple3(msg, r_addr, v));
         end
         
         if (done)
@@ -484,7 +523,7 @@ module [CONNECTED_MODULE] mkSystem ()
         if (verbose || error)
         begin
             let msg = (! error ? msgData : msgDataErr);
-            stdio.printf(msg, list3(zeroExtend(msgH), zeroExtend(r_addr), resize(pack(v))));
+            memHPrintQ.enq(tuple3(msg, r_addr, v));
         end
         
         if (done)
