@@ -42,11 +42,11 @@ CONNECTED_APPLICATION_CLASS::Main()
     cout << "Warmup" << endl;
     clientStub->RunTest(1, 1, 1, 1);
 
-    uint32_t iterations = 1 << 10;
-    if (! SYNTH)
+    uint32_t iterations = 1 << 14;
+    if (SYNTH)
     {
         // Run longer on the FPGA than in simulation
-        iterations <<= 10;
+        iterations <<= 14;
     }
 
     //
