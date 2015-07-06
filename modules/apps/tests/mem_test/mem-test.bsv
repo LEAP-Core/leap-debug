@@ -60,6 +60,8 @@ import DefaultValue::*;
 `define START_ADDR 0
 `define LAST_ADDR  'h1ff
 
+// `define DISABLE_HEAP 1
+
 typedef enum
 {
     STATE_init,
@@ -123,9 +125,10 @@ module [CONNECTED_MODULE] mkSystem ()
         mkScratchpad(`VDEV_SCRATCH_MEMTEST_SM, sconf);
 
     // Heap
+`ifndef DISABLE_HEAP
     MEMORY_HEAP#(MEM_ADDRESS, t_MEM_DATA_SM) heap <-
         mkMemoryHeapUnionScratchpad(`VDEV_SCRATCH_MEMTEST_HEAP, sconf);
-
+`endif
 
     DEBUG_FILE debugLog <- mkDebugFile("mem_test.out");
 
@@ -148,7 +151,11 @@ module [CONNECTED_MODULE] mkSystem ()
     //  0 -- disable
     //  1 -- enable
     Param#(1) heapTestMode <- mkDynamicParameter(`PARAMS_HARDWARE_SYSTEM_MEM_TEST_HEAP, paramNode);
-    let enableHeap = heapTestMode == 1;
+`ifndef DISABLE_HEAP
+    Bool enableHeap = heapTestMode == 1;
+`else
+    Bool enableHeap = False;
+`endif
 
     // Output
     STDIO#(Bit#(64)) stdio <- mkStdIO();
@@ -172,6 +179,8 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // ====================================================================
 
+    let msgStart <- getGlobalStringUID("memtest: starting\n");
+    let msgWritesDone <- getGlobalStringUID("memtest: writes complete\n");
     let msgData <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x\n");
     let msgDataErr <- getGlobalStringUID("mem%s [0x%8x] = 0x%08x  ERROR\n");
     let msgLG <- getGlobalStringUID("LG");
@@ -223,6 +232,7 @@ module [CONNECTED_MODULE] mkSystem ()
 
     rule doInit (state == STATE_init);
         linkStarterStartRun.deq();
+        stdio.printf(msgStart, List::nil);
 
         nCompleteReads <= completeReadsInitVal();
 
@@ -237,7 +247,6 @@ module [CONNECTED_MODULE] mkSystem ()
     //
     // ====================================================================
 
-    (* conservative_implicit_conditions *)
     rule sendWrite (state == STATE_writing);
         //
         // Store different values in each of the memories to increase confidence
@@ -271,6 +280,7 @@ module [CONNECTED_MODULE] mkSystem ()
             debugLog.record($format("writeSM: addr 0x%x, data 0x%x", addr, dataSM));
             
             // Allocate a slot in the heap
+`ifndef DISABLE_HEAP
             if (enableHeap)
             begin
                 let heap_idx <- heap.malloc();
@@ -284,12 +294,17 @@ module [CONNECTED_MODULE] mkSystem ()
                 heap.write(heap_idx, dataH);
                 debugLog.record($format("writeH: idx 0x%x, data 0x%x", heap_idx, dataH));
             end
+`endif
         end
         
         if (addr == `LAST_ADDR)
         begin
             addr <= `START_ADDR;
             state <= STATE_read_random;
+            if (verbose)
+            begin
+                stdio.printf(msgWritesDone, List::nil);
+            end
         end
         else
         begin
@@ -322,8 +337,10 @@ module [CONNECTED_MODULE] mkSystem ()
         memoryLG.readReq(r_addr);
         memoryMD.readReq(r_addr);
         memorySM.readReq(r_addr);
+`ifndef DISABLE_HEAP
         if (enableHeap)
             heap.readReq(r_addr);
+`endif
 
         let done = ((randTrip + 1) == maxBound);
 
@@ -345,8 +362,10 @@ module [CONNECTED_MODULE] mkSystem ()
         memoryLG.readReq(addr);
         memoryMD.readReq(addr);
         memorySM.readReq(addr);
+`ifndef DISABLE_HEAP
         if (enableHeap)
             heap.readReq(addr);
+`endif
 
         let done = (addr == `LAST_ADDR);
 
@@ -361,11 +380,13 @@ module [CONNECTED_MODULE] mkSystem ()
         // malloc on every 4th access just to keep things interesting.
         // The readRecvHeap rule is freeing every read address, so there
         // will be entries available.
+`ifndef DISABLE_HEAP
         if (enableHeap && (addr[1:0] == 3))
         begin
             let m <- heap.malloc();
             debugLog.record($format("malloc: idx 0x%x", m));
         end
+`endif
 
         if (done)
         begin
@@ -501,6 +522,7 @@ module [CONNECTED_MODULE] mkSystem ()
         match {.r_addr, .done} = readAddrHQ.first();
         readAddrHQ.deq();
 
+`ifndef DISABLE_HEAP
         if (state == STATE_read_sequential)
         begin
             heap.free(r_addr);
@@ -539,6 +561,7 @@ module [CONNECTED_MODULE] mkSystem ()
                 nCompleteReads <= nCompleteReads + 1;
             end
         end
+`endif
     endrule
     
 
