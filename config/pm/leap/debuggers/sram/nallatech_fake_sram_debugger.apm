@@ -24,8 +24,6 @@ Packagehint=leap
 File=modules/leap/build-support/project/application-env/base/application-env-hybrid-base.awb
 Packagehint=leap
 
-[Base Hybrid Application Environment/Requires]
-hybrid_application=SRAM Debugger Application
 
 [Hardware FPGA Components for Virtex 5]
 File=modules/bluespec/common/fpgaenv/fpga-components/hardware-fpga-components-virtex5.awb
@@ -96,8 +94,6 @@ Packagehint=leap
 File=modules/leap/virtual-platform/low-level-platform-interface/remote-memory/null/null-remote-memory.awb
 Packagehint=leap
 
-[NULL Virtual Devices/Requires]
-starter_device=Null Starter Virtual Device
 
 [Basic Virtual Channel Multiplexer/Requires]
 physical_channel=Nallatech Edge Physical Channel
@@ -106,9 +102,6 @@ physical_channel=Nallatech Edge Physical Channel
 File=modules/bluespec/common/fpgaenv/virtual-platform/umf/little-endian/umf-little-endian.awb
 Packagehint=leap-platforms
 
-[Null Starter Virtual Device]
-File=modules/leap/virtual-platform/virtual-devices/devices/starter/null/null-starter-device.awb
-Packagehint=leap
 
 [FPGA Environment/Requires]
 virtual_platform=Standard Virtual Platform
@@ -135,9 +128,6 @@ Packagehint=leap
 [RRR Clients and Servers/Requires]
 rrr_common=RRR Common Module
 
-[SRAM Debugger Application]
-File=modules/apps/debuggers/platform-debugger.awb
-Packagehint=leap-debug
 
 [General LED Device]
 File=modules/bluespec/common/fpgaenv/physical-platform/physical-devices/leds/general-led-device.awb
@@ -189,3 +179,10 @@ physical_platform_defs=Common Physical Platform Definitions
 [Common Physical Platform Definitions]
 File=modules/bluespec/common/fpgaenv/physical-platform/utils/physical-defs.awb
 Packagehint=leap-platforms
+
+[RRR Debug Module]
+File=modules/leap/virtual-platform/rrr/rrr-common/rrr-debug.awb
+Packagehint=leap
+
+[RRR Common Module/Requires]
+rrr_debug=RRR Debug Module
