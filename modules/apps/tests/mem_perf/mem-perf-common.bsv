@@ -30,6 +30,7 @@
 //
 
 import FIFO::*;
+import FIFOLevel::*;
 import Vector::*;
 import GetPut::*;
 import DefaultValue::*;
@@ -45,7 +46,7 @@ import DefaultValue::*;
 `include "awb/provides/mem_perf_common.bsh"
 `include "awb/provides/common_services.bsh"
 `include "awb/provides/scratchpad_memory_common.bsh"
-
+`include "awb/dict/PARAMS_MEM_PERF_COMMON.bsh"
 `include "awb/dict/VDEV_SCRATCH.bsh"
 
 `define START_ADDR 0
@@ -108,8 +109,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     CONNECTION_CHAIN#(CommandType) commandChain <- mkConnectionChain("command");
     CONNECTION_ADDR_RING#(Bit#(8), Bit#(1))     finishChain  <- mkConnectionAddrRingDynNode("finish");
 
-
-    FIFO#(CYCLE_COUNTER) operationStartCycle <- mkSizedFIFO(256);
+    FIFOCountIfc#(CYCLE_COUNTER,256) operationStartCycle <- mkFIFOCount();
     FIFO#(Bool)          operationIsLast     <- mkSizedFIFO(256);
     Reg#(Bool)           reqsDone <- mkReg(False);
     Reg#(STATE)          state <- mkReg(STATE_get_command);
@@ -123,6 +123,11 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     FIFO#(MEM_DATA) expected <- mkSizedBRAMFIFO(256);
     Reg#(MEM_ADDRESS) stride <- mkRegU();
     Reg#(MEM_ADDRESS) bound  <- mkRegU();
+
+    // Dynamic Parameter
+    // Dynamic parameters
+    PARAMETER_NODE paramNode         <- mkDynamicParameterNode();
+    Param#(9) maxOutstanding         <- mkDynamicParameter(`PARAMS_MEM_PERF_COMMON_MEM_TEST_OUTSTANDING_REQUESTS, paramNode);
 
     // Debugging
     DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
@@ -186,7 +191,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
         stdio.printf(perfMsg, list6(fromInteger(scratchpadID),
                                     zeroExtend(pack(bound)), 
                                     zeroExtend(pack(stride)), 
-                                    0, 
+                                    totalLatency, 
                                     zeroExtend(pack(endCycle - startCycle)), 
                                     zeroExtend(pack(errors))));
         state <= STATE_test_done1;
@@ -206,7 +211,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     rule doWrite(state == STATE_writing);
         memory.write(addr, zeroExtend(addrMix(addr)));
             
-        debugLog.record($format("doWrite: addr = 0x%x, val = 0x%X", addr, addrMix(addr)));
+        debugLog.record($format("doWrite (%d): addr = 0x%x, val = 0x%X", cycle, addr, addrMix(addr)));
 
         if(addr + stride < bound * stride)
         begin
@@ -225,10 +230,10 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
         end
     endrule
 
-    rule readReq (state == STATE_reading && !reqsDone);
+    rule readReq (state == STATE_reading && !reqsDone && (operationStartCycle.count() < unpack(maxOutstanding)));
         memory.readReq(addr);
         
-        debugLog.record($format("readReq: addr = 0x%x", addr));
+        debugLog.record($format("readReq (%d): addr = 0x%x", cycle, addr));
         
         if(addr + stride < bound * stride)
         begin
@@ -261,8 +266,8 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
             errors <= errors + 1;
         end
             
-        debugLog.record($format("readResp: %s val = 0x%x, expected = 0x%x", 
-                        (resp != expected.first())? "ERROR!" : "", resp, expected.first()));
+        debugLog.record($format("readResp(%d, latency %d): %s val = 0x%x, expected = 0x%x", cycle, 
+                         cycle - operationStartCycle.first, (resp != expected.first())? "ERROR!" : "", resp, expected.first()));
 
         expected.deq();
         operationIsLast.deq;

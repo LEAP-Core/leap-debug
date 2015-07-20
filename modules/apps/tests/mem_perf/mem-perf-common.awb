@@ -15,6 +15,9 @@
 %param MEM_TEST_VERBOSE 0  "Should we test the second scratchpad"
 %param MEM_TEST_SHIFT 30  "How large should the private region address offset be?"
 
+%param --dynamic MEM_TEST_OUTSTANDING_REQUESTS  256 "Maximum number of outstanding requests"
+
+
 
 
 
