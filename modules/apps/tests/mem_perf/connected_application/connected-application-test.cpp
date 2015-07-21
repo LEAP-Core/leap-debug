@@ -42,12 +42,7 @@ CONNECTED_APPLICATION_CLASS::Main()
     cout << "Warmup" << endl;
     clientStub->RunTest(1, 1, 1, 1);
 
-    uint32_t iterations = 1 << 14;
-    if (SYNTH)
-    {
-        // Run longer on the FPGA than in simulation
-        iterations <<= 14;
-    }
+    uint32_t iterations = 1 << MEM_PERF_ITERATIONS;
 
     //
     // Software controls the order of tests.  NOTE:  Writes for a given pattern
