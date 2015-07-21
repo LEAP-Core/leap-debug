@@ -7,6 +7,7 @@
 
 %public mem-perf-common.bsv
 %public mem-perf-common-coherent.bsv
+%sources -t LOG -v PUBLIC mem-perf-common.log
 
 %param MEM_TEST_ALT 1  "Should we test the second scratchpad"
 %param MEM_WIDTH 64  "Width of scratchpads"
@@ -14,4 +15,4 @@
 %param MEM_TEST_VERBOSE 0  "Should we test the second scratchpad"
 %param MEM_TEST_SHIFT 12  "How large should the private region address offset be?"
 
-
+%param --dynamic MEM_TEST_OUTSTANDING_REQUESTS  256 "Maximum number of outstanding requests"
