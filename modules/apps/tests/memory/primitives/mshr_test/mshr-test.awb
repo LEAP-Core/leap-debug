@@ -1,0 +1,7 @@
+%name MSHR Test System
+%desc MSHR Test System
+
+%provides hardware_system
+
+%public mshr-test.bsv
+
