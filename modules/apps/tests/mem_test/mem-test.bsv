@@ -89,14 +89,22 @@ MEM_DATA_SM
 
 typedef Bit#(13) MEM_ADDRESS;
 
+//
+// Tests based on the word sized, checking various container sizes.  At
+// some point the native word size gets ridiculous and doesn't meet timing.
+// Limit the tested base word size to 64 bits.
+//
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ),
 
+              // Limit testing to 64 bit words
+              NumAlias#(TMin#(64, t_SCRATCHPAD_MEM_VALUE_SZ), t_SCRATCHPAD_MEM_TEST_SZ),
+
               // Large data (multiple containers for single datum)
-              Alias#(Int#(TAdd#(t_SCRATCHPAD_MEM_VALUE_SZ, 1)), t_MEM_DATA_LG),
+              Alias#(Int#(TAdd#(t_SCRATCHPAD_MEM_TEST_SZ, 1)), t_MEM_DATA_LG),
 
               // Medium data (same container size as data)
-              Alias#(Bit#(TSub#(t_SCRATCHPAD_MEM_VALUE_SZ, 1)), t_MEM_DATA_MD),
+              Alias#(Bit#(TSub#(t_SCRATCHPAD_MEM_TEST_SZ, 1)), t_MEM_DATA_MD),
 
               // Small data (multiple data per container)
               Alias#(MEM_DATA_SM, t_MEM_DATA_SM));
