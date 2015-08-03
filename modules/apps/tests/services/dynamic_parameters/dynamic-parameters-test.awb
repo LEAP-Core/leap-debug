@@ -1,0 +1,14 @@
+%name User Dynamic Parameters Test
+%desc User Dynamic Parameters Test
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%public  dynamic-parameters-test.bsv
+%public  dynamic-parameters-test.h
+%public  dynamic-parameters-test.cpp
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+
+
