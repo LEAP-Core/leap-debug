@@ -120,6 +120,12 @@ module [CONNECTED_MODULE] mkSystem ();
 
     rule checkTesters(!done);
         Bool passed = all(id, testers);
+
+        if( counter[6:0] == 0 )
+        begin 
+            $display("Test Status: %b", pack(testers));
+        end
+
         if(passed)
         begin             
             $display("Test Passed");
@@ -138,18 +144,13 @@ module [CONNECTED_MODULE] mkSystem ();
             stdio.printf(msgFinish, list1(zeroExtend(pack(testers))));
         end
         
-        if( counter[6:0] == 0 )
-        begin 
-            $display("Test Status: %b", pack(testers));
-        end
-
     endrule
   
 endmodule
 
 module [CONNECTED_MODULE] mkMSHRTester#(t_MSHR_BINS binTypeVar, NumTypeParam#(n_ENTRIES) numMSHREntries, DEBUG_FILE debugLog) (Bool);
 
-    RL_MSHR#(QUEUE_IDX, MSHR_DATA, MSHR_BIN) mshr <- mkMSHR(numMSHREntries, debugLog);
+    RL_MSHR#(QUEUE_IDX, MSHR_DATA, MSHR_BIN, n_ENTRIES) mshr <- mkMSHR(debugLog);
 
     FIFO#(DEQ_STRUCT)                                timerQueue   <- mkSizedFIFO(64);
     Vector#(QUEUES, LFSR#(Bit#(8)))                  timerLFSRs   <- replicateM(mkLFSR_8);
