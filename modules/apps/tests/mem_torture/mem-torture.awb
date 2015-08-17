@@ -1,0 +1,15 @@
+%name Scratchpad Memory Torture Test System
+%desc Scratchpad Memory Torture Test System
+
+%attributes scratchpad_test test
+
+%provides hardware_system
+
+%public mem-torture.bsv
+%public mem-torture.dic
+
+%param --dynamic MEM_TEST_INIT_MODE  0  "0: normal, 1: write zeros, 2: no writes"
+%param --dynamic MEM_TEST_VERBOSE    0  "0: disable, 1: enable verbose output"
+
+%param MEM_TEST_REQUEST_MERGING 0 "ENable (1) / disable (0) scratchpad request merging"
+%param MEM_TEST_PRIVATE_CACHES 1  "Enable (1) / disable (0) private scratchpad caches"

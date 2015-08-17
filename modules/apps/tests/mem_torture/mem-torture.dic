@@ -1,0 +1,5 @@
+// Scratchpads
+def VDEV.CACHE.TORTURE     "torture test central cache port";
+def VDEV.CACHE.TORTURE2     "torture test central cache port 2";
+
+
