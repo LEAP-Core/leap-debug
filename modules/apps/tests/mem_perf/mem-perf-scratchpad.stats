@@ -1,0 +1,6 @@
+LEAP_SCRATCHPAD_3_PLATFORM_0_READ_REQUESTS,"Scratchpad read requests sent to the ring",343588129
+LEAP_SCRATCHPAD_3_PLATFORM_0_RESPONSES,"Scratchpad responses received from the ring",343588129
+LEAP_SCRATCHPAD_3_PLATFORM_0_WRITE_REQUESTS,"Scratchpad write requests sent to the ring",229099985
+
+Scratchpad bandwidth partition: ID: 3, Ratio: 1:1
+
