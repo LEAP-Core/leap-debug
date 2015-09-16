@@ -10,7 +10,8 @@
 %public mem-perf-wrapper.bsv
 %public mem-perf-driver.bsv
 %public mem-perf.rrr
-%public mem-perf-scratchpad.stats
+
+%sources -t SCRATCHPAD_STAT -v PRIVATE mem-perf-scratchpad.stats
 
 %param SYNTH_BOUNDARY mkSystem "name of synthesis boundary"
 
