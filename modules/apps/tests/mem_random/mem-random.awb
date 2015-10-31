@@ -1,0 +1,14 @@
+%name Scratchpad Memory Random Test System
+%desc Scratchpad Memory Random Test System
+
+%attributes scratchpad_test test
+
+%provides hardware_system
+
+%public mem-random.bsv
+%public mem-random.dic
+
+%param --dynamic MEM_TEST_CYCLES  8192  "Number of cycles to run the test"
+
+%param MEM_TEST_REQUEST_MERGING 0 "Enable (1) / disable (0) scratchpad request merging"
+%param MEM_TEST_PRIVATE_CACHES  0 "Enable (1) / disable (0) private scratchpad caches"

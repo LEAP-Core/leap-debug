@@ -147,7 +147,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
 
     // Messages
     let perfMsg <- getGlobalStringUID("Tester%d:size:%llu:stride:%llu:latency:%llu:time:%llu:errors:%llu\n");
-    let errMsg <-  getGlobalStringUID("Tester%d:expected:%llu:got:%llu:Alt\n");	    
+    let errMsg <-  getGlobalStringUID("Tester%d:expected:%llu:got:%llu:Alt\n");
     
     DEBUG_FILE debugLog <- mkDebugFile("mem_tester_"+integerToString(scratchpadID)+".out");
 
@@ -159,7 +159,7 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
     rule doGetCommand (state == STATE_get_command);
         let cmd <- commandChain.recvFromPrev();
         commandChain.sendToNext(cmd);
-	
+
         addr <= privSpace;
         bound <= truncate(cmd.workingSet);
         stride <= truncate(cmd.stride);
@@ -261,8 +261,8 @@ module [CONNECTED_MODULE] mkMemTesterRing#(Integer scratchpadID, Bool addCaches)
         if (resp != expected.first && `MEM_TEST_VERBOSE != 0)
         begin
             stdio.printf(errMsg, list3(fromInteger(scratchpadID),
-                                       zeroExtend(pack(resp)), 
-                                       zeroExtend(pack(expected.first))));
+                                       resize(pack(resp)), 
+                                       resize(pack(expected.first))));
             errors <= errors + 1;
         end
             
