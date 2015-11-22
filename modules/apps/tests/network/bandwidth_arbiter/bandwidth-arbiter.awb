@@ -1,0 +1,7 @@
+%name Bandwidth Arbiter Test System
+%desc Bandwidth Arbiter Test System
+
+%provides hardware_system
+
+%public bandwidth-arbiter.bsv
+
