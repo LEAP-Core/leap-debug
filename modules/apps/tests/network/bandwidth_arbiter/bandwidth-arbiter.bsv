@@ -84,8 +84,6 @@ module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) ra
     provisos(Add#(1, n_RADIX_extra_bits, TMul#(2, TLog#(n_RADIX))),
              Add#(1, n_RADIX_VALUES_extra_bits, TLog#(TAdd#(1, TExp#(TMul#(2, TLog#(n_RADIX)))))));
 
-    messageM("Radix " + integerToString(valueof(n_RADIX)) + " Leaves: " + integerToString(valueof(n_LEAVES)));
-
     // Generate child offsets. 
     Vector#(TAdd#(n_RADIX, 1), Integer) offsets = zipWith( \+ , replicate(offset), map( fromInteger, zipWith( \* , replicate(valueof(n_LEAVES)/valueof(n_RADIX)), genVector)));  
 
@@ -143,8 +141,10 @@ module [CONNECTED_MODULE] mkSystem ();
     Reg#(Bit#(32)) counter     <- mkReg(0);
     Reg#(Bool)     initialized <- mkReg(False); 
 
-    NumTypeParam#(4)  radix  = ?;
-    NumTypeParam#(64) leaves = ?;
+    NumTypeParam#(`ROUTER_RADIX)  radix  = ?;
+    NumTypeParam#(`ROUTER_LEAVES) leaves = ?;
+
+    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
     Vector#(1, Bool) testers <- replicateM(mkTreeTester(radix, leaves, ?));
 
@@ -160,15 +160,10 @@ module [CONNECTED_MODULE] mkSystem ();
     rule checkTesters(!done);
         Bool passed = all(id, testers);
 
-        if( counter[6:0] == 0 )
-        begin 
-            $display("Test Status: %b", pack(testers));
-        end
-
         if(passed)
         begin                        
             $display("Test Passed");
-            $finish;
+            linkStarterFinishRun.send(0);
         end 
 
         if(!passed &&& counter > 20000000) 
@@ -177,10 +172,11 @@ module [CONNECTED_MODULE] mkSystem ();
             $finish;
         end
 
-        if(counter > 20000000)
+        if(counter > 20000000 || passed && !done)
         begin
             done <= True;
             stdio.printf(msgFinish, list1(zeroExtend(pack(testers))));
+
         end
         
     endrule
@@ -194,6 +190,7 @@ endmodule
 //   sends data into the tree as quickly as possible.  It terminates when a hard coded number
 //   of responses have been received.
 // 
+
 module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves, DEBUG_FILE debugLog) (Bool)
     provisos(Add#(address_extra_bits, TLog#(TAdd#(1, n_LEAVES)), 16),
              Add#(1, n_RADIX_extra_bits, TMul#(2, TLog#(n_RADIX))),
@@ -228,7 +225,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
     endrule
 
     rule handleRoot;
-        $display("Handling root message: id %d value %h", routingTree.first.dstNode, routingTree.first.data);
         routingTree.enq(routingTree.first);
         routingTree.deq;
     endrule
@@ -248,7 +244,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
             resultFIFO[i].enq(payload);
             outgoingRequest.send(TREE_MSG{dstNode: fromInteger(i), data: payload});                
             enqLFSRs[i].next();
-            $display("Tree enq child %d data %h", i, payload); 
         endrule
 
         rule treeDeq; 
@@ -270,7 +265,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
         let total = countElem(True, readVReg(dequeued));
  
         deqCount <= deqCount + zeroExtend(pack(total));
-        $display("deqCount: %d", deqCount);
 
         for( Integer i = 0; i < valueof(n_LEAVES); i = i + 1) 
         begin

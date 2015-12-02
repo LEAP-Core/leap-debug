@@ -50,7 +50,10 @@ import LFSR::*;
 typedef Bit#(64) ROUTER_DATA;
 typedef Bit#(64) ROUTER_ADDR;
 
-
+//
+//  mkLeafNode --
+//    Instantiates a leaf node in the router tree. The external interface is 
+//    channel based. 
 module [CONNECTED_MODULE] mkLeafNode#(Integer index) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA));
 
     CONNECTION_RECV#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) incomingRequest <-
@@ -71,6 +74,11 @@ module [CONNECTED_MODULE] mkLeafNode#(Integer index) (CONNECTION_ADDR_TREE#(ROUT
 endmodule
 
 
+// 
+// mkTreeLayer --
+//   Recursively isntatiates a node of the router tree and the subtree associated with the node.
+//   For leaf nodes, a channel-based client is instantiated. 
+//
 module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA));
 
     // Generate child offsets. 
@@ -104,6 +112,11 @@ module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) ra
 
 endmodule  
 
+
+//
+// mkSystem --
+//   Instantiates a set of testbenches and manages them. 
+//
 module [CONNECTED_MODULE] mkSystem ();
 
     let msgFinish     <- getGlobalStringUID("Tests Complete, Pass Vector: %x\n");
@@ -119,6 +132,8 @@ module [CONNECTED_MODULE] mkSystem ();
     NumTypeParam#(`ROUTER_LEAVES) leaves = ?;
 
     Vector#(1, Bool) testers <- replicateM(mkTreeTester(radix, leaves, ?));
+
+    Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
     rule init(!initialized);
         stdio.printf(msgStart,List::nil);
@@ -140,7 +155,7 @@ module [CONNECTED_MODULE] mkSystem ();
         if(passed)
         begin             
             $display("Test Passed");
-            $finish;
+            linkStarterFinishRun.send(0);
         end 
 
         if(!passed &&& counter > 20000000) 
@@ -149,7 +164,7 @@ module [CONNECTED_MODULE] mkSystem ();
             $finish;
         end
 
-        if(counter > 20000000)
+        if(counter > 20000000 || passed && !done)
         begin
             done <= True;
             stdio.printf(msgFinish, list1(zeroExtend(pack(testers))));
@@ -160,13 +175,18 @@ module [CONNECTED_MODULE] mkSystem ();
 endmodule
 
 
-
+//
+// mkTreeTester -- 
+//   Constructs a router tree of the given size, and straps a test bench to it.  The test bench 
+//   sends data into the tree randomly, based on an LFSR.  It terminates when a hard coded number
+//   of responses have been received.
+// 
 module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves, DEBUG_FILE debugLog) (Bool)
     provisos(Add#(address_extra_bits, TLog#(TAdd#(1, n_LEAVES)), 16));
 
     let routingTree <- mkTreeLayer(0, radix, leaves);
 
-    Vector#(n_LEAVES, LFSR#(Bit#(16)))                            enqLFSRs     <- replicateM(mkLFSR_16);
+    Vector#(n_LEAVES, LFSR#(Bit#(32)))                            enqLFSRs     <- replicateM(mkLFSR_32);
     Vector#(n_LEAVES, Wire#(Bool))                                dequeued     <- replicateM(mkDWire(False));
     Vector#(n_LEAVES, FIFO#(ROUTER_DATA))                         resultFIFO   <- replicateM(mkSizedFIFO(1024));
     Reg#(Bool)                                                    initialized  <- mkReg(False);   
@@ -192,7 +212,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
     endrule
 
     rule handleRoot;
-        $display("Handling root message: id %d value %h", routingTree.first.dstNode, routingTree.first.data);
         routingTree.enq(routingTree.first);
         routingTree.deq;
     endrule
@@ -207,14 +226,13 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
 
         let enqSelect = enqLFSRs[i].value();        
         let enqTag = fromInteger(i);   
-        Vector#(8,Bit#(16)) payloadVector = replicate(enqLFSRs[i].value());                 
+        Vector#(8,Bit#(64)) payloadVector = replicate(999999 * signExtend(enqLFSRs[i].value()));                 
         ROUTER_DATA payload = truncateNP(pack(payloadVector));
 
         rule treeEnq (enqSelect == enqTag && initialized && !done);               
             resultFIFO[i].enq(payload);
             outgoingRequest.send(TREE_MSG{dstNode: fromInteger(i), data: payload});                
             enqLFSRs[i].next();
-            $display("Tree enq child %d data %h", i, payload); 
         endrule
 
         rule advanceLFSR (enqSelect != enqTag && initialized && !done);
@@ -240,8 +258,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
         let total = countElem(True, readVReg(dequeued));
  
         deqCount <= deqCount + zeroExtend(pack(total));
-
-        $display("DeqCount: %d", deqCount);
 
         if(deqCount > 5000) 
         begin

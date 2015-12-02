@@ -3,5 +3,8 @@
 
 %provides hardware_system
 
+%param ROUTER_RADIX  4  "Radix of tree routers"
+%param ROUTER_LEAVES  64  "Leaves of tree routers"
+
 %public bandwidth-arbiter.bsv
 
