@@ -88,7 +88,9 @@ typedef Bit#(64) CYCLE_COUNTER;
 // testing system features such as page-based virtual to physical translation
 // where a large number of pages have to be touched.
 //
-typedef Bit#(28) SCRATCH_ADDRESS;
+// The large address space is enabled when MEM_TEST_HUGE_ADDR is non-zero.
+//
+typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 28, 13)) SCRATCH_ADDRESS;
 typedef Bit#(13) MEM_ADDRESS;
 
 module [CONNECTED_MODULE] mkSystem ()
