@@ -31,6 +31,7 @@
 
 import FIFO::*;
 import FIFOF::*;
+import Vector::*;
 import LFSR::*;
 import ConfigReg::*;
 import DefaultValue::*;
@@ -90,7 +91,7 @@ typedef Bit#(64) CYCLE_COUNTER;
 //
 // The large address space is enabled when MEM_TEST_HUGE_ADDR is non-zero.
 //
-typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 28, 13)) SCRATCH_ADDRESS;
+typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 25, 15)) SCRATCH_ADDRESS;
 typedef Bit#(13) MEM_ADDRESS;
 
 module [CONNECTED_MODULE] mkSystem ()
@@ -234,6 +235,25 @@ module [CONNECTED_MODULE] mkSystem ()
 
     // ====================================================================
     //
+    // Generate a line of data given a random number.
+    //
+    // ====================================================================
+
+    function SCRATCHPAD_MEM_VALUE testValue(Bit#(32) rnd)
+        provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
+
+        // Spread 32 bit value around a larger scratchpad value
+        Vector#(8, Bit#(TDiv#(t_SCRATCHPAD_MEM_VALUE_SZ, 8))) v;
+        for (Integer i = 0; i < 8; i = i + 1)
+        begin
+            v[i] = zeroExtend(rotateBitsBy(rnd, fromInteger(i)));
+        end
+        return pack(v);
+    endfunction
+
+
+    // ====================================================================
+    //
     // Test memory (BRAM) for comparing against system memory.
     //
     // ====================================================================
@@ -263,7 +283,7 @@ module [CONNECTED_MODULE] mkSystem ()
         let v = lfsrWrD.value;
 
         nWrites <= nWrites + 1;
-        memory.write(s_addr, zeroExtend(v));
+        memory.write(s_addr, testValue(v));
         bram.write(m_addr, v);
 
         debugLog.record($format("write: addr 0x%x, data 0x%x", s_addr, v));
@@ -299,11 +319,11 @@ module [CONNECTED_MODULE] mkSystem ()
         let check = bramRdFIFO.first();
         bramRdFIFO.deq();
 
-        if (truncate(v) != check)
+        if (v != testValue(check))
         begin
             nErrors <= nErrors + 1;
 
-            debugLog.record($format("ERROR: Read 0x%x, expected 0x%x", v[31:0], check));
+            debugLog.record($format("ERROR: Read 0x%x\n    expected 0x%x", v, testValue(check)));
             stdio.printf(msgError, list(zeroExtend(v[31:0]), zeroExtend(check)));
         end
 
