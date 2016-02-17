@@ -91,7 +91,7 @@ typedef Bit#(64) CYCLE_COUNTER;
 //
 // The large address space is enabled when MEM_TEST_HUGE_ADDR is non-zero.
 //
-typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 25, 15)) SCRATCH_ADDRESS;
+typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 25, 13)) SCRATCH_ADDRESS;
 typedef Bit#(13) MEM_ADDRESS;
 
 module [CONNECTED_MODULE] mkSystem ()
