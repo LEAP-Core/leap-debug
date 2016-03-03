@@ -50,36 +50,12 @@ import LFSR::*;
 typedef Bit#(64) ROUTER_DATA;
 typedef Bit#(64) ROUTER_ADDR;
 
-//
-//  mkLeafNode --
-//    Instantiates a leaf node in the router tree. The external interface is 
-//    channel based. 
-module [CONNECTED_MODULE] mkLeafNode#(Integer index) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA));
-
-    CONNECTION_RECV#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) incomingRequest <-
-        mkConnectionRecv("TREE_NODE_IN_" + integerToString(index));
-
-    CONNECTION_SEND#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) outgoingRequest <-
-        mkConnectionSend("TREE_NODE_OUT_" + integerToString(index));
-    
-    // Outgoing portion of the network
-    method enq = outgoingRequest.send;
-    method notFull = outgoingRequest.notFull;
-
-    // Incoming portion
-    method first = incomingRequest.receive;
-    method deq = incomingRequest.deq;
-    method notEmpty = incomingRequest.notEmpty;
-
-endmodule
-
-
 // 
 // mkTreeLayer --
 //   Recursively isntatiates a node of the router tree and the subtree associated with the node.
 //   For leaf nodes, a channel-based client is instantiated. 
 //
-module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA));
+module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA));
 
     // Generate child offsets. 
     Vector#(TAdd#(n_RADIX, 1), Integer) offsets = zipWith( \+ , replicate(offset), map( fromInteger, zipWith( \* , replicate(valueof(n_LEAVES)/valueof(n_RADIX)), genVector)));  
@@ -92,10 +68,10 @@ module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) ra
 
         messageM("Building tree layer: offset " + integerToString(offset) + " radix " + integerToString(valueof(n_RADIX)) + " leaves " + integerToString(valueof(n_LEAVES)));
         NumTypeParam#(TDiv#(n_LEAVES, n_RADIX)) childLeaves = ?;
-        List#(CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA)) children <- List::zipWith3M(mkTreeLayer, List::take(valueof(n_RADIX) ,toList(offsets)), List::replicate(valueof(n_RADIX), radix), List::replicate(valueof(n_RADIX), childLeaves));
+        List#(CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA)) children <- List::zipWith3M(mkTreeLayer, List::take(valueof(n_RADIX) ,toList(offsets)), List::replicate(valueof(n_RADIX), radix), List::replicate(valueof(n_RADIX), childLeaves));
 
         // Having constructed the children, we can construct the parent. 
-        CONNECTION_ADDR_TREE#(ROUTER_ADDR, ROUTER_DATA) parent <- mkTreeRouter(toVector(children), map(fromInteger, offsets), mkLocalArbiterBandwidth(replicate(3'd4)));
+        CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA) parent <- mkTreeRouter(toVector(children), map(fromInteger, offsets), mkLocalArbiterBandwidth(replicate(3'd4)));
  
         rootIfc = parent;
 
@@ -104,7 +80,7 @@ module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) ra
     begin 
 
         messageM("Building tree leaf: offset " + integerToString(offset) + " radix " + integerToString(valueof(n_RADIX)) + " leaves " + integerToString(valueof(n_LEAVES)));
-        rootIfc <- mkLeafNode(offset); 
+        rootIfc <- mkTreeLeafNode("TEST", offset); 
 
     end
 
@@ -127,11 +103,17 @@ module [CONNECTED_MODULE] mkSystem ();
     Reg#(Bit#(32)) counter     <- mkReg(0);
     Reg#(Bool)     initialized <- mkReg(False); 
 
+    function ActionValue#(Bool) doCurryTester(mFunction, id);
+        actionvalue
+            NumTypeParam#(`ROUTER_RADIX)  radix  = ?;
+            NumTypeParam#(`ROUTER_LEAVES) leaves = ?;
+            DEBUG_FILE debugFile <- mkDebugFile("tree_tester_" + integerToString(id) + ".out");
+            let m <- mFunction(radix, leaves, debugFile);
+            return m;
+        endactionvalue
+    endfunction
 
-    NumTypeParam#(`ROUTER_RADIX)  radix  = ?;
-    NumTypeParam#(`ROUTER_LEAVES) leaves = ?;
-
-    Vector#(1, Bool) testers <- replicateM(mkTreeTester(radix, leaves, ?));
+    Vector#(1, Bool) testers <- zipWithM(doCurryTester, replicate(mkTreeTester), genVector());
 
     Connection_Send#(Bit#(8)) linkStarterFinishRun <- mkConnectionSend("vdev_starter_finish_run");
 
@@ -146,12 +128,7 @@ module [CONNECTED_MODULE] mkSystem ();
 
     rule checkTesters(!done);
         Bool passed = all(id, testers);
-
-        if( counter[6:0] == 0 )
-        begin 
-            $display("Test Status: %b", pack(testers));
-        end
-
+        
         if(passed)
         begin             
             $display("Test Passed");
@@ -212,7 +189,8 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
     endrule
 
     rule handleRoot;
-        routingTree.enq(routingTree.first);
+        match {.dest, .data} = routingTree.first();
+        routingTree.enq(TREE_MSG{dstNode: dest, data: data});
         routingTree.deq;
     endrule
 
@@ -220,19 +198,21 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
     for( Integer i = 0; i < valueof(n_LEAVES); i = i + 1) 
     begin
 
-        CONNECTION_RECV#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) incomingResponse <- mkConnectionRecv("TREE_NODE_OUT_" + integerToString(i));
+        CONNECTION_RECV#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) incomingResponse <- mkConnectionRecv("TEST_TREE_NODE_OUT_" + integerToString(i));
 
-        CONNECTION_SEND#(TREE_MSG#(ROUTER_ADDR, ROUTER_DATA)) outgoingRequest <- mkConnectionSend("TREE_NODE_IN_" + integerToString(i));
+        CONNECTION_SEND#(Tuple2#(ROUTER_ADDR, ROUTER_DATA)) outgoingRequest <- mkConnectionSend("TEST_TREE_NODE_IN_" + integerToString(i));
 
-        let enqSelect = enqLFSRs[i].value();        
+        //let enqSelect = enqLFSRs[i].value();        
+        Bit#(10) enqSelect = truncate(enqLFSRs[i].value());        
         let enqTag = fromInteger(i);   
         Vector#(8,Bit#(64)) payloadVector = replicate(999999 * signExtend(enqLFSRs[i].value()));                 
         ROUTER_DATA payload = truncateNP(pack(payloadVector));
 
         rule treeEnq (enqSelect == enqTag && initialized && !done);               
             resultFIFO[i].enq(payload);
-            outgoingRequest.send(TREE_MSG{dstNode: fromInteger(i), data: payload});                
+            outgoingRequest.send(tuple2(fromInteger(i),payload));                
             enqLFSRs[i].next();
+            debugLog.record($format("treeEnq: node_id=%0d, data=0x%x", fromInteger(i), payload));
         endrule
 
         rule advanceLFSR (enqSelect != enqTag && initialized && !done);
@@ -248,6 +228,8 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
                 $finish;
             end
             dequeued[i] <= True;
+            debugLog.record($format("treeDeq: node_id=%0d, data=0x%x (%0d), expected=0x%x", 
+                            fromInteger(i), incomingResponse.receive.data, incomingResponse.receive.dstNode, resultFIFO[i].first));
         endrule
 
     end
@@ -258,6 +240,11 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
         let total = countElem(True, readVReg(dequeued));
  
         deqCount <= deqCount + zeroExtend(pack(total));
+       
+        if (pack(total) != 0)
+        begin
+            debugLog.record($format("deqCount: old=%0d, add=%0d", deqCount, pack(total)));
+        end
 
         if(deqCount > 5000) 
         begin
