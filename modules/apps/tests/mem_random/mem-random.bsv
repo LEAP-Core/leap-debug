@@ -91,8 +91,10 @@ typedef Bit#(64) CYCLE_COUNTER;
 //
 // The large address space is enabled when MEM_TEST_HUGE_ADDR is non-zero.
 //
-typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 25, 13)) SCRATCH_ADDRESS;
-typedef Bit#(13) MEM_ADDRESS;
+typedef Bit#(TSelect#(`MEM_TEST_HUGE_ADDR, 25, 15)) SCRATCH_ADDRESS;
+typedef Bit#(15) MEM_ADDRESS;
+
+typedef 1024 BRAM_FIFO_SIZE;
 
 module [CONNECTED_MODULE] mkSystem ()
     provisos (Bits#(SCRATCHPAD_MEM_VALUE, t_SCRATCHPAD_MEM_VALUE_SZ));
@@ -104,6 +106,7 @@ module [CONNECTED_MODULE] mkSystem ()
     // Allocate scratchpad
     //
     SCRATCHPAD_CONFIG sconf = defaultValue;
+    sconf.deepMemoryPipelines = True;
     sconf.requestMerging = (`MEM_TEST_REQUEST_MERGING != 0);
     sconf.cacheMode = (`MEM_TEST_PRIVATE_CACHES != 0 ? SCRATCHPAD_CACHED :
                                                        SCRATCHPAD_NO_PVT_CACHE);
@@ -148,7 +151,8 @@ module [CONNECTED_MODULE] mkSystem ()
     // ====================================================================
 
     let msgStart <- getGlobalStringUID("memtest: starting\n");
-    let msgError <- getGlobalStringUID("ERROR: Read 0x%08x, expected 0x%08x\n");
+    let msgError <- getGlobalStringUID("ERROR (%d): Read 0x%08x, expected 0x%08x\n");
+    let msgOk <- getGlobalStringUID("OK (%d): expected 0x%08x\n");
     let msgDone <- getGlobalStringUID("memtest: done\n");
     let msgReadsDone <- getGlobalStringUID("memtest: all reads done\n");
     let msgStatus <- getGlobalStringUID("Completed %lld read req, %lld read rsp, %lld writes, %lld errors\n");
@@ -162,11 +166,6 @@ module [CONNECTED_MODULE] mkSystem ()
     (* fire_when_enabled *)
     rule cycleCount (state != STATE_init);
         cycle <= cycle + 1;
-
-        lfsrRdA.next();
-
-        lfsrWrA.next();
-        lfsrWrD.next();
     endrule
 
 
@@ -262,7 +261,8 @@ module [CONNECTED_MODULE] mkSystem ()
 
     // Buffer BRAM read responses in a big FIFO so reads can have latency
     // like host memory.
-    FIFOF#(Bit#(32)) bramRdFIFO <- mkSizedBRAMFIFOF(512);
+    FIFOF#(Bit#(32)) bramRdFIFO <- mkSizedBRAMFIFOF(valueOf(BRAM_FIFO_SIZE));
+    COUNTER#(TLog#(BRAM_FIFO_SIZE)) bramRdFIFOCnt <- mkLCounter(0);
 
     rule bramReadBuffer (True);
         let v <- bram.readRsp();
@@ -272,62 +272,94 @@ module [CONNECTED_MODULE] mkSystem ()
 
     // ====================================================================
     //
-    // Write values into memory
+    // Read and write values into memory
     //
     // ====================================================================
 
-    rule doWrite (state == STATE_run);
-        MEM_ADDRESS m_addr = truncate(lfsrWrA.value);
+    Reg#(Bit#(16)) cntRdReq <- mkReg(0);
 
-        let s_addr = testAddrToScratchAddr(m_addr);
-        let v = lfsrWrD.value;
+    rule doMemReq ((state == STATE_run) && (bramRdFIFOCnt.value() != maxBound));
+        MEM_ADDRESS w_m_addr = truncate(lfsrWrA.value);
+
+        let w_s_addr = testAddrToScratchAddr(w_m_addr);
+        let w_v = lfsrWrD.value;
+        lfsrWrA.next();
+        lfsrWrD.next();
 
         nWrites <= nWrites + 1;
-        memory.write(s_addr, testValue(v));
-        bram.write(m_addr, v);
+        memory.write(w_s_addr, testValue(w_v));
+        bram.write(w_m_addr, w_v);
 
-        debugLog.record($format("write: addr 0x%x, data 0x%x", s_addr, v));
-    endrule
-    
+        debugLog.record($format("write: addr 0x%x, data 0x%x", w_s_addr, w_v));
 
-    // ====================================================================
-    //
-    // Read from memory
-    //
-    // ====================================================================
-
-    rule doReadReq (state == STATE_run);
         MEM_ADDRESS m_addr = truncate(lfsrRdA.value);
+        lfsrRdA.next();
 
         let s_addr = testAddrToScratchAddr(m_addr);
 
         nReadReqs <= nReadReqs + 1;
         memory.readReq(s_addr);
         bram.readReq(m_addr);
+        bramRdFIFOCnt.up();
+        cntRdReq <= cntRdReq + 1;
 
-        debugLog.record($format("read req: addr 0x%x", s_addr));
+        debugLog.record($format("read req (%0d): addr 0x%x", cntRdReq, s_addr));
     endrule
     
-    (* descending_urgency = "doInit, doReadRsp" *)
-    (* descending_urgency = "sendDone, doReadRsp" *)
-    (* descending_urgency = "printStatus, doReadRsp" *)
-    (* descending_urgency = "doReadRsp, waitForReads" *)
-    rule doReadRsp (True);
-        let v <- memory.readRsp();
-        nReadRsps <= nReadRsps + 1;
+    //
+    // Pipeline memory read response consumption and value checking.
+    //
+    FIFO#(Tuple2#(SCRATCHPAD_MEM_VALUE, Bit#(32))) rdRsp0Q <- mkFIFO();
+    FIFO#(Tuple3#(SCRATCHPAD_MEM_VALUE, Bit#(32), Bool)) rdRsp1Q <- mkFIFO();
 
-        let check = bramRdFIFO.first();
+    rule doReadRsp0 (True);
+        let v <- memory.readRsp();
+
+        let check_v = bramRdFIFO.first();
         bramRdFIFO.deq();
 
-        if (v != testValue(check))
+        rdRsp0Q.enq(tuple2(v, check_v));
+    endrule
+
+    rule doReadRsp1 (True);
+        match {.v, .check_v} = rdRsp0Q.first();
+        rdRsp0Q.deq();
+
+        let ok = (v == testValue(check_v));
+
+        rdRsp1Q.enq(tuple3(v, check_v, ok));
+    endrule
+
+    Reg#(Bit#(16)) cnt <- mkReg(0);
+
+    (* descending_urgency = "doInit, doReadRsp2" *)
+    (* descending_urgency = "sendDone, doReadRsp2" *)
+    (* descending_urgency = "printStatus, doReadRsp2" *)
+    (* descending_urgency = "doReadRsp2, waitForReads" *)
+    rule doReadRsp2 (True);
+        match {.v, .check_v, .ok} = rdRsp1Q.first();
+        rdRsp1Q.deq();
+
+        nReadRsps <= nReadRsps + 1;
+
+        bramRdFIFOCnt.down();
+
+        if (! ok)
         begin
             nErrors <= nErrors + 1;
 
-            debugLog.record($format("ERROR: Read 0x%x\n    expected 0x%x", v, testValue(check)));
-            stdio.printf(msgError, list(zeroExtend(v[31:0]), zeroExtend(check)));
+            debugLog.record($format("ERROR: Read (%0d) 0x%x\n    expected 0x%x", cnt, v, testValue(check_v)));
+            stdio.printf(msgError, list(zeroExtend(cnt), zeroExtend(v[31:0]), zeroExtend(check_v)));
+        end
+        else
+        begin
+            debugLog.record($format("OK: Read (%0d) 0x%x\n    expected 0x%x", cnt, v, testValue(check_v)));
+//            stdio.printf(msgOk, list(zeroExtend(cnt), zeroExtend(v[31:0])));
         end
 
-        debugLog.record($format("read rsp: data 0x%x", v[31:0]));
+        cnt <= cnt + 1;
+
+        debugLog.record($format("read rsp (%0d): data 0x%x", cnt, v[31:0]));
     endrule
 
 endmodule
