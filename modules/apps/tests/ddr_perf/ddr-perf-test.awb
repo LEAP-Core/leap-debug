@@ -1,0 +1,20 @@
+%name DDR Performance Test
+%desc DDR Performance Test
+
+%attributes ddr_perf test
+
+%provides hardware_system
+
+%public ddr-perf-test.bsv
+%public ddr-perf-local-mem.bsv
+
+%param --dynamic DDR_PERF_VERBOSE                       0   "0: disable, 1: enable verbose output"
+%param --dynamic DDR_PERF_WORKING_SET_SIZE_LOG         29   "Testing ddr address space size in log"
+%param --dynamic DDR_PERF_TEST_NUM_LOG                 29   "Number of test operations in log"
+%param --dynamic DDR_PERF_MAX_OUTSTANDING_READS        64   "Maximum number of outstanding read requests"
+%param --dynamic DDR_PERF_ADDR_MASK_MODE                0   "0: using low-order bits, 1: using both low-order and high-order bits"
+
+%param LOCAL_MEM_DDR_SLOW_MODEL_EN                      0   "Enable modeling slow DDR memory"
+%param --dynamic LOCAL_MEM_DDR_MIN_LATENCY             35   "Local memory DDR minimum latency"
+%param --dynamic LOCAL_MEM_DDR_BANDWIDTH_LIMIT         49   "Maximum number of serving requests per 128 cycles"
+

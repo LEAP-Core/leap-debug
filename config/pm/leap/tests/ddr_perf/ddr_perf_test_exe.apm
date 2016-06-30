@@ -1,0 +1,54 @@
+
+[Global]
+SaveParameters=0
+Description=VC709 DRAM Performance Simulation Test
+File=ddr_perf_test_exe
+Version=2.2
+Name=VC709 DRAM Performance Simulation Test
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=hybrid bluespec
+model=HW/SW Hybrid Pipeline Build
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid Simulation FPGA Environment - No Memory
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Default Software Connected Application
+
+[Default Software Connected Application/Requires]
+hardware_system=DDR Performance Test
+
+[DDR Performance Test]
+File=modules/apps/tests/ddr_perf/ddr-perf-test.awb
+Packagehint=leap-debug
+
+[Default Software Connected Application]
+Packagehint=leap
+File=modules/leap/build-support/project/application-env/soft-services/default-sw/connected-application-default-sw.awb
+
+
+
+[Hybrid Simulation FPGA Environment - No Memory]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe-no-memory.apm
+Packagehint=leap
