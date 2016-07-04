@@ -50,10 +50,8 @@ module [CONNECTED_MODULE] mkConnectedApplication
 
     let testNodeDump <- getGlobalStringUID("TestNode is 0x%x\n");
 
-    let testNodeName <- getGlobalStringUID("TestNode");
-
     PARAMETER_NODE paramNode         <- mkDynamicParameterNode();
-    Param#(32)     testNode          <- mkDynamicParameterFromString(testNodeName, paramNode);
+    Param#(32)     testNode          <- mkDynamicParameterFromStringInitialized("TestNode", 32'hdeadbeef, paramNode);
     Reg#(Bool)     done              <- mkReg(False);
 
 
