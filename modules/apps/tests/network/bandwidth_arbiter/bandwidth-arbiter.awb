@@ -2,9 +2,11 @@
 %desc Bandwidth Arbiter Test System
 
 %provides hardware_system
+%requires routing_tree
 
 %param ROUTER_RADIX  4  "Radix of tree routers"
 %param ROUTER_LEAVES  64  "Leaves of tree routers"
+%param ROUTER_WIDTH  64  "Width of tree routers"
 
 %public bandwidth-arbiter.bsv
 

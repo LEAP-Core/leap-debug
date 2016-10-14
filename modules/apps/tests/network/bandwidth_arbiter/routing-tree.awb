@@ -1,0 +1,9 @@
+%name Bandwidth Routing Tree 
+%desc Bandwidth Routing Tree
+
+%provides routing_tree
+
+%public routing-tree.bsv
+
+%param SYNTH_BOUNDARY mkRouter "name of synthesis boundary"
+

@@ -2,7 +2,7 @@
 [Global]
 SaveParameters=0
 Description=Hybrid MSHR Test Model
-File=bandwidth_router_hybrid_exe
+File=bandwidth_router_hybrid_vc709
 Version=2.2
 Name=Hybrid MSHR Test Model
 DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
@@ -23,10 +23,6 @@ Packagehint=leap
 [Default Software Connected Application/Requires]
 hardware_system=Bandwidth Arbiter Test System
 
-[Hybrid Simulation FPGA Environment]
-File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
-Packagehint=leap
-
 [Default Hybrid Project Common Utilities]
 File=config/pm/leap/submodels/common/project-common-default.apm
 Packagehint=leap
@@ -37,7 +33,7 @@ Packagehint=leap
 
 [HW/SW Hybrid Pipeline Build/Requires]
 project_common=Default Hybrid Project Common Utilities
-fpgaenv=Hybrid Simulation FPGA Environment
+fpgaenv=Hybrid VC709 PCIE FPGA Environment (Vivado)
 application_env=Soft Services Hybrid Application Environment
 
 [Soft Services Hybrid Application Environment]
@@ -52,10 +48,15 @@ File=modules/apps/tests/network/bandwidth_arbiter/bandwidth-arbiter.awb
 Packagehint=leap-debug
 
 [Bandwidth Arbiter Test System/Params]
-ROUTER_RADIX=2
+ROUTER_RADIX=16
 ROUTER_LEAVES=16
+ROUTER_WIDTH=57
 
-[Hybrid Simulation FPGA Environment/Params]
+[Hybrid VC709 PCIE FPGA Environment (Vivado)]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-vc709-pcie-vivado.apm
+Packagehint=leap
+
+[Hybrid VC709 PCIE FPGA Environment (Vivado)/Params]
 MODEL_CLOCK_FREQ=100
 
 [Bandwidth Arbiter Test System/Requires]

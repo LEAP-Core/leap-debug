@@ -47,60 +47,9 @@ import LFSR::*;
 `include "asim/provides/soft_services_deps.bsh"
 `include "asim/provides/common_services.bsh"
 
-typedef Bit#(64) ROUTER_DATA;
-typedef Bit#(64) ROUTER_ADDR;
+typedef Bit#(`ROUTER_WIDTH) ROUTER_DATA;
+typedef Bit#(`ROUTER_WIDTH) ROUTER_ADDR;
 
-
-// 
-// mkTreeLayer --
-//   Recursively isntatiates a node of the router tree and the subtree associated with the node.
-//   For leaf nodes, a channel-based client is instantiated. 
-//
-module [CONNECTED_MODULE] mkTreeLayer#(Integer offset, NumTypeParam#(n_RADIX) radix, NumTypeParam#(n_LEAVES) leaves) (CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA))
-    provisos(Add#(1, n_RADIX_extra_bits, TMul#(2, TLog#(n_RADIX))),
-             Add#(1, n_RADIX_VALUES_extra_bits, TLog#(TAdd#(1, TExp#(TMul#(2, TLog#(n_RADIX)))))));
-
-    // Generate child offsets. 
-    Vector#(TAdd#(n_RADIX, 1), Integer) offsets = zipWith( \+ , replicate(offset), map( fromInteger, zipWith( \* , replicate(valueof(n_LEAVES)/valueof(n_RADIX)), genVector)));  
-
-    let rootIfc = ?;
-
-    // Build the child nodes.
-    if (valueof(n_LEAVES) > 1)
-    begin
-
-        NumTypeParam#(TDiv#(n_LEAVES, n_RADIX)) childLeaves = ?;
-        List#(CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA)) children <- List::zipWith3M(mkTreeLayer, List::take(valueof(n_RADIX) ,toList(offsets)), List::replicate(valueof(n_RADIX), radix), List::replicate(valueof(n_RADIX), childLeaves));
-
-        // This function will generate a priority series for the router bandwidth allocation. It proceeds 0/2^n,1/2^n,2/2^n,4/2^n,....
-        function UInt#(TMul#(2,TLog#(n_RADIX))) genFrac(Integer index);
-            let frac = 0;
-
-            if(index > 0)
-            begin
-                frac = (1 << (fromInteger(index) - 1));                
-            end
-            
-            return frac;
-        endfunction
-
-        // Having constructed the children, we can construct the parent. 
-        CONNECTION_ADDR_TREE#(ROUTER_ADDR, Tuple2#(ROUTER_ADDR, ROUTER_DATA), ROUTER_DATA) parent <- mkTreeRouter(toVector(children), map(fromInteger, offsets), mkLocalArbiterBandwidth(genWith(genFrac)));
-         
-        rootIfc = parent;
-
-    end
-    else
-    begin 
-
-        messageM("Building tree leaf: offset " + integerToString(offset) + " radix " + integerToString(valueof(n_RADIX)) + " leaves " + integerToString(valueof(n_LEAVES)));
-        rootIfc <- mkTreeLeafNode("TEST", offset); 
-
-    end
-
-    return rootIfc;
-
-endmodule  
 
 
 //
@@ -172,8 +121,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
              Add#(1, n_RADIX_extra_bits, TMul#(2, TLog#(n_RADIX))),
              Add#(1, n_RADIX_VALUES_extra_bits, TLog#(TAdd#(1, TExp#(TMul#(2, TLog#(n_RADIX)))))));
 
-    let routingTree <- mkTreeLayer(0, radix, leaves);
-
     Vector#(n_LEAVES, LFSR#(Bit#(16)))                            enqLFSRs     <- replicateM(mkLFSR_16);
     Vector#(n_LEAVES, Wire#(Bool))                                dequeued     <- replicateM(mkDWire(False));
     Vector#(n_LEAVES, FIFO#(ROUTER_DATA))                         resultFIFO   <- replicateM(mkSizedFIFO(1024));
@@ -198,12 +145,6 @@ module [CONNECTED_MODULE] mkTreeTester#(NumTypeParam#(n_RADIX) radix, NumTypePar
 
     rule incrCounter;
         counter <= counter + 1;
-    endrule
-
-    rule handleRoot;
-        match {.dest, .data} = routingTree.first();
-        routingTree.enq(TREE_MSG{dstNode: dest, data: data});
-        routingTree.deq;
     endrule
 
 
